@@ -51,13 +51,36 @@ def test_semantics() -> None:
         ("玉山金完成填息", "bull", "填息是利多、貼息是利空"),
         ("國泰金貼息 股價走弱", "bear", "貼息是利空"),
         ("台積電11月營收年增28% 創同期新高", "bull", "營收年增＋創同期新高"),
-        ("聯詠11月營收年減15% 需求疲弱", "bear", "營收年減＋需求疲弱"),
+        ("聯電11月營收年減15% 需求疲弱", "bear", "營收年減＋需求疲弱"),
     ]
     for title, want, why in cases:
         got = analyze.analyze_article(make(title))
         check(got["sentiment_key"] == want,
               f"語意判讀錯誤：〈{title}〉期望 {want}，實得 {got['sentiment_key']}"
               f"（情緒 {got['sentiment']:+d}）—— {why}")
+
+
+def test_negators_do_not_misfire() -> None:
+    """反轉詞不可以在「無塵室」「未來」「不動產」這種詞裡誤中。
+
+    這曾經是個很難察覺的錯：分數看起來完全合理，只是方向剛好相反。
+    """
+    cases = [
+        ("台積電無塵室擴產 產能滿載", "bull", "「無塵室」裡的無不是否定"),
+        ("緯創未來訂單滿手 明年產能吃緊", "bull", "「未來」裡的未不是否定"),
+        ("廣達不動產處分利益入帳 獲利成長", "bull", "「不動產」裡的不不是否定"),
+        ("聯電無線通訊晶片需求強勁", "bull", "「無線」裡的無不是否定"),
+    ]
+    for title, want, why in cases:
+        got = analyze.analyze_article(make(title))
+        check(got["sentiment_key"] == want,
+              f"反轉詞誤中：〈{title}〉期望 {want}，實得 {got['sentiment_key']}"
+              f"（情緒 {got['sentiment']:+d}）—— {why}")
+
+    # 真正的否定仍然要生效
+    for title in ("智邦未能突破前高", "緯創訂單遭取消"):
+        got = analyze.analyze_article(make(title))
+        check(got["sentiment"] < 0, f"〈{title}〉的否定沒有生效（{got['sentiment']:+d}）")
 
 
 def test_confidence() -> None:
@@ -96,6 +119,67 @@ def test_dedupe() -> None:
     tsmc = [k for k in kept if "台積電" in k["title"]]
     check(bool(tsmc) and tsmc[0]["dup_count"] == 3,
           f"合併後 dup_count 應為 3，實得 {tsmc[0]['dup_count'] if tsmc else 'n/a'}")
+
+
+def test_dedupe_respects_subject() -> None:
+    """同模板不同主角的標題不可以被併掉。
+
+    「廣達AI伺服器出貨看增」和「緯創AI伺服器出貨看增」的字元重疊度是 0.78，
+    沒有主體守門的話其中一家的新聞會直接從網站上消失。
+    """
+    recs = [
+        {"title": "廣達AI伺服器出貨看增", "outlet": "經濟日報", "tickers": ["2382"], "summary": ""},
+        {"title": "緯創AI伺服器出貨看增", "outlet": "工商時報", "tickers": ["3231"], "summary": ""},
+        {"title": "廣達AI伺服器出貨看增 法人喊買", "outlet": "鉅亨網",
+         "tickers": ["2382"], "summary": ""},
+    ]
+    kept = tu.dedupe(recs)
+    check(len(kept) == 2, f"兩家公司的同模板標題應保留 2 則，實得 {len(kept)} 則")
+    names = {k["title"][:2] for k in kept}
+    check(names == {"廣達", "緯創"}, f"保留下來的應該是廣達與緯創各一則，實得 {names}")
+
+
+def test_split_outlet_keeps_dashes_in_title() -> None:
+    """標題本身含破折號時不可以被當成媒體名切掉。"""
+    title, outlet = tu.split_outlet("台積電 - 三星 - 英特爾三強鼎立 - 經濟日報", "經濟日報")
+    check(title == "台積電 - 三星 - 英特爾三強鼎立",
+          f"標題被切壞了：{title}")
+    check(outlet == "經濟日報", f"媒體名應為經濟日報，實得 {outlet}")
+
+    title2, _ = tu.split_outlet("鴻海11月營收年增12%", "中央社")
+    check(title2 == "鴻海11月營收年增12%", f"沒有後綴時不該改動標題：{title2}")
+
+
+def test_lookalike_names_do_not_match() -> None:
+    """同字開頭但不同公司／不相干的用語不可以被掛上個股。"""
+    import fetch_news  # noqa: PLC0415
+    for title, want_empty in [
+        ("統一發票中獎號碼公布 千萬特獎在超商", True),
+        ("統一超商全新門市開幕", True),
+        ("長榮航空調整冬季航班", True),
+        ("統一企業11月營收年增5%", False),
+        ("長榮海運運價回升", False),
+    ]:
+        got = fetch_news.attach_tickers({"title": title, "summary": "", "tickers": []})["tickers"]
+        if want_empty:
+            check(not got, f"〈{title}〉不該關聯到任何個股，實得 {got}")
+        else:
+            check(bool(got), f"〈{title}〉應該要關聯到個股，實得空的")
+
+
+def test_google_cluster_description() -> None:
+    """Google 新聞的叢集 description 不可以被剝成一坨黏在一起的標題。"""
+    import fetch_news  # noqa: PLC0415
+    cluster = ('<ol><li><a href="#">台積電11月營收創高</a>'
+               '<font color="#6f6f6f">經濟日報</font></li>'
+               '<li><a href="#">台積電營收年增28%</a>'
+               '<font color="#6f6f6f">工商時報</font></li>'
+               '<li><a href="#">台積電續創同期新高</a>'
+               '<font color="#6f6f6f">中央社</font></li></ol>')
+    summary, outlets = fetch_news._clean_summary({"summary": cluster}, "台積電11月營收創高")
+    check(summary == "", f"叢集不該產生摘要，實得：{summary[:60]}")
+    check(outlets == ["經濟日報", "工商時報", "中央社"],
+          f"應從叢集取出跟進的媒體名，實得 {outlets}")
 
 
 def test_multi_stock_link() -> None:
@@ -159,9 +243,14 @@ def test_payload(path: str) -> None:
 
 def main() -> int:
     test_semantics()
+    test_negators_do_not_misfire()
     test_confidence()
     test_importance()
     test_dedupe()
+    test_dedupe_respects_subject()
+    test_split_outlet_keeps_dashes_in_title()
+    test_lookalike_names_do_not_match()
+    test_google_cluster_description()
     test_multi_stock_link()
     test_ticker_not_matched_inside_longer_number()
 

@@ -43,6 +43,9 @@ CNYES_LIST = ("https://api.cnyes.com/media/api/v1/newslist/category/{cat}"
 YAHOO_RSS = "https://tw.stock.yahoo.com/rss?category=news"
 TWSE_DAY_ALL = "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"
 
+# 撈不到幾則時改用的放寬窗口（天）。
+WIDE_WINDOW_DAYS = 7
+
 # 來源可信度分級，供重要性計分使用。
 OUTLET_TIER = {
     1: ["經濟日報", "工商時報", "中央社", "鉅亨網", "MoneyDJ", "路透", "彭博", "Bloomberg",
@@ -75,18 +78,35 @@ def _entry_time(entry) -> Optional[datetime]:
     return None
 
 
-def _clean_summary(entry, title: str) -> str:
+_LI_RE = re.compile(r"<li\b", re.I)
+_FONT_RE = re.compile(r"<font[^>]*>([^<]{1,24})</font>", re.I)
+
+
+def _clean_summary(entry, title: str) -> Tuple[str, List[str]]:
+    """回傳 (摘要, 叢集中其他媒體名)。
+
+    Google 新聞的 description 有兩種形態：
+      單篇 —— `<a>標題</a><font>媒體</font>`，其實沒有摘要可言；
+      叢集 —— `<ol><li>…</li>×5</ol>`，是同一則事件的多家報導。
+    直接把標籤剝掉會把五條標題黏成一坨無意義的字串貼到頁面上。
+    叢集本身反而是好東西：它等於免費告訴我們「有幾家媒體跟進」。
+    """
     raw = entry.get("summary") or entry.get("description") or ""
-    text = tu.strip_html(raw)
-    # Google 的 description 常常只是把標題和媒體名再列一次，那就沒有資訊量。
-    if tu.normalize(text)[:40] and tu.normalize(text)[:40] in tu.normalize(title):
-        return ""
-    text = re.sub(r"\s{2,}", " ", text)
-    return text[:400]
+    if len(_LI_RE.findall(raw)) >= 2:
+        outlets = [o.strip() for o in _FONT_RE.findall(raw) if o.strip()]
+        return "", outlets
+
+    text = re.sub(r"\s{2,}", " ", tu.strip_html(raw))
+    # 剩下的單篇形態多半只是把標題和媒體名再列一次，沒有資訊量。
+    head = tu.normalize(text)[:40]
+    if head and head in tu.normalize(title):
+        return "", []
+    return text[:400], []
 
 
 def _mk_record(*, title: str, url: str, outlet: str, published: Optional[datetime],
-               summary: str, source_id: str, tickers: List[str]) -> Optional[dict]:
+               summary: str, source_id: str, tickers: List[str],
+               dup_outlets: Optional[List[str]] = None) -> Optional[dict]:
     title = (title or "").strip()
     if len(tu.normalize(title)) < 6:
         return None
@@ -96,7 +116,7 @@ def _mk_record(*, title: str, url: str, outlet: str, published: Optional[datetim
         return None
     return {
         "title": title,
-        "url": url or "",
+        "url": url,
         "outlet": outlet or "",
         "outlet_tier": outlet_tier(outlet),
         "published": published.isoformat() if published else "",
@@ -104,6 +124,7 @@ def _mk_record(*, title: str, url: str, outlet: str, published: Optional[datetim
         "summary": summary or "",
         "source_id": source_id,
         "tickers": sorted(set(tickers)),
+        "dup_outlets": list(dup_outlets or []),
     }
 
 
@@ -124,17 +145,20 @@ def fetch_google_news(query: str, *, days: int, tickers: List[str],
 
     out: List[dict] = []
     for entry in feed.entries[:limit]:
-        raw_title = entry.get("title", "")
-        title, split_outlet = tu.split_outlet(raw_title)
-        outlet = (entry.get("source", {}) or {}).get("title") or split_outlet
+        # <source> 才是可信的媒體名。Google News 的連結是加密轉址，
+        # 從網址主機名猜媒體是猜不出來的。
+        source_name = (entry.get("source", {}) or {}).get("title") or ""
+        title, outlet = tu.split_outlet(entry.get("title", ""), source_name)
+        summary, cluster_outlets = _clean_summary(entry, title)
         rec = _mk_record(
             title=title,
             url=entry.get("link", ""),
             outlet=outlet,
             published=_entry_time(entry),
-            summary=_clean_summary(entry, title),
+            summary=summary,
             source_id="google_news",
             tickers=tickers,
+            dup_outlets=cluster_outlets,
         )
         if rec:
             out.append(rec)
@@ -185,12 +209,13 @@ def fetch_yahoo() -> List[dict]:
     out: List[dict] = []
     for entry in feed.entries[:40]:
         title = entry.get("title", "")
+        summary, _ = _clean_summary(entry, title)
         rec = _mk_record(
             title=title,
             url=entry.get("link", ""),
             outlet="Yahoo奇摩股市",
             published=_entry_time(entry),
-            summary=_clean_summary(entry, title),
+            summary=summary,
             source_id="yahoo",
             tickers=[],
         )
@@ -282,18 +307,30 @@ def collect(*, days: int = 2, limit_per_query: int = 40,
 
     # 1) 逐檔（含大盤）跑 Google 新聞搜尋 —— 這是主力。
     for target in ALL_TARGETS:
-        got = 0
+        tickers = [] if target["ticker"] == "TAIEX" else [target["ticker"]]
+        items: List[dict] = []
         for term in target["query_terms"]:
             health["queries"] += 1
-            tickers = [] if target["ticker"] == "TAIEX" else [target["ticker"]]
-            items = fetch_google_news(term, days=days, tickers=tickers,
-                                      limit=limit_per_query)
-            got += len(items)
-            raw.extend(items)
+            items.extend(fetch_google_news(term, days=days, tickers=tickers,
+                                           limit=limit_per_query))
             net.polite_sleep(1.0)
-        log.info("%s(%s)：%d 則", target["name"], target["ticker"], got)
-        health["sources"].append({"id": f"google:{target['ticker']}", "ok": got > 0,
-                                  "items": got, "note": target["name"]})
+
+        # 時間窗階梯：台積電用 2 天就有幾十則，但冷門一點的權值股（尤其週末）
+        # 可能一則都沒有。與其讓那一檔整天空白，不如把窗口放寬再撈一次。
+        # 反過來不能一開始就用 7 天 —— 那會讓「今日新聞」混進一堆舊聞。
+        if len(items) < 3 and days < WIDE_WINDOW_DAYS:
+            log.info("%s 只有 %d 則，改用 %d 天窗口再撈一次",
+                     target["name"], len(items), WIDE_WINDOW_DAYS)
+            for term in target["query_terms"][:1]:
+                health["queries"] += 1
+                items.extend(fetch_google_news(term, days=WIDE_WINDOW_DAYS,
+                                               tickers=tickers, limit=limit_per_query))
+                net.polite_sleep(1.0)
+
+        raw.extend(items)
+        log.info("%s(%s)：%d 則", target["name"], target["ticker"], len(items))
+        health["sources"].append({"id": f"google:{target['ticker']}", "ok": bool(items),
+                                  "items": len(items), "note": target["name"]})
 
     # 2) best-effort 的市場面來源
     for name, fn in (("cnyes", fetch_cnyes), ("yahoo", fetch_yahoo)):
@@ -314,7 +351,11 @@ def collect(*, days: int = 2, limit_per_query: int = 40,
 
 
 def _finalize(articles: List[dict], days: int, health: dict) -> List[dict]:
-    cutoff = datetime.now(TPE) - timedelta(days=days, hours=6)
+    # 階梯有可能把窗口放寬到 WIDE_WINDOW_DAYS，這裡的門檻必須跟著放寬，
+    # 否則放寬撈回來的那些會在下一行被全部丟掉。
+    # Google 的 when: 已經做過主要的時間限縮，這道只是防止來源日期異常。
+    effective = max(days, WIDE_WINDOW_DAYS)
+    cutoff = datetime.now(TPE) - timedelta(days=effective, hours=6)
     fresh = [a for a in articles
              if not a.get("published_ts") or a["published_ts"] >= cutoff.timestamp()]
 

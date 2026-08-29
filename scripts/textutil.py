@@ -65,12 +65,25 @@ def jaccard(a: set, b: set) -> float:
     return len(a & b) / len(a | b)
 
 
-def split_outlet(title: str) -> tuple:
-    """Google News 的標題格式是「真標題 - 媒體名」，把媒體名切出來。"""
-    m = re.match(r"^(.*?)\s+[-–—]\s+([^\-–—]{1,20})$", (title or "").strip())
-    if m and len(m.group(1)) >= 6:
+def split_outlet(title: str, known_outlet: str = "") -> tuple:
+    """Google News 的標題格式是「真標題 - 媒體名」，把媒體名切出來。
+
+    不能用通用的「切最後一個破折號」規則 —— 「台積電 - 三星 - 英特爾三強鼎立」
+    這種標題本身就含破折號，硬切會把標題砍掉一半。所以只有在結尾恰好等於
+    已知的來源名稱時才切；拿不到來源名時，退而求其次只認明確像媒體名的短後綴。
+    """
+    text = (title or "").strip()
+    if known_outlet:
+        for dash in ("-", "–", "—"):
+            suffix = f" {dash} {known_outlet}"
+            if text.endswith(suffix):
+                return text[: -len(suffix)].strip(), known_outlet
+        return text, known_outlet
+
+    m = re.match(r"^(.*?)\s+[-–—]\s+([^\-–—]{2,12})$", text)
+    if m and len(m.group(1)) >= 8:
         return m.group(1).strip(), m.group(2).strip()
-    return (title or "").strip(), ""
+    return text, ""
 
 
 def contains_any(haystack: str, needles: Iterable[str]) -> List[str]:
@@ -85,6 +98,21 @@ def contains_any(haystack: str, needles: Iterable[str]) -> List[str]:
     return hits
 
 
+def same_subject(a: dict, b: dict) -> bool:
+    """兩則新聞講的是不是同一批公司。
+
+    這是去重的守門條件。台灣財經標題大量使用同一個模板，只換主角：
+    「廣達AI伺服器出貨看增」和「緯創AI伺服器出貨看增」的字元重疊度高達 0.78，
+    純看相似度一定會把它們併成一則，然後其中一家的新聞就從網站上消失了。
+    兩邊都有標到公司、而且完全不重疊時，一律視為不同新聞。
+    """
+    ta = set(a.get("tickers") or [])
+    tb = set(b.get("tickers") or [])
+    if ta and tb:
+        return bool(ta & tb)
+    return True
+
+
 def dedupe(records: Sequence[dict], *, threshold: float = 0.68) -> List[dict]:
     """全域去重。
 
@@ -94,7 +122,7 @@ def dedupe(records: Sequence[dict], *, threshold: float = 0.68) -> List[dict]:
     """
     kept: List[dict] = []
     index: dict = {}          # shingle -> [kept index]
-    seen_exact: dict = {}     # 正規化標題 -> kept index
+    seen_exact: dict = {}     # 正規化標題 -> [kept index]
 
     for rec in records:
         title = rec.get("title", "")
@@ -102,8 +130,13 @@ def dedupe(records: Sequence[dict], *, threshold: float = 0.68) -> List[dict]:
         if not key:
             continue
 
-        if key in seen_exact:
-            _merge_dup(kept[seen_exact[key]], rec)
+        exact_hit = None
+        for idx in seen_exact.get(key, ()):
+            if same_subject(kept[idx], rec):
+                exact_hit = idx
+                break
+        if exact_hit is not None:
+            _merge_dup(kept[exact_hit], rec)
             continue
 
         sh = shingles(title)
@@ -113,6 +146,8 @@ def dedupe(records: Sequence[dict], *, threshold: float = 0.68) -> List[dict]:
                 candidates[idx] = candidates.get(idx, 0) + 1
         hit = None
         for idx, _ in sorted(candidates.items(), key=lambda kv: -kv[1])[:25]:
+            if not same_subject(kept[idx], rec):
+                continue
             if containment(sh, kept[idx]["_shingles"]) >= threshold:
                 hit = idx
                 break
@@ -125,7 +160,7 @@ def dedupe(records: Sequence[dict], *, threshold: float = 0.68) -> List[dict]:
         rec.setdefault("dup_outlets", [])
         kept.append(rec)
         pos = len(kept) - 1
-        seen_exact[key] = pos
+        seen_exact.setdefault(key, []).append(pos)
         for g in sh:
             index.setdefault(g, []).append(pos)
 

@@ -243,10 +243,16 @@ def analyze_article(rec: dict) -> dict:
     if any(h.get("negated") for h in t_hits + s_hits):
         flags.append("含語意反轉")
 
-    drivers = sorted(
-        [h for h in t_hits + s_hits if h["score"] != 0],
-        key=lambda h: -abs(h["score"]),
-    )[:6]
+    # 同一個詞在標題和摘要各命中一次，會變成「出現『大賺』『大賺』等訊號」，
+    # 讀起來像壞掉。每個詞只留分數絕對值最大的那一次。
+    best_by_term: Dict[str, dict] = {}
+    for h in t_hits + s_hits:
+        if h["score"] == 0:
+            continue
+        prev = best_by_term.get(h["term"])
+        if prev is None or abs(h["score"]) > abs(prev["score"]):
+            best_by_term[h["term"]] = h
+    drivers = sorted(best_by_term.values(), key=lambda h: -abs(h["score"]))[:6]
 
     result = {
         "sentiment": sentiment,

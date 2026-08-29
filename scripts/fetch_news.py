@@ -46,6 +46,40 @@ TWSE_DAY_ALL = "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"
 # 撈不到幾則時改用的放寬窗口（天）。
 WIDE_WINDOW_DAYS = 7
 
+# 市場層級的用語。沒有比對到任何個股的新聞，必須至少命中這裡的一個詞才留下來，
+# 否則就是雜訊 —— 實測第一次上線時，市場面的 RSS 夾帶了基輔空襲、濟州島溺水、
+# 中職賽事這類完全無關的內容，佔了全部新聞的一成。
+MARKET_TERMS = [
+    "台股", "加權指數", "大盤", "集中市場", "台北股市", "櫃買", "上市櫃",
+    "外資", "投信", "自營商", "三大法人", "買超", "賣超", "融資", "融券",
+    "台指", "期貨", "選擇權", "未平倉", "成交量", "成交值",
+    "美股", "費半", "那斯達克", "道瓊", "標普", "S&P",
+    "台幣", "新台幣", "匯率", "央行", "聯準會", "Fed", "升息", "降息",
+    "半導體", "晶圓", "晶片", "AI 伺服器", "AI伺服器", "供應鏈",
+    "台積電", "護國神山", "權值股", "電子股", "金融股", "傳產股",
+    "除權息", "股利", "殖利率", "本益比", "財報", "法說會",
+    "關稅", "出口管制", "景氣", "製造業", "出口訂單",
+]
+
+# 不是新聞的頁面。Yahoo 的個股報價頁會混在 RSS 裡，標題長得像
+# 「富邦金(2881) 個股概覽 | 個股 - 股市」，放到網站上只是佔位子。
+_NON_NEWS_PATTERNS = [
+    re.compile(r"個股概覽"),
+    re.compile(r"\|\s*個股\s*[-–—]\s*股市\s*$"),
+    re.compile(r"^\s*[\w一-鿿]+\(\d{4}\)\s*(股價|走勢|籌碼|基本資料)\s*$"),
+    re.compile(r"(即時報價|技術分析|籌碼分析|財務報表)\s*[-–—|]\s*"),
+]
+
+
+def is_market_relevant(rec: dict) -> bool:
+    """沒有關聯個股時，這則新聞還值不值得留下來。"""
+    text = f"{rec.get('title', '')} {rec.get('summary', '')}"
+    return bool(tu.contains_any(text, MARKET_TERMS))
+
+
+def is_non_news(title: str) -> bool:
+    return any(rx.search(title or "") for rx in _NON_NEWS_PATTERNS)
+
 # 來源可信度分級，供重要性計分使用。
 OUTLET_TIER = {
     1: ["經濟日報", "工商時報", "中央社", "鉅亨網", "MoneyDJ", "路透", "彭博", "Bloomberg",
@@ -359,9 +393,21 @@ def _finalize(articles: List[dict], days: int, health: dict) -> List[dict]:
     fresh = [a for a in articles
              if not a.get("published_ts") or a["published_ts"] >= cutoff.timestamp()]
 
+    # 相關性把關。市場面的 RSS 是綜合新聞來源，會夾帶國際災難、體育、社會案件；
+    # 沒比對到個股、又完全沒有市場用語的，就是雜訊。
+    relevant, dropped_noise, dropped_nonnews = [], 0, 0
+    for a in fresh:
+        if is_non_news(a.get("title", "")):
+            dropped_nonnews += 1
+            continue
+        if not a.get("tickers") and not is_market_relevant(a):
+            dropped_noise += 1
+            continue
+        relevant.append(a)
+
     # 排序決定去重時「誰是正本」：先看媒體層級，再看時間新舊。
-    fresh.sort(key=lambda a: (a.get("outlet_tier", 3), -a.get("published_ts", 0)))
-    deduped = tu.dedupe(fresh)
+    relevant.sort(key=lambda a: (a.get("outlet_tier", 3), -a.get("published_ts", 0)))
+    deduped = tu.dedupe(relevant)
     deduped.sort(key=lambda a: -a.get("published_ts", 0))
 
     for a in deduped:
@@ -369,8 +415,11 @@ def _finalize(articles: List[dict], days: int, health: dict) -> List[dict]:
 
     health["after_dedupe"] = len(deduped)
     health["dropped_stale"] = len(articles) - len(fresh)
-    log.info("原始 %d 則 → 過期濾除 %d → 去重後 %d 則",
-             len(articles), len(articles) - len(fresh), len(deduped))
+    health["dropped_irrelevant"] = dropped_noise
+    health["dropped_non_news"] = dropped_nonnews
+    log.info("原始 %d 則 → 過期 %d、非新聞 %d、不相關 %d → 去重後 %d 則",
+             len(articles), len(articles) - len(fresh),
+             dropped_nonnews, dropped_noise, len(deduped))
     return deduped
 
 

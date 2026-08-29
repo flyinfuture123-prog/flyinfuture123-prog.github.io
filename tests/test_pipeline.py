@@ -182,6 +182,55 @@ def test_google_cluster_description() -> None:
           f"應從叢集取出跟進的媒體名，實得 {outlets}")
 
 
+def test_irrelevant_news_is_dropped() -> None:
+    """市場面的綜合 RSS 會夾帶完全無關的新聞，必須擋在資料集之外。
+
+    以下標題都是第一次正式上線時真的被抓進來、顯示在網站上的內容。
+    """
+    import fetch_news  # noqa: PLC0415
+
+    noise = [
+        "基輔遇襲釀37死！軍方彈藥庫藏住宅區遭擊中",
+        "濟州島男子出門釣魚失聯！今在海邊尋獲遺體",
+        "西藏尼泊爾邊境發現第二處堰塞湖 若潰決對下方堰塞湖衝擊很大",
+        "中職》前5局遭勝騎士8K壓制王苡丞開轟救隊",
+        "民眾騎機車硬闖奈良吊橋！警方卻無法開罰",
+    ]
+    for title in noise:
+        rec = fetch_news.attach_tickers({"title": title, "summary": "", "tickers": []})
+        check(not rec["tickers"] and not fetch_news.is_market_relevant(rec),
+              f"〈{title}〉是雜訊，不該留在資料集裡")
+
+    keep = [
+        "台股周一恐跌500點　專家點名：5檔低位階個股逢低布局",
+        "72萬股東嗨了！外資大買365億狂掃「這檔」奪冠",
+        "法人：華許言論偏中性　輝達財報蘋果新機有利台股",
+    ]
+    for title in keep:
+        rec = fetch_news.attach_tickers({"title": title, "summary": "", "tickers": []})
+        check(fetch_news.is_market_relevant(rec),
+              f"〈{title}〉是市場面新聞，不該被濾掉")
+
+
+def test_non_news_pages_are_dropped() -> None:
+    """報價頁不是新聞，混進 RSS 時要擋掉。"""
+    import fetch_news  # noqa: PLC0415
+    for title in ("富邦金(2881) 個股概覽 | 個股 - 股市",
+                  "緯創(3231) 個股概覽 | 個股 - 股市"):
+        check(fetch_news.is_non_news(title), f"〈{title}〉是報價頁，不是新聞")
+    for title in ("鴻海11月營收年增12%", "台積電法說會上修財測"):
+        check(not fetch_news.is_non_news(title), f"〈{title}〉是新聞，不該被當成報價頁")
+
+
+def test_drivers_have_no_duplicate_terms() -> None:
+    """同一個詞在標題和摘要都命中時，判斷依據不該印兩次。"""
+    got = analyze.analyze_article(
+        make("國泰金上半年大賺765億元 總座預告明年配息更優渥",
+             summary="國泰金大賺，配息看好。"))
+    terms = [d["term"] for d in got["drivers"]]
+    check(len(terms) == len(set(terms)), f"drivers 出現重複詞：{terms}")
+
+
 def test_multi_stock_link() -> None:
     """一則供應鏈新聞要能同時連到多檔。"""
     import fetch_news  # noqa: PLC0415
@@ -251,6 +300,9 @@ def main() -> int:
     test_split_outlet_keeps_dashes_in_title()
     test_lookalike_names_do_not_match()
     test_google_cluster_description()
+    test_irrelevant_news_is_dropped()
+    test_non_news_pages_are_dropped()
+    test_drivers_have_no_duplicate_terms()
     test_multi_stock_link()
     test_ticker_not_matched_inside_longer_number()
 

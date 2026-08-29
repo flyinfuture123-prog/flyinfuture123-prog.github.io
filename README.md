@@ -1,12 +1,13 @@
 # flyinfuture123-prog.github.io
 
-個人靜態網站。目前有兩個頁面，都放在不容易被猜到的隨機路徑底下，並加上
+個人靜態網站。目前有三個頁面，都放在不容易被猜到的隨機路徑底下，並加上
 `noindex` 避免被搜尋引擎收錄。
 
 | 頁面 | 路徑 | 資料來源 |
 | --- | --- | --- |
 | 台股戰情室 | `tw-f7ae6d8241f3f8e1/` | 產出當下寫死在頁面內 |
 | 台股權值股新聞分析 | `news-0a1318b62d883e0a/` | 每天早上自動更新 |
+| 全球服飾價格與時尚趨勢 | `fashion-8fc308ee73649044/` | 每天早上自動更新 |
 
 ---
 
@@ -130,3 +131,84 @@ python -m http.server 8000 --directory news-0a1318b62d883e0a
 - 排程 workflow 在 repository 連續 60 天沒有任何活動後會被 GitHub 自動停用；
   這個排程本身每天都會 commit，所以正常運作下不會被停掉。
 - 內容僅供資訊整理與研究參考，**不構成任何投資建議**。
+
+---
+
+## 全球服飾價格與時尚趨勢
+
+與台股站同一套架構的姊妹站：每天台灣時間早上 **07:52** 自動執行一次，
+抓取全球服飾產業新聞（中英雙語）、**逐則**分析價格方向與趨勢標籤，
+產生當日頁面並 commit 回 repository。
+
+網址：`https://flyinfuture123-prog.github.io/fashion-8fc308ee73649044/`
+
+### 這個站在看什麼
+
+- **價格方向**：每則新聞標 −100（明確降價／促銷）～ +100（明確漲價）。
+  詞庫懂「凍漲」「吸收關稅」是不漲價、「取消折扣」是實質漲價、
+  「price hike」「slashing prices」等英文訊號也吃得下來。
+- **品牌溫度**：32 個觀察對象，分快時尚／運動休閒／精品／電商平台／其他
+  五個板塊（UNIQLO、ZARA、SHEIN、NIKE、愛馬仕、香奈兒、儒鴻聚陽…），
+  名稱與別名用台灣媒體實際寫法（鉅亨「耐吉」、經濟日報「迅銷」）。
+- **趨勢雷達**：26 個趨勢標籤（波希米亞復興、靜奢老錢風、足球球衣風、
+  芭蕾風、古著二手…），各標 2026 年當下的上升／持平／退燒狀態，
+  這是人工策展的快照，隨季度手動更新 `scripts/fashion_lexicon.py`。
+- **衣價為什麼變動**：關稅、小額免稅、棉價、運價、產地工資等十個
+  驅動因素的背景說明卡（人工整理，標註整理時點）。
+- **服飾物價指數**（best-effort）：FRED 的美國服飾 CPI 與 Eurostat 的
+  歐元區衣著鞋類 HICP，免金鑰端點，抓不到就不顯示。
+
+### 資料從哪裡來
+
+- **主要來源：Google 新聞 RSS 搜尋**，中文（台灣）與英文（美國）各一組：
+  主題查詢（服飾漲價、快時尚、穿搭趨勢、時裝週、精品調價、紡織成本、
+  二手古著…）加上逐品牌查詢。事件型主題（精品調價、關稅）用 30 天窗口，
+  日常題材用短窗口。
+- **次要來源（best-effort）**：WWD、FashionUnited、Hypebeast 等國際時尚
+  媒體的公開 RSS，掛掉只會少幾則國際新聞。
+
+### 檔案結構（時尚站）
+
+```
+scripts/
+  fashion_brands.py   32 個品牌／板塊：別名、板塊、搜尋詞、觀察重點
+  fashion_lexicon.py  中英雙語價格詞庫、主題分類、地區、趨勢標籤、驅動因素
+  fashion_fetch.py    抓取與品牌關聯（共用 net.py / textutil.py）
+  fashion_analyze.py  規則式分析（價格方向 + 趨勢標籤 + 品牌/趨勢彙總）
+  fashion_llm.py      選用的 Claude 深度分析層（FASHION_LLM_* 變數）
+  fashion_build.py    統籌：抓取 → 分析 → 寫出資料檔
+tests/
+  make_fashion_fixture.py   產生離線測試資料
+  test_fashion_pipeline.py  語意回歸測試 + 資料結構驗證
+fashion-8fc308ee73649044/
+  index.html          網頁（讀取 data/latest.json）
+  data/               今日資料 + 每日封存（保留 180 天）
+.github/workflows/
+  daily-fashion.yml   每日 07:52（台灣時間）排程更新並回推
+```
+
+### 本機執行（時尚站）
+
+```bash
+python tests/make_fashion_fixture.py
+python scripts/fashion_build.py --site-dir fashion-8fc308ee73649044 \
+  --fixture tests/fixtures/fashion_sample.json --no-llm
+python tests/test_fashion_pipeline.py fashion-8fc308ee73649044/data/latest.json
+
+# 真的去抓新聞
+python scripts/fashion_build.py --site-dir fashion-8fc308ee73649044 --days 2
+
+# 本機預覽
+python -m http.server 8000 --directory fashion-8fc308ee73649044
+```
+
+Claude 深度分析同樣是選配：設定 `ANTHROPIC_API_KEY` secret 即啟用，
+可用 repository variables `FASHION_LLM_MODEL`、`FASHION_LLM_MAX_ARTICLES`、
+`FASHION_LLM_BATCH` 調整。沒設定時規則式引擎照樣每天產出。
+
+### 已知限制（時尚站）
+
+- 價格方向與重要性依**標題與摘要**推估，趨勢狀態（上升／退燒）是人工
+  快照，都會過時或誤判；「衣價為什麼變動」是背景整理，不是即時數據。
+- 英文新聞的標題照原文顯示，逐則分析一律以中文撰寫。
+- 內容僅供資訊整理與研究參考，**不構成任何消費或投資建議**。

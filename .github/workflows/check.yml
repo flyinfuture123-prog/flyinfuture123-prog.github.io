@@ -38,14 +38,14 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: 模組自我檢查
+      - name: 模組自我檢查（台股站）
         run: |
           python scripts/lexicon.py
           python scripts/stocks.py > /dev/null
           python scripts/analyze.py > /dev/null
           python scripts/llm.py
 
-      - name: 用離線 fixture 跑完整條流程
+      - name: 用離線 fixture 跑完整條流程（台股站）
         run: |
           python tests/make_fixture.py /tmp/fixture.json
           python scripts/build.py \
@@ -53,5 +53,23 @@ jobs:
             --fixture /tmp/fixture.json \
             --no-llm
 
-      - name: 檢查產出
+      - name: 檢查產出（台股站）
         run: python tests/test_pipeline.py /tmp/site-check/data/latest.json
+
+      - name: 模組自我檢查（時尚站）
+        run: |
+          python scripts/fashion_brands.py > /dev/null
+          python scripts/fashion_lexicon.py
+          python scripts/fashion_analyze.py > /dev/null
+          python scripts/fashion_llm.py
+
+      - name: 用離線 fixture 跑完整條流程（時尚站）
+        run: |
+          python tests/make_fashion_fixture.py /tmp/fashion_fixture.json
+          python scripts/fashion_build.py \
+            --site-dir /tmp/fashion-site-check \
+            --fixture /tmp/fashion_fixture.json \
+            --no-llm
+
+      - name: 檢查產出（時尚站）
+        run: python tests/test_fashion_pipeline.py /tmp/fashion-site-check/data/latest.json

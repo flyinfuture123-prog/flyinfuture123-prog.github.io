@@ -85,9 +85,9 @@ jobs:
       # ── 1. 取得原始碼 ────────────────────────────────────────────────
       - name: Checkout 預設分支
         # 供應鏈強化建議：正式環境把 tag 換成完整 commit SHA，例如
-        #   uses: actions/checkout@<40 位 SHA>  # v4.2.2
-        # 取得方式：gh api repos/actions/checkout/git/ref/tags/v4.2.2
-        uses: actions/checkout@v4
+        #   uses: actions/checkout@<40 位 SHA>  # v7.0.1
+        # 取得方式：gh api repos/actions/checkout/git/ref/tags/v7.0.1
+        uses: actions/checkout@v7
         with:
           # 一律以預設分支為準。Pages 只吃預設分支，在別的分支產資料沒有意義；
           # 想在分支上測就用 workflow_dispatch + dry_run。
@@ -99,7 +99,7 @@ jobs:
 
       # ── 2. Python 環境 ──────────────────────────────────────────────
       - name: 安裝 Python ${{ env.PYTHON_VERSION }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           # 固定 minor 版本。用 "3.x" 會在 GitHub 換預設版本那天無預警換掉
           # 執行環境，而排程工作沒有人盯著，通常等到網站壞掉才會發現。

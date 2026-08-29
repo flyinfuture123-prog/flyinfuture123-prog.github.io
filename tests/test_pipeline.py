@@ -212,6 +212,46 @@ def test_irrelevant_news_is_dropped() -> None:
               f"〈{title}〉是市場面新聞，不該被濾掉")
 
 
+def test_query_hint_is_not_evidence() -> None:
+    """用某檔股票的關鍵字查到，不等於那則新聞就是該股的新聞。
+
+    Google 新聞對「富邦金控」會回中職賽事（富邦悍將對中信兄弟的比賽叫
+    「金控大戰」），對「統一企業」會回統一投信的 ETF。第一次正式上線時，
+    53% 的新聞掛著內文完全沒提到該公司的個股標記，就是因為程式把查詢意圖
+    當成了證據。
+    """
+    import fetch_news  # noqa: PLC0415
+
+    # 模擬「由 2881 富邦金控的查詢撈回來」的棒球新聞
+    rec = fetch_news.attach_tickers({
+        "title": "中職》「金控大戰」票房開紅盤！ 洲際寫本季第3多觀眾紀錄",
+        "summary": "", "tickers": ["2881"],
+    })
+    check(not rec["tickers"],
+          f"內文沒提到富邦金，不該掛上個股標記，實得 {rec['tickers']}")
+    check(rec.get("query_ticker") == "2881", "查詢意圖應保留在 query_ticker 供除錯")
+    check(not fetch_news.is_market_relevant(rec), "棒球新聞不該通過市場相關性")
+
+    # 真的提到公司的，標記要留下來，而且要有依據
+    rec2 = fetch_news.attach_tickers({
+        "title": "富邦金11月自結每股盈餘0.85元", "summary": "", "tickers": ["2881"],
+    })
+    check(rec2["tickers"] == ["2881"], f"應標記 2881，實得 {rec2['tickers']}")
+    check(rec2["matched_terms"], "標記必須附上命中的詞當依據")
+
+
+def test_single_token_query_is_quoted() -> None:
+    """單一詞查詢要加引號，否則「統一企業」會被拆開撈到統一投信的 ETF。"""
+    import inspect  # noqa: PLC0415
+
+    import fetch_news  # noqa: PLC0415
+    src = inspect.getsource(fetch_news.fetch_google_news)
+    check('f\'"{query}"\'' in src or '"{query}"' in src,
+          "fetch_google_news 應對單一詞查詢加引號")
+    check('" " not in query' in src,
+          "有空白的複合查詢不能加引號（會變成要求兩詞相鄰）")
+
+
 def test_non_news_pages_are_dropped() -> None:
     """報價頁不是新聞，混進 RSS 時要擋掉。"""
     import fetch_news  # noqa: PLC0415
@@ -301,6 +341,8 @@ def main() -> int:
     test_lookalike_names_do_not_match()
     test_google_cluster_description()
     test_irrelevant_news_is_dropped()
+    test_query_hint_is_not_evidence()
+    test_single_token_query_is_quoted()
     test_non_news_pages_are_dropped()
     test_drivers_have_no_duplicate_terms()
     test_multi_stock_link()

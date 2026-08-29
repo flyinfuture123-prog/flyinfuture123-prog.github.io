@@ -168,7 +168,11 @@ def _mk_record(*, title: str, url: str, outlet: str, published: Optional[datetim
 
 def fetch_google_news(query: str, *, days: int, tickers: List[str],
                       limit: int = 40) -> List[dict]:
-    q = f'{query} when:{days}d'
+    # 單一詞加引號，強迫 Google 做完整比對。不加的話「統一企業」會被拆開，
+    # 撈回一堆統一投信的 ETF 新聞；「廣達電腦」也會擴散到不相干的結果。
+    # 有空白的複合查詢（「台積電 法說會」）不能加引號 —— 那會變成要求兩詞相鄰。
+    term = f'"{query}"' if " " not in query else query
+    q = f'{term} when:{days}d'
     resp = net.get(GOOGLE_NEWS.format(q=quote(q, safe="")))
     if resp is None:
         return []
@@ -298,13 +302,23 @@ def _to_float(value) -> Optional[float]:
 # --------------------------------------------------------------------------
 
 def attach_tickers(rec: dict) -> dict:
-    """依標題與摘要中出現的公司名/別名，補上關聯個股。
+    """依標題與摘要中出現的公司名/別名，判定這則新聞關聯到哪些個股。
 
-    搜尋來源帶進來的 ticker 一律保留（那是查詢意圖），另外掃描文字補上
-    「同時被提到的其他權值股」，這樣一則供應鏈新聞才連得到多檔。
+    關鍵原則：**搜尋關鍵字只是線索，不是證據。**
+
+    第一次正式上線時，53% 的新聞掛著「內文從頭到尾沒提到那家公司」的個股標記，
+    因為程式直接把「這則是用富邦金控查到的」當成「這則是富邦金的新聞」。
+    Google 新聞對「富邦金控」會回中職賽事（富邦悍將對中信兄弟叫「金控大戰」），
+    對「統一企業」會回統一投信的 ETF。這些全部被掛上個股標記送到網站上。
+
+    所以標記一律重新從文字認定；查詢意圖只留在 query_ticker 供除錯，
+    不進入 tickers。認不出公司的新聞，會在後面由市場相關性那關決定去留。
     """
     text = f"{rec.get('title','')} {rec.get('summary','')}"
-    found = set(rec.get("tickers") or [])
+    hint = rec.get("tickers") or []
+    if hint:
+        rec["query_ticker"] = hint[0]
+    found: set = set()
     matched_terms: List[str] = []
     for s in TOP20:
         # 公司名與別名用單純的子字串比對就夠了；代號一定要走正規式，

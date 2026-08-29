@@ -1,0 +1,6 @@
+# 台股新聞分析站 — 執行環境相依套件
+# requests / feedparser 是抓新聞必需；anthropic 只有在設定 ANTHROPIC_API_KEY
+# 時才會真的被用到，沒設定時整條流程照樣跑（改用規則式分析）。
+requests==2.32.5
+feedparser==6.0.14
+anthropic>=1.0,<2

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.venv/
+
+# 測試 fixture 由 tests/make_fixture.py 即時產生（時間戳相對於執行當下）。
+# commit 進版控只會得到一份「因為過期而被全部濾掉」的假資料。
+tests/fixtures/

@@ -1,0 +1,4 @@
+資料檔由 .github/workflows/tw-news-daily.yml 每日產生後 commit 進來。
+這裡刻意不放預先產生的樣本 —— 測試用的 fixture 是虛構標題，
+掛到線上頁面上會變成「看起來像真新聞的假新聞」。
+第一次排程跑完（或手動觸發 workflow）之後，latest.json 就會出現在這個目錄。

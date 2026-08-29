@@ -1,0 +1,57 @@
+name: 離線流程檢查
+
+# 每日排程真的跑起來才發現 script 有語法錯誤，代價是漏掉一天的資料。
+# 這個 workflow 用固定的離線 fixture 把整條流程跑一遍，不碰任何外部網站，
+# 所以 push / PR 當下就能抓到問題。
+on:
+  push:
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "requirements.txt"
+      - ".github/workflows/**"
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "tests/**"
+      - "requirements.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: 安裝相依套件
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: 模組自我檢查
+        run: |
+          python scripts/lexicon.py
+          python scripts/stocks.py > /dev/null
+          python scripts/analyze.py > /dev/null
+          python scripts/llm.py
+
+      - name: 用離線 fixture 跑完整條流程
+        run: |
+          python tests/make_fixture.py /tmp/fixture.json
+          python scripts/build.py \
+            --site-dir /tmp/site-check \
+            --fixture /tmp/fixture.json \
+            --no-llm
+
+      - name: 檢查產出
+        run: python tests/test_pipeline.py /tmp/site-check/data/latest.json

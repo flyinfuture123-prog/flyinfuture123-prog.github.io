@@ -1,0 +1,407 @@
+# 台股權值股新聞分析 —— 每日建置並回寫 GitHub Pages
+#
+# 這個 workflow 每天台北時間清晨跑一次：抓新聞 → 逐則分析 → 產生 JSON 與頁面
+# → 直接 commit 回預設分支。本 repo 是 GitHub Pages 使用者站台（從預設分支
+# 直接提供靜態檔），所以「推上去」就等於「上線」，不需要 Pages 專用的部署 job。
+#
+# 設計前提：預設路徑不需要任何付費金鑰。ANTHROPIC_API_KEY 只是選配升級，
+# 沒設定時整條流程照跑，只是分析改用規則式引擎。
+
+name: 每日台股新聞建置
+
+on:
+  schedule:
+    # 23:23 UTC = 台北時間隔日 07:23（UTC+8）。
+    #
+    # 為什麼是 :23 而不是 :00 或 :30 —— GitHub 的排程佇列在整點、半點、
+    # 一刻鐘這些「整齊」的分鐘負載最重，官方明講 schedule 可能被延遲；
+    # 挑一個沒人用的分鐘可以明顯減少 skew。就算被延遲 15~30 分鐘，
+    # 也還在 09:00 開盤前把當日簡報產好。
+    #
+    # 台灣不實施日光節約時間，全年固定 UTC+8，所以這個 cron 不需要
+    # 一年調兩次（換成美/歐時區的專案就必須處理）。
+    - cron: "23 23 * * *"
+
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "回溯天數（預設 2）"
+        required: false
+        type: string
+        default: "2"
+      force_rules:
+        description: "強制使用規則式分析（即使有 ANTHROPIC_API_KEY 也不呼叫 Claude）"
+        required: false
+        type: boolean
+        default: false
+      dry_run:
+        description: "只建置與驗證，不 commit / push"
+        required: false
+        type: boolean
+        default: false
+
+# 只要能推 commit 就夠了。GITHUB_TOKEN 其餘權限一律不給。
+# 注意：本站是「從分支提供」的 Pages，不是 Pages Actions 部署，
+# 所以不需要 pages: write / id-token: write。
+permissions:
+  contents: write
+
+# 全域單一車道。兩個 run 同時產資料、同時 push 一定會打架，
+# 所以寧可排隊也不要並行。
+#
+# cancel-in-progress 必須是 false：正在 push 的 run 被砍掉，
+# 有機會留下只寫一半的 commit 或壞掉的索引。
+concurrency:
+  group: daily-news-build-and-commit
+  cancel-in-progress: false
+
+env:
+  SITE_DIR: news-0a1318b62d883e0a
+  PYTHON_VERSION: "3.12"
+  # schedule 事件的 payload 也帶 repository，但還是留一層保險。
+  TARGET_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+  MIN_ARTICLES: "8"
+  EXPECTED_STOCKS: "20"
+
+jobs:
+  build:
+    name: 建置並回寫
+    runs-on: ubuntu-latest
+
+    # 整個 job 的上限。抓新聞最壞情況（所有來源都逾時重試）大約 40 分鐘，
+    # 這個上限保證卡死的 run 會被砍掉而不是掛在那裡佔用額度。
+    timeout-minutes: 45
+
+    # Fork 防護：
+    #  - GitHub 本來就會在 fork 停用 schedule，但使用者若手動按下
+    #    「I understand my workflows, go ahead and enable them」就會恢復，
+    #    屆時 fork 會每天對自己的 fork 推一堆沒意義的 commit。
+    #  - 這一行讓排程只在上游 repo 生效；fork 裡仍可手動 workflow_dispatch 測試。
+    if: >-
+      github.event_name != 'schedule' ||
+      github.repository == 'flyinfuture123-prog/flyinfuture123-prog.github.io'
+
+    steps:
+      # ── 1. 取得原始碼 ────────────────────────────────────────────────
+      - name: Checkout 預設分支
+        # 供應鏈強化建議：正式環境把 tag 換成完整 commit SHA，例如
+        #   uses: actions/checkout@<40 位 SHA>  # v4.2.2
+        # 取得方式：gh api repos/actions/checkout/git/ref/tags/v4.2.2
+        uses: actions/checkout@v4
+        with:
+          # 一律以預設分支為準。Pages 只吃預設分支，在別的分支產資料沒有意義；
+          # 想在分支上測就用 workflow_dispatch + dry_run。
+          ref: ${{ github.event.repository.default_branch || 'main' }}
+          # rebase 需要真正的歷史，shallow clone 會讓 git pull --rebase 失敗。
+          fetch-depth: 0
+          # 預設值，寫出來是為了強調：push 要靠這組 credential。
+          persist-credentials: true
+
+      # ── 2. Python 環境 ──────────────────────────────────────────────
+      - name: 安裝 Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          # 固定 minor 版本。用 "3.x" 會在 GitHub 換預設版本那天無預警換掉
+          # 執行環境，而排程工作沒有人盯著，通常等到網站壞掉才會發現。
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: 安裝相依套件
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          # requirements.txt 已鎖版本；anthropic 沒設金鑰時不會被真的用到，
+          # 但還是照裝，讓「有沒有金鑰」不會影響環境本身。
+          pip install --disable-pip-version-check -r requirements.txt
+          pip list
+
+      # ── 3. 判斷這次要不要走 Claude 深度分析 ─────────────────────────
+      - name: 檢查 ANTHROPIC_API_KEY 是否存在
+        id: llm
+        env:
+          # secret 不存在時，這個表達式會展開成空字串，不會讓 workflow 失敗。
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FORCE_RULES: ${{ github.event.inputs.force_rules }}
+        run: |
+          set -euo pipefail
+          if [ "${FORCE_RULES}" = "true" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "reason=手動指定 force_rules" >> "$GITHUB_OUTPUT"
+          elif [ -n "${ANTHROPIC_API_KEY}" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "reason=已設定 ANTHROPIC_API_KEY" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "reason=未設定 ANTHROPIC_API_KEY（規則式分析）" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── 4. 建置 ─────────────────────────────────────────────────────
+      - name: 抓新聞、逐則分析、產生資料與頁面
+        id: build
+        timeout-minutes: 30
+        env:
+          # 沒有這個 secret 時值是 ""，scripts/llm.py 用
+          # os.environ.get(...,"").strip() 判斷，空字串等同未設定。
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # 以下三個可用 repository variables 覆寫，不必改程式碼：
+          # Settings → Secrets and variables → Actions → Variables
+          TWNEWS_LLM_MODEL: ${{ vars.TWNEWS_LLM_MODEL }}
+          TWNEWS_LLM_MAX_ARTICLES: ${{ vars.TWNEWS_LLM_MAX_ARTICLES || '200' }}
+          TWNEWS_LLM_BATCH: ${{ vars.TWNEWS_LLM_BATCH || '10' }}
+          PYTHONUNBUFFERED: "1"
+          DAYS: ${{ github.event.inputs.days || '2' }}
+          LLM_ENABLED: ${{ steps.llm.outputs.enabled }}
+        run: |
+          set -euo pipefail
+          ARGS=(--site-dir "$SITE_DIR" --days "$DAYS")
+          if [ "$LLM_ENABLED" != "true" ]; then
+            ARGS+=(--no-llm)
+          fi
+          echo "執行：python scripts/build.py ${ARGS[*]}"
+          # 這裡刻意不加 || true。
+          # 單一新聞來源掛掉由 scripts/net.py 吞掉（回 None 而非丟例外），
+          # 不會走到這裡；能讓 build.py 回非 0 的只有「整份資料是空的」，
+          # 那就必須紅燈 —— 靜靜把好好的網站蓋成空白比失敗更糟。
+          python scripts/build.py "${ARGS[@]}"
+
+      # ── 5. 獨立驗證（不信任 build.py 自己的檢查）────────────────────
+      - name: 驗證產出資料完整性
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, sys
+          from datetime import datetime, timedelta, timezone
+
+          site = os.environ["SITE_DIR"]
+          min_articles = int(os.environ["MIN_ARTICLES"])
+          expected_stocks = int(os.environ["EXPECTED_STOCKS"])
+          errs, warns = [], []
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              errs.append(msg)
+
+          latest = os.path.join(site, "data", "latest.json")
+          index = os.path.join(site, "data", "index.json")
+          page = os.path.join(site, "index.html")
+
+          for p in (latest, index, page):
+              if not os.path.exists(p):
+                  fail(f"缺少產出檔案：{p}")
+          if errs:
+              sys.exit("產出檔案不齊全")
+
+          if os.path.getsize(page) < 4096:
+              fail(f"index.html 只有 {os.path.getsize(page)} bytes，疑似被截斷")
+          if os.path.getsize(latest) < 2048:
+              fail(f"latest.json 只有 {os.path.getsize(latest)} bytes，疑似不完整")
+
+          try:
+              with open(latest, encoding="utf-8") as fh:
+                  d = json.load(fh)
+          except (ValueError, OSError) as exc:
+              sys.exit(f"::error::latest.json 無法解析：{exc}")
+          try:
+              with open(index, encoding="utf-8") as fh:
+                  json.load(fh)
+          except (ValueError, OSError) as exc:
+              fail(f"index.json 無法解析：{exc}")
+
+          for key in ("schema_version", "generated_at", "date", "market",
+                      "stocks", "articles", "stats", "categories"):
+              if key not in d:
+                  fail(f"latest.json 缺少必要欄位 {key}")
+
+          arts = d.get("articles") or []
+          stocks = d.get("stocks") or []
+
+          if len(arts) < min_articles:
+              fail(f"新聞只有 {len(arts)} 則，低於門檻 {min_articles} —— 視為抓取失敗")
+          if len(stocks) != expected_stocks:
+              fail(f"個股數為 {len(stocks)}，應為 {expected_stocks}")
+
+          # 每一則都必須真的被分析過（這是本站的核心承諾）。
+          missing = [a.get("id", "?") for a in arts
+                     if not isinstance(a.get("analysis"), dict)]
+          if missing:
+              fail(f"有 {len(missing)} 則新聞沒有 analysis 區塊，例如 {missing[:3]}")
+
+          bad = []
+          for a in arts:
+              an = a.get("analysis") or {}
+              s = an.get("sentiment")
+              if not isinstance(s, (int, float)) or not -100 <= s <= 100:
+                  bad.append(a.get("id", "?"))
+              if not a.get("title") or not a.get("url"):
+                  bad.append(a.get("id", "?"))
+          if bad:
+              fail(f"有 {len(set(bad))} 則新聞的欄位不合法，例如 {list(set(bad))[:3]}")
+
+          covered = d.get("stats", {}).get("covered_stocks", 0)
+          if covered < 5:
+              fail(f"只有 {covered} 檔個股有新聞，明顯不正常")
+
+          # 日期必須是今天（台北）。允許 ±1 天，避開午夜前後手動觸發的邊界。
+          today = datetime.now(timezone(timedelta(hours=8))).date()
+          try:
+              got = datetime.strptime(d["date"], "%Y-%m-%d").date()
+              if abs((got - today).days) > 1:
+                  fail(f"資料日期 {got} 與今天（台北）{today} 相差過大，疑似寫到舊檔")
+          except (KeyError, ValueError) as exc:
+              fail(f"date 欄位不合法：{exc}")
+
+          # 當日封存必須與 latest 一致。
+          archive = os.path.join(site, "data", f"{d.get('date')}.json")
+          if not os.path.exists(archive):
+              fail(f"缺少當日封存 {archive}")
+          elif os.path.getsize(archive) != os.path.getsize(latest):
+              warns.append("當日封存與 latest.json 大小不一致")
+
+          for w in warns:
+              print(f"::warning::{w}")
+
+          if errs:
+              sys.exit(f"資料驗證未通過，共 {len(errs)} 項問題")
+
+          print(f"驗證通過：{len(arts)} 則新聞、{len(stocks)} 檔個股、涵蓋 {covered} 檔")
+
+          # 把數字丟給後續步驟與摘要使用。
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as fh:
+              fh.write(f"DATA_DATE={d.get('date')}\n")
+              fh.write(f"DATA_ARTICLES={len(arts)}\n")
+              fh.write(f"DATA_COVERED={covered}\n")
+              fh.write(f"DATA_ENGINE={d.get('engine', 'rules')}\n")
+              fh.write(f"DATA_SENTIMENT={d.get('market', {}).get('sentiment', 0)}\n")
+          PY
+
+      # ── 6. 保存本次產出，供 push 打架時重放 ─────────────────────────
+      - name: 快照本次產出
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/site-snapshot"
+          mkdir -p "$RUNNER_TEMP/site-snapshot"
+          cp -a "$SITE_DIR/." "$RUNNER_TEMP/site-snapshot/"
+          echo "已快照 $(find "$RUNNER_TEMP/site-snapshot" -type f | wc -l) 個檔案"
+
+      # ── 7. 是否真的有變動 ───────────────────────────────────────────
+      - name: 檢查有無變動
+        id: diff
+        run: |
+          set -euo pipefail
+          # Pages 從分支提供時預設會跑 Jekyll。本站不需要，關掉可以縮短
+          # 部署時間，也避免將來有人加了底線開頭的目錄被默默忽略。
+          [ -f .nojekyll ] || touch .nojekyll
+
+          # 只 stage 產出物。scripts/__pycache__ 之類的執行殘留一律不進版控。
+          git add -A -- "$SITE_DIR" .nojekyll
+
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "沒有任何變動，略過 commit"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --cached --stat
+          fi
+
+      # ── 8. Commit + push（含 rebase 重試）───────────────────────────
+      - name: 提交並推送回預設分支
+        id: push
+        if: steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
+        run: |
+          set -euo pipefail
+
+          # GitHub 官方的 bot 身分。用這組 email，commit 在 UI 上會正確
+          # 歸屬給 github-actions[bot]，而不是掛在某個真人頭上。
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # 用兩個 -m 組出 subject/body，不要用多行字串 —— YAML 區塊的縮排
+          # 會原封不動跑進 commit message 裡。
+          SUBJECT="資料更新：${DATA_DATE} 台股權值股新聞（${DATA_ARTICLES} 則／${DATA_ENGINE}）"
+          BODY="由 ${GITHUB_WORKFLOW} run ${GITHUB_RUN_ID} 自動產生；涵蓋 ${DATA_COVERED}/20 檔，加權情緒 ${DATA_SENTIMENT}。"
+
+          # 不需要 [skip ci]：用 GITHUB_TOKEN 推出去的 commit 依設計
+          # 不會觸發 on:push / on:pull_request，所以不會遞迴。
+          git commit -q -m "$SUBJECT" -m "$BODY"
+
+          SNAP="$RUNNER_TEMP/site-snapshot"
+
+          for attempt in 1 2 3 4 5; do
+            if git push origin "HEAD:${TARGET_BRANCH}"; then
+              echo "第 ${attempt} 次嘗試推送成功"
+              echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            echo "::warning::第 ${attempt} 次推送被拒（遠端已前進），重新同步後再試"
+            git fetch --prune origin "${TARGET_BRANCH}"
+
+            # rebase 期間 -X theirs 指的是「正在被重放的那個 commit」，
+            # 也就是本次 run 的產出 —— 重新產生的資料本來就該以最新一次為準。
+            if git rebase -X theirs "origin/${TARGET_BRANCH}"; then
+              :
+            else
+              echo "::warning::rebase 失敗，改用「以遠端為底、重放本次產出」"
+              git rebase --abort >/dev/null 2>&1 || true
+              git reset --hard "origin/${TARGET_BRANCH}"
+              rm -rf "${SITE_DIR:?}/data"
+              cp -a "$SNAP/." "$SITE_DIR/"
+              [ -f .nojekyll ] || touch .nojekyll
+              git add -A -- "$SITE_DIR" .nojekyll
+              # 遠端內容剛好和本次產出一模一樣時 commit 會空掉，那就直接收工。
+              if git diff --cached --quiet; then
+                echo "遠端已包含相同內容，無須再推"
+                exit 0
+              fi
+              git commit -q -m "$SUBJECT" -m "$BODY"
+            fi
+
+            sleep $(( attempt * 5 ))
+          done
+
+          echo "::error::連續 5 次推送都失敗，請人工檢查分支保護或遠端狀態"
+          exit 1
+
+      # ── 9. 摘要 ─────────────────────────────────────────────────────
+      - name: 寫入執行摘要
+        if: always()
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          DIFF_CHANGED: ${{ steps.diff.outputs.changed }}
+          PUSH_OUTCOME: ${{ steps.push.outcome }}
+          PUSHED_SHA: ${{ steps.push.outputs.sha }}
+          LLM_REASON: ${{ steps.llm.outputs.reason }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          {
+            echo ""
+            echo "### 本次執行"
+            echo ""
+            echo "| 項目 | 結果 |"
+            echo "| --- | --- |"
+            echo "| 觸發方式 | \`${GITHUB_EVENT_NAME}\` |"
+            echo "| 分析引擎 | ${LLM_REASON:-未知} |"
+            echo "| 建置 | ${BUILD_OUTCOME:-skipped} |"
+            echo "| 檔案有變動 | ${DIFF_CHANGED:-n/a} |"
+            if [ "${DRY_RUN}" = "true" ]; then
+              echo "| 推送 | 略過（dry_run） |"
+            elif [ "${DIFF_CHANGED}" = "false" ]; then
+              echo "| 推送 | 略過（內容未變動，不產生空 commit） |"
+            elif [ -z "${PUSH_OUTCOME}" ]; then
+              echo "| 推送 | 未執行（前面的步驟就失敗了） |"
+            else
+              echo "| 推送 | ${PUSH_OUTCOME} \`${PUSHED_SHA:-}\` |"
+            fi
+            echo ""
+            if [ "${BUILD_OUTCOME}" != "success" ]; then
+              echo "> **建置失敗，網站維持上一版內容。**"
+              echo "> 常見原因：Google 新聞 RSS 全面不可用、或產出的資料未通過完整性驗證。"
+              echo "> 站上仍是昨天的資料，不會被空白頁蓋掉。"
+            else
+              echo "網站：<https://flyinfuture123-prog.github.io/${SITE_DIR}/>"
+              echo ""
+              echo "_Pages 從分支提供，推送後約 30–60 秒生效；瀏覽器可能還會快取一小段時間。_"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

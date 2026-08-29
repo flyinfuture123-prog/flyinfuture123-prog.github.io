@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>台股權值股新聞分析</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="台股前 20 大權值股每日新聞蒐集與逐則分析">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #eceef1; --surface: #ffffff; --surface-2: #f4f5f7; --border: rgba(20,28,40,0.10); --border-strong: rgba(20,28,40,0.18);
+  --ink: #151a21; --ink-2: #4a5564; --ink-3: #7d8794;
+  --accent: #a8721a; --accent-ink: #7a5210; --accent-soft: rgba(199,133,0,0.13);
+  --up: #cf3a41; --down: #1f9560; --up-soft: rgba(207,58,65,0.12); --down-soft: rgba(31,149,96,0.12); --flat-soft: rgba(125,135,148,0.14);
+  --grid: #e6e8eb; --axis: #c9cdd3;
+  --shadow: 0 1px 2px rgba(20,28,40,0.06), 0 8px 24px -12px rgba(20,28,40,0.18);
+  --serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0d1117; --surface: #151a21; --surface-2: #1b222b; --border: rgba(255,255,255,0.09); --border-strong: rgba(255,255,255,0.16);
+    --ink: #e7eaee; --ink-2: #aab3bf; --ink-3: #7b8694;
+    --accent: #e4a93a; --accent-ink: #f0c268; --accent-soft: rgba(228,169,58,0.14);
+    --up: #f0605f; --down: #34c48b; --up-soft: rgba(240,96,95,0.16); --down-soft: rgba(52,196,139,0.16); --flat-soft: rgba(123,134,148,0.18);
+    --grid: #1f2730; --axis: #2f3945;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0d1117; --surface: #151a21; --surface-2: #1b222b; --border: rgba(255,255,255,0.09); --border-strong: rgba(255,255,255,0.16);
+  --ink: #e7eaee; --ink-2: #aab3bf; --ink-3: #7b8694;
+  --accent: #e4a93a; --accent-ink: #f0c268; --accent-soft: rgba(228,169,58,0.14);
+  --up: #f0605f; --down: #34c48b; --up-soft: rgba(240,96,95,0.16); --down-soft: rgba(52,196,139,0.16); --flat-soft: rgba(123,134,148,0.18);
+  --grid: #1f2730; --axis: #2f3945;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.6; }
+button, input, select { font: inherit; color: inherit; }
+a { color: var(--accent-ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--ink-2); }
+.muted { color: var(--ink-3); }
+.small { font-size: 12px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---- top bar ---- */
+.topbar { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom: 1px solid var(--border); }
+.topbar-inner { max-width: 1320px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.brand-mark { font-family: var(--serif); font-weight: 900; font-size: 22px; letter-spacing: 0.06em; }
+.brand-sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--ink-3); text-transform: uppercase; }
+.topbar-meta { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
+.btn { border: 1px solid var(--border-strong); background: var(--surface); border-radius: 6px; padding: 5px 11px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--ink); }
+.btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+.btn:focus-visible, select:focus-visible, input:focus-visible, .chip:focus-visible, .heat-cell:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.sm { padding: 3px 8px; font-size: 11px; }
+.btn.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+select, input[type="search"] { border: 1px solid var(--border-strong); background: var(--surface); border-radius: 6px; padding: 5px 9px; }
+
+main { max-width: 1320px; margin: 0 auto; padding: 18px 20px 56px; }
+.stack { display: grid; gap: 16px; }
+.grid { display: grid; gap: 14px; }
+.g-tiles { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.g-cards { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.g-brief { grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr); }
+@media (max-width: 900px) { .g-brief { grid-template-columns: 1fr; } }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); min-width: 0; }
+.card-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.card-h h2, .card-h h3 { font-family: var(--serif); font-weight: 700; font-size: 15px; letter-spacing: 0.03em; }
+.card-h .sub { font-size: 12px; color: var(--ink-3); }
+.section-title { font-family: var(--serif); font-weight: 900; font-size: 18px; letter-spacing: 0.04em; margin: 10px 0 0; }
+.eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tile .label { font-size: 12px; color: var(--ink-3); }
+.tile .value { font-family: var(--mono); font-size: 26px; font-weight: 600; line-height: 1.15; }
+.tile .value.sm { font-size: 17px; }
+.tile .foot { font-size: 11.5px; color: var(--ink-2); }
+
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 500; font-family: var(--mono); white-space: nowrap; }
+.pill.up { background: var(--up-soft); color: var(--up); }
+.pill.down { background: var(--down-soft); color: var(--down); }
+.pill.flat { background: var(--flat-soft); color: var(--ink-2); }
+.pill.accent { background: var(--accent-soft); color: var(--accent-ink); }
+.pill.plain { background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--border); font-family: var(--sans); }
+.pill.warn { background: var(--accent-soft); color: var(--accent-ink); font-family: var(--sans); }
+
+/* ---- sentiment meter ---- */
+.meter { height: 8px; border-radius: 999px; background: var(--flat-soft); position: relative; overflow: hidden; }
+.meter > i { position: absolute; top: 0; bottom: 0; display: block; }
+.meter > i.pos { left: 50%; background: var(--up); }
+.meter > i.neg { right: 50%; background: var(--down); }
+.meter::after { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--axis); }
+
+/* ---- heat strip ---- */
+.heat { display: grid; grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)); gap: 6px; }
+.heat-cell { border: 1px solid var(--border); border-radius: 8px; padding: 8px 9px; text-align: left; cursor: pointer; background: var(--surface-2); display: grid; gap: 2px; min-width: 0; }
+.heat-cell:hover { border-color: var(--accent); }
+.heat-cell.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.heat-cell .hn { font-weight: 500; font-size: 13px; display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
+.heat-cell .hn small { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); font-weight: 400; }
+.heat-cell .hs { font-family: var(--mono); font-size: 16px; font-weight: 600; }
+.heat-cell .hm { font-size: 11px; color: var(--ink-3); }
+
+/* ---- chips ---- */
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { border: 1px solid var(--border-strong); background: var(--surface); border-radius: 999px; padding: 3px 11px; font-size: 12px; cursor: pointer; color: var(--ink-2); }
+.chip:hover { border-color: var(--accent); color: var(--accent-ink); }
+.chip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 500; }
+
+/* ---- stock cards ---- */
+.stock { display: grid; gap: 8px; }
+.stock-h { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stock-h .nm { font-family: var(--serif); font-weight: 700; font-size: 16px; }
+.stock-h .tk { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
+.stock-h .wt { margin-left: auto; font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); }
+.stock .why { font-size: 12px; color: var(--ink-3); }
+.counts { display: flex; gap: 10px; font-family: var(--mono); font-size: 12px; }
+
+/* ---- article list ---- */
+.arts { display: grid; gap: 0; }
+.art { border-top: 1px solid var(--border); padding: 12px 0; display: grid; gap: 6px; }
+.art:first-child { border-top: 0; }
+.art-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.art-title { font-weight: 500; font-size: 14.5px; line-height: 1.5; flex: 1 1 260px; min-width: 0; }
+.art-title a { color: inherit; }
+.art-meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-3); align-items: center; }
+.art-analysis { background: var(--surface-2); border-left: 3px solid var(--border-strong); border-radius: 0 6px 6px 0; padding: 8px 11px; font-size: 13px; color: var(--ink-2); }
+.art-analysis.bull { border-left-color: var(--up); }
+.art-analysis.bear { border-left-color: var(--down); }
+.art-analysis .lead { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); display: block; margin-bottom: 3px; }
+.art-summary { font-size: 12.5px; color: var(--ink-3); }
+.stars { font-family: var(--mono); font-size: 11px; color: var(--accent-ink); letter-spacing: 0.1em; }
+.score { display: inline-block; min-width: 42px; text-align: center; font-family: var(--mono); font-weight: 600; font-size: 12px; padding: 2px 7px; border-radius: 5px; }
+.score.s2 { background: var(--up); color: #fff; }
+.score.s1 { background: var(--up-soft); color: var(--up); }
+.score.s0 { background: var(--flat-soft); color: var(--ink-2); }
+.score.sm1 { background: var(--down-soft); color: var(--down); }
+.score.sm2 { background: var(--down); color: #fff; }
+
+/* ---- filters ---- */
+.filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.filters label { font-size: 12px; color: var(--ink-3); }
+.filters input[type="search"] { min-width: 180px; flex: 1 1 180px; }
+
+details.more > summary { cursor: pointer; font-size: 12px; color: var(--accent-ink); list-style: none; padding-top: 4px; }
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before { content: "＋ "; }
+details.more[open] > summary::before { content: "－ "; }
+
+.state { padding: 40px 20px; text-align: center; color: var(--ink-2); }
+.state code { font-family: var(--mono); font-size: 12px; background: var(--surface-2); padding: 2px 6px; border-radius: 4px; }
+footer { max-width: 1320px; margin: 0 auto; padding: 0 20px 40px; color: var(--ink-3); font-size: 12px; line-height: 1.8; }
+.legend-note { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-3); }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-mark">台股新聞戰情</span>
+      <span class="brand-sub">Top-20 News Desk</span>
+    </div>
+    <div class="topbar-meta">
+      <span id="meta-date" class="num">—</span>
+      <span id="meta-engine" class="pill plain">—</span>
+      <label class="sr" for="date-pick">選擇日期</label>
+      <select id="date-pick" hidden></select>
+      <button class="btn sm" id="theme-btn" type="button">深色</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div id="loading" class="state">載入資料中…</div>
+  <div id="error" class="state" hidden></div>
+  <div id="content" class="stack" hidden>
+
+    <!-- 盤前快報 -->
+    <section class="grid g-brief" aria-labelledby="t-brief">
+      <div class="card">
+        <div class="card-h">
+          <h2 id="t-brief">今日盤前快報</h2>
+          <span class="sub" id="brief-window">—</span>
+        </div>
+        <p id="brief-text" style="margin:0 0 10px; font-size:14.5px;"></p>
+        <div class="meter" aria-hidden="true"><i id="brief-meter"></i></div>
+        <div class="legend-note" style="margin-top:8px;">
+          <span>← 利空</span><span class="muted">新聞情緒 −100 … +100</span><span>利多 →</span>
+        </div>
+        <div class="chips" id="brief-themes" style="margin-top:12px;"></div>
+      </div>
+      <div class="grid g-tiles" style="align-content:start;">
+        <div class="tile">
+          <span class="label">加權新聞情緒</span>
+          <span class="value" id="kpi-sent">—</span>
+          <span class="foot" id="kpi-sent-label">—</span>
+        </div>
+        <div class="tile">
+          <span class="label">分析則數</span>
+          <span class="value" id="kpi-count">—</span>
+          <span class="foot" id="kpi-cover">—</span>
+        </div>
+        <div class="tile">
+          <span class="label">新聞面最強</span>
+          <span class="value sm up" id="kpi-strong">—</span>
+          <span class="foot">權重加權後情緒最高的個股</span>
+        </div>
+        <div class="tile">
+          <span class="label">新聞面最弱</span>
+          <span class="value sm down" id="kpi-weak">—</span>
+          <span class="foot">最需要留意的個股</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 20 檔熱力 -->
+    <section class="card" aria-labelledby="t-heat">
+      <div class="card-h">
+        <h2 id="t-heat">20 大權值股新聞溫度</h2>
+        <span class="sub">點一下可篩選該檔新聞</span>
+      </div>
+      <div class="heat" id="heat"></div>
+    </section>
+
+    <!-- 今日最重要 -->
+    <section class="card" aria-labelledby="t-top">
+      <div class="card-h">
+        <h2 id="t-top">今日最值得看的幾則</h2>
+        <span class="sub">依重要性排序</span>
+      </div>
+      <div class="arts" id="top-arts"></div>
+    </section>
+
+    <!-- 個股 -->
+    <h2 class="section-title">個股新聞面</h2>
+    <section class="grid g-cards" id="stock-cards" aria-label="個股新聞面"></section>
+
+    <!-- 全部新聞 -->
+    <h2 class="section-title">全部新聞與逐則分析</h2>
+    <section class="card" aria-labelledby="t-all">
+      <div class="card-h">
+        <h2 id="t-all" class="sr">全部新聞</h2>
+        <div class="filters">
+          <label for="f-stock">個股</label>
+          <select id="f-stock"></select>
+          <label for="f-cat">題材</label>
+          <select id="f-cat"></select>
+          <label for="f-dir">方向</label>
+          <select id="f-dir">
+            <option value="">全部</option>
+            <option value="bull">偏多</option>
+            <option value="bear">偏空</option>
+            <option value="flat">中性</option>
+          </select>
+          <label for="f-sort">排序</label>
+          <select id="f-sort">
+            <option value="importance">重要性</option>
+            <option value="time">時間</option>
+            <option value="bull">情緒（多→空）</option>
+            <option value="bear">情緒（空→多）</option>
+          </select>
+          <input type="search" id="f-q" placeholder="搜尋標題或分析…" aria-label="搜尋新聞">
+          <button class="btn sm" id="f-reset" type="button">清除</button>
+        </div>
+      </div>
+      <div class="small muted" id="f-count" style="margin-bottom:4px;"></div>
+      <div class="arts" id="all-arts"></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <p id="foot-sources"></p>
+  <p>本頁由排程程式每日自動產生。情緒／重要性為程式依標題與摘要推估的結果，可能誤判；
+     所有內容僅供資訊整理與研究參考，不構成任何投資建議或買賣要約。請以各公司正式公告與原始報導為準。</p>
+</footer>
+
+<script>
+"use strict";
+
+var DATA = null;
+var STATE = { stock: "", cat: "", dir: "", sort: "importance", q: "" };
+
+/* ---------- 小工具 ---------- */
+function $(id) { return document.getElementById(id); }
+function el(tag, cls, text) {
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined && text !== null) n.textContent = String(text);
+  return n;
+}
+function keyOf(s) { return s >= 15 ? "bull" : (s <= -15 ? "bear" : "flat"); }
+function toneClass(k) { return k === "bull" ? "up" : (k === "bear" ? "down" : "flat"); }
+function scoreClass(s) {
+  if (s >= 45) return "s2"; if (s >= 15) return "s1";
+  if (s <= -45) return "sm2"; if (s <= -15) return "sm1";
+  return "s0";
+}
+function signed(n) { return (n > 0 ? "+" : "") + n; }
+function stars(n) { return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n); }
+function fmtTime(iso) {
+  if (!iso) return "";
+  var d = new Date(iso);
+  if (isNaN(d)) return "";
+  var pad = function (x) { return x < 10 ? "0" + x : String(x); };
+  return (d.getMonth() + 1) + "/" + d.getDate() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+
+/* ---------- 主題 ---------- */
+function initTheme() {
+  var saved = null;
+  try { saved = localStorage.getItem("twnews-theme"); } catch (e) { /* 無痕模式會丟例外 */ }
+  if (saved === "dark" || saved === "light") document.documentElement.setAttribute("data-theme", saved);
+  syncThemeBtn();
+  $("theme-btn").addEventListener("click", function () {
+    var cur = document.documentElement.getAttribute("data-theme");
+    if (!cur) cur = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    var next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("twnews-theme", next); } catch (e) { /* 忽略 */ }
+    syncThemeBtn();
+  });
+}
+function syncThemeBtn() {
+  var cur = document.documentElement.getAttribute("data-theme");
+  var dark = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  $("theme-btn").textContent = dark ? "淺色" : "深色";
+}
+
+/* ---------- 載入 ---------- */
+function load(file) {
+  $("loading").hidden = false;
+  $("error").hidden = true;
+  return fetch(file + "?v=" + Date.now(), { cache: "no-store" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function (json) {
+      DATA = json;
+      render();
+      $("loading").hidden = true;
+      $("content").hidden = false;
+    })
+    .catch(function (err) {
+      $("loading").hidden = true;
+      $("content").hidden = true;
+      var box = $("error");
+      var missing = err.message.indexOf("404") !== -1;
+      box.hidden = false;
+      box.innerHTML = "";
+      if (missing) {
+        // 還沒跑過第一次排程是預期中的狀態，不該長得像壞掉。
+        box.appendChild(el("h2", "section-title", "尚未產生資料"));
+        box.appendChild(el("p", null,
+          "每日排程會在台灣時間早上 07:30 抓取新聞、逐則分析後把資料寫進來。"));
+        box.appendChild(el("p", "small muted",
+          "想立刻看到結果，可以到 GitHub 的 Actions 分頁手動執行「每日台股新聞建置」。"));
+      } else {
+        box.appendChild(el("h2", "section-title", "讀不到資料"));
+        box.appendChild(el("p", null, err.message));
+        box.appendChild(el("p", "small muted",
+          "若是在本機直接開檔，瀏覽器會擋下 fetch；請透過 GitHub Pages 或本機伺服器瀏覽。"));
+      }
+      var p = el("p", "small muted");
+      p.appendChild(document.createTextNode("預期路徑："));
+      p.appendChild(el("code", null, "data/" + file.replace(/^data\//, "")));
+      box.appendChild(p);
+    });
+}
+
+function loadIndex() {
+  return fetch("data/index.json?v=" + Date.now(), { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (idx) {
+      if (!idx || !idx.days || idx.days.length < 2) return;
+      var sel = $("date-pick");
+      sel.hidden = false;
+      idx.days.forEach(function (d) {
+        var o = el("option", null, d.date + "（" + d.article_count + " 則）");
+        o.value = "data/" + d.file;
+        sel.appendChild(o);
+      });
+      sel.addEventListener("change", function () { load(sel.value); });
+    })
+    .catch(function () { /* 索引不存在不影響主要功能 */ });
+}
+
+/* ---------- 渲染 ---------- */
+function render() {
+  var m = DATA.market, st = DATA.stats;
+  // 換日期時 DATA 整份被換掉，這兩份索引必須跟著作廢，
+  // 否則畫面會混到前一天的新聞。
+  articleById._map = null;
+  stockOf._map = null;
+
+  $("meta-date").textContent = DATA.date + " 更新";
+  var eng = $("meta-engine");
+  eng.textContent = DATA.engine === "claude" ? "Claude 深度分析" : "規則式分析";
+  eng.className = "pill " + (DATA.engine === "claude" ? "accent" : "plain");
+
+  $("brief-text").textContent = m.text;
+  $("brief-window").textContent = "回溯 " + DATA.window_days + " 日 · " +
+    (DATA.generated_at || "").replace("T", " ").slice(0, 16);
+
+  var meter = $("brief-meter");
+  var pct = Math.min(50, Math.abs(m.sentiment) / 2);
+  meter.className = m.sentiment >= 0 ? "pos" : "neg";
+  meter.style.width = pct + "%";
+
+  $("kpi-sent").textContent = signed(m.sentiment);
+  $("kpi-sent").className = "value " + toneClass(m.sentiment_key);
+  $("kpi-sent-label").textContent = m.sentiment_label;
+  $("kpi-count").textContent = st.article_count;
+  $("kpi-cover").textContent = "涵蓋 " + st.covered_stocks + " / " + st.stock_count +
+    " 檔（約占大盤 " + st.index_weight_covered + "%）";
+
+  var fmtRank = function (arr, want) {
+    var hit = (arr || []).filter(function (s) {
+      return want > 0 ? s.sentiment > 0 : s.sentiment < 0;
+    });
+    return hit.length ? hit[0].name + " " + signed(hit[0].sentiment) : "無";
+  };
+  $("kpi-strong").textContent = fmtRank(m.strongest, 1);
+  $("kpi-weak").textContent = fmtRank(m.weakest, -1);
+
+  var themes = $("brief-themes");
+  themes.innerHTML = "";
+  (m.themes || []).forEach(function (t) {
+    themes.appendChild(el("span", "pill plain", t.label + " " + t.count));
+  });
+
+  var sel = $("date-pick");
+  if (!sel.hidden) {
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value.indexOf(DATA.date) !== -1) { sel.selectedIndex = i; break; }
+    }
+  }
+
+  renderHeat();
+  renderTop();
+  renderStockCards();
+  initFilters();
+  renderAll();
+  renderFooter();
+}
+
+function renderHeat() {
+  var host = $("heat");
+  host.innerHTML = "";
+  DATA.stocks.forEach(function (s) {
+    var b = el("button", "heat-cell" + (STATE.stock === s.ticker ? " on" : ""));
+    b.type = "button";
+    b.setAttribute("aria-pressed", STATE.stock === s.ticker ? "true" : "false");
+    var n = el("span", "hn");
+    n.appendChild(el("span", null, s.name));
+    n.appendChild(el("small", null, s.ticker));
+    b.appendChild(n);
+    var sc = el("span", "hs " + toneClass(s.sentiment_key),
+      s.article_count ? signed(s.sentiment) : "—");
+    b.appendChild(sc);
+    b.appendChild(el("span", "hm", s.article_count
+      ? (s.article_count + " 則 · " + s.sentiment_label)
+      : "無新聞"));
+    b.title = s.name + "（" + s.ticker + "）權重約 " + s.weight + "%\n" + s.summary_text;
+    b.addEventListener("click", function () {
+      STATE.stock = STATE.stock === s.ticker ? "" : s.ticker;
+      $("f-stock").value = STATE.stock;
+      renderHeat();
+      renderAll();
+      document.getElementById("all-arts").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    host.appendChild(b);
+  });
+}
+
+function articleById(id) {
+  if (!articleById._map) {
+    articleById._map = {};
+    DATA.articles.forEach(function (a) { articleById._map[a.id] = a; });
+  }
+  return articleById._map[id];
+}
+
+function renderTop() {
+  var host = $("top-arts");
+  host.innerHTML = "";
+  var ids = DATA.market.top_article_ids || [];
+  if (!ids.length) { host.appendChild(el("p", "muted small", "今日沒有足夠的新聞可排序。")); return; }
+  ids.forEach(function (id) {
+    var a = articleById(id);
+    if (a) host.appendChild(articleNode(a, true));
+  });
+}
+
+function articleNode(a, showStocks) {
+  var an = a.analysis;
+  var wrap = el("article", "art");
+
+  var top = el("div", "art-top");
+  var sc = el("span", "score " + scoreClass(an.sentiment), signed(an.sentiment));
+  sc.title = "新聞情緒 " + signed(an.sentiment) + "（" + an.sentiment_label +
+    "）· 信心 " + Math.round(an.confidence * 100) + "%";
+  top.appendChild(sc);
+
+  var t = el("div", "art-title");
+  if (a.url) {
+    var link = el("a", null, a.title);
+    link.href = a.url; link.target = "_blank"; link.rel = "noopener noreferrer";
+    t.appendChild(link);
+  } else {
+    t.textContent = a.title;
+  }
+  top.appendChild(t);
+  var st = el("span", "stars", stars(an.importance));
+  st.title = "重要性 " + an.importance + "/5";
+  top.appendChild(st);
+  wrap.appendChild(top);
+
+  var meta = el("div", "art-meta");
+  if (a.outlet) meta.appendChild(el("span", null, a.outlet));
+  if (a.dup_count > 1) meta.appendChild(el("span", "pill plain", a.dup_count + " 家報導"));
+  var tm = fmtTime(a.published);
+  if (tm) meta.appendChild(el("span", null, tm));
+  meta.appendChild(el("span", "pill accent", an.category_label));
+  meta.appendChild(el("span", "pill plain", an.horizon));
+  meta.appendChild(el("span", "pill plain", "信心 " + Math.round(an.confidence * 100) + "%"));
+  (an.flags || []).forEach(function (f) { meta.appendChild(el("span", "pill warn", f)); });
+  if (showStocks) {
+    (a.tickers || []).forEach(function (tk) {
+      var s = stockOf(tk);
+      if (s) meta.appendChild(el("span", "pill plain", s.name));
+    });
+  }
+  wrap.appendChild(meta);
+
+  var box = el("div", "art-analysis " + an.sentiment_key);
+  box.appendChild(el("span", "lead", "逐則分析"));
+  box.appendChild(document.createTextNode(an.commentary));
+  wrap.appendChild(box);
+
+  if (a.summary) {
+    var d = el("details", "more");
+    d.appendChild(el("summary", null, "原文摘要"));
+    d.appendChild(el("div", "art-summary", a.summary));
+    wrap.appendChild(d);
+  }
+  return wrap;
+}
+
+function stockOf(ticker) {
+  if (!stockOf._map) {
+    stockOf._map = {};
+    DATA.stocks.forEach(function (s) { stockOf._map[s.ticker] = s; });
+  }
+  return stockOf._map[ticker];
+}
+
+function renderStockCards() {
+  var host = $("stock-cards");
+  host.innerHTML = "";
+  DATA.stocks.forEach(function (s) {
+    var c = el("section", "card stock");
+    var h = el("div", "stock-h");
+    h.appendChild(el("span", "nm", s.name));
+    h.appendChild(el("span", "tk", s.ticker));
+    h.appendChild(el("span", "pill plain", s.sector));
+    h.appendChild(el("span", "wt", "權重約 " + s.weight + "%"));
+    c.appendChild(h);
+
+    var row = el("div", "art-top");
+    row.appendChild(el("span", "score " + scoreClass(s.sentiment),
+      s.article_count ? signed(s.sentiment) : "—"));
+    row.appendChild(el("span", "small " + toneClass(s.sentiment_key),
+      s.article_count ? s.sentiment_label : "今日無新聞"));
+    c.appendChild(row);
+
+    var meter = el("div", "meter");
+    var bar = el("i", s.sentiment >= 0 ? "pos" : "neg");
+    bar.style.width = Math.min(50, Math.abs(s.sentiment) / 2) + "%";
+    meter.appendChild(bar);
+    c.appendChild(meter);
+
+    var counts = el("div", "counts");
+    counts.appendChild(el("span", "up", "多 " + s.counts.bull));
+    counts.appendChild(el("span", "down", "空 " + s.counts.bear));
+    counts.appendChild(el("span", "flat", "中 " + s.counts.flat));
+    c.appendChild(counts);
+
+    if (s.top_categories.length) {
+      var chips = el("div", "chips");
+      s.top_categories.forEach(function (t) {
+        chips.appendChild(el("span", "pill plain", t.label + " " + t.count));
+      });
+      c.appendChild(chips);
+    }
+
+    c.appendChild(el("p", "small", s.summary_text));
+    c.appendChild(el("p", "why", "長期觀察重點：" + s.driver));
+
+    if (s.article_ids.length) {
+      var d = el("details", "more");
+      d.appendChild(el("summary", null, "展開 " + s.article_ids.length + " 則新聞與分析"));
+      var list = el("div", "arts");
+      s.article_ids.forEach(function (id) {
+        var a = articleById(id);
+        if (a) list.appendChild(articleNode(a, false));
+      });
+      d.appendChild(list);
+      c.appendChild(d);
+    }
+    host.appendChild(c);
+  });
+}
+
+/* ---------- 篩選 ---------- */
+function initFilters() {
+  var fs = $("f-stock");
+  fs.innerHTML = "";
+  fs.appendChild(new Option("全部個股", ""));
+  DATA.stocks.forEach(function (s) {
+    fs.appendChild(new Option(s.name + "（" + s.ticker + "）" +
+      (s.article_count ? " · " + s.article_count : ""), s.ticker));
+  });
+  fs.value = STATE.stock;
+
+  var used = {};
+  DATA.articles.forEach(function (a) { used[a.analysis.category] = a.analysis.category_label; });
+  var fc = $("f-cat");
+  fc.innerHTML = "";
+  fc.appendChild(new Option("全部題材", ""));
+  Object.keys(used).forEach(function (k) { fc.appendChild(new Option(used[k], k)); });
+  fc.value = STATE.cat;
+
+  fs.onchange = function () { STATE.stock = fs.value; renderHeat(); renderAll(); };
+  fc.onchange = function () { STATE.cat = fc.value; renderAll(); };
+  $("f-dir").onchange = function () { STATE.dir = $("f-dir").value; renderAll(); };
+  $("f-sort").onchange = function () { STATE.sort = $("f-sort").value; renderAll(); };
+  $("f-q").oninput = function () { STATE.q = $("f-q").value.trim(); renderAll(); };
+  $("f-reset").onclick = function () {
+    STATE = { stock: "", cat: "", dir: "", sort: "importance", q: "" };
+    fs.value = ""; fc.value = ""; $("f-dir").value = ""; $("f-sort").value = "importance"; $("f-q").value = "";
+    renderHeat(); renderAll();
+  };
+}
+
+function renderAll() {
+  var list = DATA.articles.filter(function (a) {
+    var an = a.analysis;
+    if (STATE.stock && (a.tickers || []).indexOf(STATE.stock) === -1) return false;
+    if (STATE.cat && an.category !== STATE.cat) return false;
+    if (STATE.dir && an.sentiment_key !== STATE.dir) return false;
+    if (STATE.q) {
+      var hay = (a.title + " " + (a.summary || "") + " " + an.commentary + " " + (a.outlet || "")).toLowerCase();
+      if (hay.indexOf(STATE.q.toLowerCase()) === -1) return false;
+    }
+    return true;
+  });
+
+  list.sort(function (x, y) {
+    var ax = x.analysis, ay = y.analysis;
+    if (STATE.sort === "time") return (y.published_ts || 0) - (x.published_ts || 0);
+    if (STATE.sort === "bull") return ay.sentiment - ax.sentiment;
+    if (STATE.sort === "bear") return ax.sentiment - ay.sentiment;
+    return (ay.importance - ax.importance) || ((y.published_ts || 0) - (x.published_ts || 0));
+  });
+
+  var host = $("all-arts");
+  host.innerHTML = "";
+  var label = STATE.stock ? ("　·　已篩選：" + (stockOf(STATE.stock) || {}).name) : "";
+  $("f-count").textContent = "顯示 " + list.length + " / " + DATA.articles.length + " 則" + label;
+  if (!list.length) {
+    host.appendChild(el("p", "muted small", "沒有符合條件的新聞。試著放寬篩選條件。"));
+    return;
+  }
+  list.forEach(function (a) { host.appendChild(articleNode(a, true)); });
+}
+
+function renderFooter() {
+  var st = DATA.stats;
+  var ok = 0, bad = 0;
+  (st.sources.sources || []).forEach(function (s) { s.ok ? ok++ : bad++; });
+  var parts = ["資料來源：Google 新聞（台灣）等公開摘要，共 " + (ok + bad) + " 個查詢，成功 " + ok + " 個"];
+  if (bad) parts.push("失敗 " + bad + " 個（已略過）");
+  if (st.llm && st.llm.enabled) {
+    parts.push("深度分析模型：" + st.llm.model + "，升級 " + st.llm.upgraded + " 則");
+  }
+  parts.push("產生時間 " + (DATA.generated_at || "").replace("T", " "));
+  $("foot-sources").textContent = parts.join("　·　");
+}
+
+/* ---------- 啟動 ---------- */
+initTheme();
+loadIndex();
+load("data/latest.json");
+</script>
+</body>
+</html>

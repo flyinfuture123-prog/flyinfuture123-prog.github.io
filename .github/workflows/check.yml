@@ -10,11 +10,13 @@ on:
       - "tests/**"
       - "requirements.txt"
       - ".github/workflows/**"
+      - "patentmap-4b9c7e2a51d8f306/data/**"
   pull_request:
     paths:
       - "scripts/**"
       - "tests/**"
       - "requirements.txt"
+      - "patentmap-4b9c7e2a51d8f306/data/**"
   workflow_dispatch:
 
 permissions:
@@ -73,3 +75,12 @@ jobs:
 
       - name: 檢查產出（時尚站）
         run: python tests/test_fashion_pipeline.py /tmp/fashion-site-check/data/latest.json
+
+      # patentmap 站的 data/book.json 是由 scripts/patentmap/ 的模組產生的。
+      # 只改模組沒重跑產生器（或反過來直接手改 json），頁面就會跟原始資料對不上，
+      # 而且不會有任何錯誤訊息。這一步把兩邊比對起來。
+      - name: 檢查 patentmap 資料檔與產生器同步
+        run: |
+          python scripts/patentmap_build.py /tmp/patentmap-book.json
+          diff -u patentmap-4b9c7e2a51d8f306/data/book.json /tmp/patentmap-book.json \
+            || { echo "::error::data/book.json 與 scripts/patentmap_build.py 的產出不一致，請重跑產生器"; exit 1; }

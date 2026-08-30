@@ -24,16 +24,18 @@ def build():
         "chapters": [
             ch01_02.CH1, ch01_02.CH2,
             ch03_05.CH3, ch03_05.CH4, ch03_05.CH5,
-            ch06_08.CH6, ch06_08.CH7, ch06_08.CH8, ch06_08.APPENDIX,
+            ch06_08.CH6, ch06_08.CH7,
         ],
     }
     book["meta"]["coverage"] = {
-        "have": ["1–15", "27–36", "46–77", "78–81"],
-        "missing": ["16–26", "37–45", "82–96"],
-        "missingDetail": [
-            {"range": "16–26", "what": "第三章 專利與論文地圖蒐集（三大資料庫檢索）"},
-            {"range": "37–45", "what": "4-4 年份趨勢圖第四步以後、4-5 發表地區統計圖"},
-            {"range": "82–96", "what": "7-3 應用策略後半、第八章 結論、作者簡歷"},
+        "covered": "1–81",
+        "byImage": ["1–26", "37–45", "78–81"],
+        "byOcr": ["27–36", "46–77"],
+        "excluded": ["82–96"],
+        "excludedDetail": [
+            {"range": "82–94", "what": "7-3 個別簡報之展示範例"},
+            {"range": "95", "what": "第八章 結論"},
+            {"range": "96", "what": "作者簡歷"},
         ],
     }
     return book

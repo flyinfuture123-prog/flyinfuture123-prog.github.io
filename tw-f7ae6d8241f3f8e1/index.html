@@ -371,19 +371,19 @@ tr.drawer td { background: var(--surface-2); padding: 12px 14px; white-space: no
       <div class="tbl-wrap" id="techRank"></div>
     </div>
     <div class="section-title">進場策略</div>
-    <div class="grid g-main">
-      <div class="card">
-        <div class="card-h"><h2 id="entryChartTitle">進場地圖</h2><span class="sub">進場區間（金色帶）· 停損（綠線）· 目標（紅線）· 長線分批價（紫線）</span></div>
-        <div id="entryChart" style="height:500px"></div>
-      </div>
+    <div class="card">
+      <div class="card-h"><h2 id="entryChartTitle">進場地圖</h2><span class="sub">進場區間（金色帶）· 停損（綠線）· 目標（紅線）· 長線分批價（紫線）</span></div>
+      <div id="entryChart" style="height:760px"></div>
+    </div>
+    <div class="grid g-2">
       <div class="card">
         <div class="card-h"><h2>技術面摘要</h2><span class="sub" id="entryTechSub"></span></div>
         <div id="entryTech"></div>
       </div>
-    </div>
-    <div class="card">
-      <div class="card-h"><h2>資訊面背書</h2><div style="display:flex;gap:6px;flex-wrap:wrap" id="entryNewsBtns"></div></div>
-      <div id="entryNews"></div>
+      <div class="card">
+        <div class="card-h"><h2>資訊面背書</h2><div style="display:flex;gap:6px;flex-wrap:wrap" id="entryNewsBtns"></div></div>
+        <div id="entryNews"></div>
+      </div>
     </div>
     <div class="grid g-2" id="entryCards"></div>
     <div class="card">
@@ -1623,7 +1623,7 @@ const APP = (() => {
     st.targets.forEach((t, k) => hl.push({ y: t.price, label: `${k ? '目標二' : '目標一'} ${fmtN(t.price)}`, color: '--up', extend: k === 0, right: true }));
     lt.plan.slice(1).forEach(p => { if (isN(p.price)) hl.push({ y: p.price, label: `${p.label} ${fmtN(p.price)}`, color: '--s4', dash: true }); });
     return { dates: s.d, window: window_ || 130, panes: [
-      { weight: 3.2, title: '進場地圖 · 金色帶 = 短線進場區間', hlines: hl, series: [{ type: 'band', lo: konst(st.entry.lo), hi: konst(st.entry.hi), color: '--accent', alpha: 0.22 }, { type: 'band', lo: ind.bb.lo, hi: ind.bb.up, color: '--band', alpha: 0.07 }, { type: 'candle', data: { o: s.o, h: s.h, l: s.l, c: s.c } }, { type: 'line', name: 'MA5', data: ind.ma5, color: '--s1', thin: true }, { type: 'line', name: 'MA20', data: ind.ma20, color: '--s2', thin: true }, { type: 'line', name: 'MA60', data: ind.ma60, color: '--s3', thin: true }, { type: 'line', name: 'MA240', data: ind.ma240, color: '--s4', thin: true }], noLegend: true },
+      { weight: 4.4, title: '進場地圖 · 金色帶 = 短線進場區間', hlines: hl, series: [{ type: 'band', lo: konst(st.entry.lo), hi: konst(st.entry.hi), color: '--accent', alpha: 0.22 }, { type: 'band', lo: ind.bb.lo, hi: ind.bb.up, color: '--band', alpha: 0.07 }, { type: 'candle', data: { o: s.o, h: s.h, l: s.l, c: s.c } }, { type: 'line', name: 'MA5', data: ind.ma5, color: '--s1', thin: true }, { type: 'line', name: 'MA20', data: ind.ma20, color: '--s2', thin: true }, { type: 'line', name: 'MA60', data: ind.ma60, color: '--s3', thin: true }, { type: 'line', name: 'MA240', data: ind.ma240, color: '--s4', thin: true }], noLegend: true },
       { weight: 0.8, title: 'KD(9,3,3)', series: [{ type: 'line', name: 'K', data: ind.K, color: '--s1', thin: true }, { type: 'line', name: 'D', data: ind.D, color: '--s2', thin: true }], fixed: [0, 100], hlines: [{ y: 20 }, { y: 80 }] },
       { weight: 0.8, title: 'MACD(12,26,9)', series: [{ type: 'bar', name: 'OSC', data: ind.osc, colorBy: 'sign', noLegend: true }, { type: 'line', name: 'DIF', data: ind.dif, color: '--s1', thin: true }, { type: 'line', name: 'DEA', data: ind.dea, color: '--s2', thin: true }], zero: true },
     ] };

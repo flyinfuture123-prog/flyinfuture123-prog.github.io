@@ -15,6 +15,14 @@ on:
     # 與台股站（23:23）錯開，也避開整點/半點的 GitHub 排程壅塞分鐘。
     - cron: "52 23 * * *"
 
+  # 這個 workflow 檔本身被修改並推上 main 時，立刻試跑一次。
+  # 首次上線靠這條產生第一天的資料；之後改抓取邏輯的排程設定時，
+  # 也能馬上驗證而不用等隔天。每日的資料 commit 不會碰這個檔，不會誤觸。
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/daily-fashion.yml"
+
   workflow_dispatch:
     inputs:
       days:

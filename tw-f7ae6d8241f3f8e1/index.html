@@ -1220,21 +1220,33 @@ const CHARTS = (() => {
       this.el = el; this.opts = opts; this.canvas = document.createElement('canvas'); this.canvas.className = 'chart-canvas';
       this.tip = document.createElement('div'); this.tip.className = 'chart-tip'; this.tip.hidden = true;
       el.classList.add('chart-host'); el.innerHTML = ''; el.appendChild(this.canvas); el.appendChild(this.tip);
-      this.hover = -1; this.spec = null; this.view = null; this.offset = 0; this.drag = null; this.tdrag = null;
+      this.hover = -1; this.spec = null; this.view = null; this.offset = 0; this.drag = null; this.tdrag = null; this.pinch = null; this.vwin = null;
       this.canvas.style.cursor = 'grab'; this.canvas.style.touchAction = 'pan-y';
       const ro = new ResizeObserver(() => this.draw()); ro.observe(el);
       this.canvas.addEventListener('mousemove', e => this.onMove(e)); this.canvas.addEventListener('mouseleave', () => { if (this.drag) return; this.hover = -1; this.tip.hidden = true; this.draw(); });
       this.canvas.addEventListener('mousedown', e => { if (!this.view || !this.pannable()) return; this.drag = { x: e.clientX, off: this.offset }; this.canvas.style.cursor = 'grabbing'; e.preventDefault(); });
       window.addEventListener('mousemove', e => { if (!this.drag || !this.view) return; this.panTo(this.drag.off, e.clientX - this.drag.x); });
       window.addEventListener('mouseup', () => { if (this.drag) { this.drag = null; this.canvas.style.cursor = 'grab'; } });
-      this.canvas.addEventListener('dblclick', () => { if (this.offset) { this.offset = 0; this.draw(); } });
-      this.canvas.addEventListener('touchstart', e => { const t = e.touches[0]; this.tdrag = { x: t.clientX, y: t.clientY, off: this.offset, pan: false }; this.onMove(t); }, { passive: true });
-      this.canvas.addEventListener('touchmove', e => { const t = e.touches[0], d = this.tdrag; if (!d || !this.view) return; const dx = t.clientX - d.x, dy = t.clientY - d.y; if (!d.pan && this.pannable() && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.2) d.pan = true; if (d.pan) { if (e.cancelable) e.preventDefault(); this.panTo(d.off, dx); } else this.onMove(t); }, { passive: false });
-      this.canvas.addEventListener('touchend', () => { this.tdrag = null; });
+      this.canvas.addEventListener('dblclick', () => { if (this.offset || this.vwin) { this.offset = 0; this.vwin = null; this.draw(); } });
+      this.canvas.addEventListener('wheel', e => { if (!this.view || !this.zoomable()) return; e.preventDefault(); const r = this.canvas.getBoundingClientRect(); this.zoomAt(e.deltaY > 0 ? 1.25 : 0.8, e.clientX - r.left); }, { passive: false });
+      const tDist = e => Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+      const tMidX = e => { const r = this.canvas.getBoundingClientRect(); return (e.touches[0].clientX + e.touches[1].clientX) / 2 - r.left; };
+      this.canvas.addEventListener('touchstart', e => { if (e.touches.length >= 2) { this.tdrag = null; this.pinch = { d: tDist(e), win: this.viewWin() }; return; } const t = e.touches[0]; this.tdrag = { x: t.clientX, y: t.clientY, off: this.offset, pan: false }; this.onMove(t); }, { passive: true });
+      this.canvas.addEventListener('touchmove', e => { if (this.pinch && e.touches.length >= 2 && this.view && this.zoomable()) { if (e.cancelable) e.preventDefault(); this.zoomTo(Math.round(this.pinch.win * this.pinch.d / Math.max(20, tDist(e))), tMidX(e)); return; } const t = e.touches[0], d = this.tdrag; if (!d || !this.view) return; const dx = t.clientX - d.x, dy = t.clientY - d.y; if (!d.pan && this.pannable() && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy) * 1.2) d.pan = true; if (d.pan) { if (e.cancelable) e.preventDefault(); this.panTo(d.off, dx); } else this.onMove(t); }, { passive: false });
+      this.canvas.addEventListener('touchend', e => { if (e.touches.length < 2) this.pinch = null; if (e.touches.length === 0) this.tdrag = null; });
     }
-    pannable() { const sp = this.spec; return !!(sp && sp.window && sp.dates.length > sp.window); }
-    panTo(baseOff, dx) { const sp = this.spec; if (!sp) return; const total = sp.dates.length; const nView = Math.min(sp.window || total, total); const off = Math.max(0, Math.min(baseOff + Math.round(dx / this.view.slot), total - nView)); if (off !== this.offset) { this.offset = off; this.hover = -1; this.tip.hidden = true; this.draw(); } }
-    setSpec(spec) { this.spec = spec; this.hover = -1; this.offset = 0; this.draw(); }
+    viewWin() { const sp = this.spec; if (!sp) return 0; const t = sp.dates.length; return Math.max(1, Math.min(this.vwin || sp.window || t, t)); }
+    zoomable() { const sp = this.spec; return !!(sp && sp.dates && sp.dates.length > 30 && !sp.ticks); }
+    pannable() { const sp = this.spec; return !!(sp && sp.dates.length > this.viewWin()); }
+    zoomAt(factor, px) { const nv = Math.max(20, Math.min(this.spec.dates.length, Math.round(this.viewWin() * factor))); this.zoomTo(nv, px); }
+    zoomTo(nv, px) {
+      const sp = this.spec; const t = sp.dates.length; nv = Math.max(20, Math.min(t, nv)); if (nv === this.viewWin()) return;
+      const { x0, x1, start, n } = this.view; const f = Math.max(0, Math.min(1, (px - x0) / (x1 - x0)));
+      const anchor = start + Math.round(f * (n - 1)); let ns = anchor - Math.round(f * (nv - 1)); ns = Math.max(0, Math.min(ns, t - nv));
+      this.vwin = nv; this.offset = t - nv - ns; this.hover = -1; this.tip.hidden = true; this.draw();
+    }
+    panTo(baseOff, dx) { const sp = this.spec; if (!sp) return; const total = sp.dates.length; const nView = this.viewWin(); const off = Math.max(0, Math.min(baseOff + Math.round(dx / this.view.slot), total - nView)); if (off !== this.offset) { this.offset = off; this.hover = -1; this.tip.hidden = true; this.draw(); } }
+    setSpec(spec) { this.spec = spec; this.hover = -1; this.offset = 0; this.vwin = null; this.pinch = null; this.draw(); }
     onMove(e) { if (!this.view || this.drag || (this.tdrag && this.tdrag.pan)) return; const r = this.canvas.getBoundingClientRect(); const x = e.clientX - r.left; const { x0, x1, n, start } = this.view; if (x < x0 || x > x1) { this.hover = -1; this.tip.hidden = true; this.draw(); return; } const i = start + Math.round((x - x0) / (x1 - x0) * (n - 1)); if (i !== this.hover) { this.hover = i; this.draw(); } this.showTip(e.clientX - r.left, e.clientY - r.top); }
     showTip(px, py) {
       const sp = this.spec, i = this.hover; if (!sp || i < 0) { this.tip.hidden = true; return; }
@@ -1252,7 +1264,7 @@ const CHARTS = (() => {
       const dpr = window.devicePixelRatio || 1; this.canvas.width = W * dpr; this.canvas.height = H * dpr; this.canvas.style.width = W + 'px'; this.canvas.style.height = H + 'px';
       const ctx = this.canvas.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
       const T = theme(); ctx.font = `13px ${T.font}`;
-      const total = sp.dates.length; const nView = Math.min(sp.window || total, total); this.offset = Math.max(0, Math.min(this.offset || 0, total - nView)); const start = total - nView - this.offset; const end = start + nView; const n = nView;
+      const total = sp.dates.length; const nView = this.viewWin(); this.offset = Math.max(0, Math.min(this.offset || 0, total - nView)); const start = total - nView - this.offset; const end = start + nView; const n = nView;
       const padL = 8, padR = sp.yWidth || 62, padT = 8, padB = 22; const x0 = padL, x1 = W - padR; const slot = (x1 - x0) / Math.max(n - 1, 1);
       const xOf = i => x0 + (i - start) * slot;
       this.view = { x0, x1, n, start, slot };
@@ -1316,7 +1328,7 @@ const CHARTS = (() => {
       ctx.fillStyle = T.ink3; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.strokeStyle = T.grid;
       monthIdx.forEach((i, k) => { if (k % every) return; const xx = Math.round(xOf(i)) + 0.5; ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, H - padB); ctx.stroke(); const lab = sp.dates[i].startsWith('+') ? sp.dates[i] : sp.ticks ? sp.dates[i].slice(5) : (sp.dates[i].slice(5, 7) === '01' || nView > 300 ? sp.dates[i].slice(0, 7) : sp.dates[i].slice(5, 7) + '月'); ctx.fillText(lab, xx, H - padB + 6); });
       // pan hint
-      if (this.offset > 0) { ctx.fillStyle = T.ink2; ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.font = `600 13px ${T.font}`; ctx.fillText('\u25c0 \u5df2\u5e73\u79fb\u81f3 ' + sp.dates[end - 1] + '\uff08\u96d9\u64ca\u56de\u6700\u65b0\uff09', x1, padT); ctx.font = `13px ${T.font}`; }
+      if (this.offset > 0 || this.vwin) { ctx.fillStyle = T.ink2; ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.font = `600 13px ${T.font}`; const ztxt = (this.offset > 0 ? '\u25c0 \u5df2\u5e73\u79fb\u81f3 ' + sp.dates[end - 1] + ' \u00b7 ' : '') + n + ' \u500b\u4ea4\u6613\u65e5\uff08\u96d9\u64ca\u91cd\u7f6e\uff09'; ctx.fillText(ztxt, x1, padT); ctx.font = `13px ${T.font}`; }
       // crosshair
       if (this.hover >= start && this.hover < end) {
         const xx = Math.round(xOf(this.hover)) + 0.5; ctx.strokeStyle = T.ink3; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(xx, padT); ctx.lineTo(xx, H - padB); ctx.stroke(); ctx.setLineDash([]);

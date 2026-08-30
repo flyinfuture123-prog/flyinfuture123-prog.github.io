@@ -11,7 +11,8 @@
   color-scheme: light;
   --bg: #eceef1; --surface: #ffffff; --surface-2: #f4f5f7; --border: rgba(20,28,40,0.10); --border-strong: rgba(20,28,40,0.18);
   --ink: #151a21; --ink-2: #4a5564; --ink-3: #7d8794;
-  --accent: #a8721a; --accent-ink: #7a5210; --accent-soft: rgba(199,133,0,0.13);
+  --accent: #6f2c91; --accent-ink: #58207a; --accent-soft: rgba(111,44,145,0.12);
+  --util-bg: #38185c; --util-ink: #e6ddf2; --nav-bg: #6f2c91; --nav-ink: rgba(255,255,255,0.9); --nav-active: #58207a; --hero-a: #58207a; --hero-b: #8a4bb0;
   --up: #cf3a41; --down: #1f9560; --up-soft: rgba(207,58,65,0.12); --down-soft: rgba(31,149,96,0.12); --flat-soft: rgba(125,135,148,0.14);
   --grid: #e6e8eb; --axis: #c9cdd3;
   --s1: #c98500; --s2: #2a78d6; --s3: #c2416e; --s4: #5b4fc9; --band: #2a78d6;
@@ -23,7 +24,8 @@
     color-scheme: dark;
     --bg: #0d1117; --surface: #151a21; --surface-2: #1b222b; --border: rgba(255,255,255,0.09); --border-strong: rgba(255,255,255,0.16);
     --ink: #e7eaee; --ink-2: #aab3bf; --ink-3: #7b8694;
-    --accent: #e4a93a; --accent-ink: #f0c268; --accent-soft: rgba(228,169,58,0.14);
+    --accent: #a86bcf; --accent-ink: #cfa6e8; --accent-soft: rgba(168,107,207,0.16);
+    --util-bg: #120a1c; --util-ink: #cbbedd; --nav-bg: #2a1440; --nav-ink: rgba(255,255,255,0.85); --nav-active: #3c1f5c; --hero-a: #241035; --hero-b: #3c1f5c;
     --up: #f0605f; --down: #34c48b; --up-soft: rgba(240,96,95,0.16); --down-soft: rgba(52,196,139,0.16); --flat-soft: rgba(123,134,148,0.18);
     --grid: #1f2730; --axis: #2f3945;
     --s1: #c98500; --s2: #3987e5; --s3: #d55181; --s4: #9085e9; --band: #3987e5;
@@ -34,7 +36,8 @@
   color-scheme: dark;
   --bg: #0d1117; --surface: #151a21; --surface-2: #1b222b; --border: rgba(255,255,255,0.09); --border-strong: rgba(255,255,255,0.16);
   --ink: #e7eaee; --ink-2: #aab3bf; --ink-3: #7b8694;
-  --accent: #e4a93a; --accent-ink: #f0c268; --accent-soft: rgba(228,169,58,0.14);
+  --accent: #a86bcf; --accent-ink: #cfa6e8; --accent-soft: rgba(168,107,207,0.16);
+  --util-bg: #120a1c; --util-ink: #cbbedd; --nav-bg: #2a1440; --nav-ink: rgba(255,255,255,0.85); --nav-active: #3c1f5c; --hero-a: #241035; --hero-b: #3c1f5c;
   --up: #f0605f; --down: #34c48b; --up-soft: rgba(240,96,95,0.16); --down-soft: rgba(52,196,139,0.16); --flat-soft: rgba(123,134,148,0.18);
   --grid: #1f2730; --axis: #2f3945;
   --s1: #c98500; --s2: #3987e5; --s3: #d55181; --s4: #9085e9; --band: #3987e5;
@@ -51,13 +54,35 @@ h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
 .muted { color: var(--ink-3); }
 .small { font-size: 12px; }
 
-/* ---- top bar ---- */
-.topbar { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom: 1px solid var(--border); }
-.topbar-inner { max-width: 1320px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.brand { display: flex; align-items: baseline; gap: 10px; }
-.brand-mark { font-family: var(--serif); font-weight: 900; font-size: 22px; letter-spacing: 0.06em; }
-.brand-sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--ink-3); text-transform: uppercase; }
-.topbar-meta { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
+/* ---- portal header (utility bar + brand row + nav + hero) ---- */
+.topbar { background: var(--surface); }
+.utilbar { background: var(--util-bg); color: var(--util-ink); font-size: 12px; }
+.utilbar-inner { max-width: 1320px; margin: 0 auto; padding: 5px 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.util-links { display: flex; align-items: center; gap: 8px; letter-spacing: 0.04em; }
+.util-links .sep { opacity: 0.45; }
+.util-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.btn.util { background: transparent; border-color: rgba(255,255,255,0.35); color: var(--util-ink); }
+.btn.util:hover { border-color: #fff; color: #fff; }
+.brandrow { border-bottom: 1px solid var(--border); }
+.brandrow-inner { max-width: 1320px; margin: 0 auto; padding: 16px 20px 14px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-seal { width: 46px; height: 46px; border-radius: 50%; background: var(--accent); color: #fff; font-family: var(--serif); font-weight: 900; font-size: 23px; display: flex; align-items: center; justify-content: center; flex: none; }
+.brand-text { display: flex; flex-direction: column; gap: 1px; }
+.brand-mark { font-family: var(--serif); font-weight: 900; font-size: 26px; letter-spacing: 0.1em; color: var(--accent-ink); line-height: 1.2; }
+.brand-sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.22em; color: var(--ink-3); text-transform: uppercase; }
+.brand-right { margin-left: auto; font-family: var(--serif); letter-spacing: 0.12em; color: var(--ink-2); }
+.hero { background: linear-gradient(135deg, var(--hero-a), var(--hero-b)); color: #fff; }
+.hero-inner { max-width: 1320px; margin: 0 auto; padding: 30px 20px 24px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.hero-title { font-family: var(--serif); font-weight: 700; font-size: 18px; letter-spacing: 0.35em; text-indent: 0.35em; opacity: 0.95; }
+.herosearch { display: flex; width: 100%; max-width: 640px; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+.herosearch input { flex: 1; border: 0; padding: 13px 16px; font-size: 15px; color: #151a21; background: #fff; min-width: 0; }
+.herosearch input:focus { outline: none; }
+.herosearch input::placeholder { color: #7d8794; }
+.herosearch button { border: 0; background: var(--accent); color: #fff; padding: 0 24px; font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: 0.25em; text-indent: 0.25em; }
+.herosearch button:hover { filter: brightness(1.12); }
+.hero-quick { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.hero-quick button { border: 1px solid rgba(255,255,255,0.4); background: rgba(255,255,255,0.12); color: #fff; border-radius: 999px; padding: 6px 14px; font-size: 12.5px; cursor: pointer; }
+.hero-quick button:hover { background: rgba(255,255,255,0.24); }
 .btn { border: 1px solid var(--border-strong); background: var(--surface); border-radius: 6px; padding: 5px 11px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--ink); }
 .btn:hover { border-color: var(--accent); color: var(--accent-ink); }
 .btn:focus-visible, .tab:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -66,13 +91,13 @@ h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
 .btn.sm { padding: 3px 8px; font-size: 11px; }
 .btn[disabled] { opacity: 0.55; cursor: default; }
 
-/* ---- tabs ---- */
-.tabs { max-width: 1320px; margin: 0 auto; padding: 0 12px; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+/* ---- main nav (library-portal style) ---- */
+.tabs { max-width: 1320px; margin: 0 auto; padding: 0 12px; display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
 .tabs::-webkit-scrollbar { display: none; }
-.tab { border: 0; background: none; padding: 10px 12px 9px; cursor: pointer; color: var(--ink-2); border-bottom: 2px solid transparent; white-space: nowrap; font-weight: 500; }
-.tab:hover { color: var(--ink); }
-.tab.active { color: var(--accent-ink); border-bottom-color: var(--accent); }
-.tabs-wrap { background: var(--surface); border-bottom: 1px solid var(--border); }
+.tab { border: 0; background: none; padding: 12px 16px 11px; cursor: pointer; color: var(--nav-ink); border-bottom: 3px solid transparent; white-space: nowrap; font-weight: 500; letter-spacing: 0.02em; }
+.tab:hover { background: rgba(255,255,255,0.10); color: #fff; }
+.tab.active { color: #fff; background: var(--nav-active); border-bottom-color: #fff; font-weight: 700; }
+.tabs-wrap { background: var(--nav-bg); position: sticky; top: 0; z-index: 20; box-shadow: var(--shadow); }
 
 /* ---- instrument bar ---- */
 .instbar { max-width: 1320px; margin: 0 auto; padding: 14px 20px 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -189,7 +214,11 @@ textarea { width: 100%; min-height: 90px; border: 1px solid var(--border-strong)
 .callout.warn { border-left-color: var(--ink-3); background: var(--flat-soft); }
 .progress { height: 4px; background: var(--flat-soft); border-radius: 2px; overflow: hidden; margin-top: 6px; }
 .progress i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
-footer { max-width: 1320px; margin: 0 auto; padding: 0 20px 30px; font-size: 11.5px; color: var(--ink-3); line-height: 1.6; }
+footer { background: var(--util-bg); color: var(--util-ink); margin-top: 34px; font-size: 12.5px; line-height: 1.7; }
+.f-inner { max-width: 1320px; margin: 0 auto; padding: 26px 20px 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px; }
+.f-inner h3 { font-size: 14px; color: #fff; margin: 0 0 6px; font-family: var(--serif); letter-spacing: 0.14em; }
+.f-bottom { border-top: 1px solid rgba(255,255,255,0.16); }
+.f-bottom-inner { max-width: 1320px; margin: 0 auto; padding: 10px 20px; font-size: 11.5px; opacity: 0.75; display: flex; gap: 12px; flex-wrap: wrap; }
 .heat { display: grid; grid-template-columns: repeat(12, 1fr); gap: 4px; }
 .heat div { text-align: center; padding: 6px 2px; border-radius: 6px; font-family: var(--mono); font-size: 11.5px; }
 .heat .m { font-size: 10px; color: var(--ink-3); }
@@ -248,21 +277,27 @@ tr.drawer td { background: var(--surface-2); padding: 12px 14px; white-space: no
 .journal-form label { display: grid; gap: 3px; font-size: 12px; color: var(--ink-3); }
 .journal-form input, .journal-form select { border: 1px solid var(--border-strong); background: var(--surface); border-radius: 6px; padding: 6px 8px; width: 100%; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-@media (max-width: 640px) { .topbar-inner, .instbar, main { padding-left: 12px; padding-right: 12px; } .tile .value { font-size: 20px; } .chart-h { height: 400px; } .plan-row { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .utilbar-inner, .brandrow-inner, .hero-inner, .instbar, main { padding-left: 12px; padding-right: 12px; } .brand-mark { font-size: 21px; } .brand-right { display: none; } .tile .value { font-size: 20px; } .chart-h { height: 400px; } .plan-row { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 
 <header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand"><span class="brand-mark">台股戰情室</span><span class="brand-sub">Taiwan Market War Room</span></div>
-    <div class="topbar-meta">
-      <span id="dataDate"></span>
-      <button class="btn" id="btnUpdate" title="向 FinMind / 證交所抓取最新資料">更新資料</button>
-      <button class="btn" id="btnTheme" title="切換深色／淺色">主題</button>
+  <div class="utilbar"><div class="utilbar-inner">
+    <span class="util-links"><span>台股研究入口</span><span class="sep" aria-hidden="true">｜</span><span id="dataDate"></span></span>
+    <span class="util-actions">
       <span id="updateStatus" class="small"></span>
+      <button class="btn util" id="btnUpdate" title="向 FinMind / 證交所抓取最新資料">更新資料</button>
+      <button class="btn util" id="btnTheme" title="切換深色／淺色">主題</button>
+    </span>
+  </div></div>
+  <div class="brandrow"><div class="brandrow-inner">
+    <div class="brand">
+      <span class="brand-seal" aria-hidden="true">股</span>
+      <span class="brand-text"><span class="brand-mark">台股戰情室</span><span class="brand-sub">Taiwan Market War Room</span></span>
     </div>
-  </div>
+    <div class="brand-right small">研究 · 策略 · 訓練</div>
+  </div></div>
   <div class="tabs-wrap"><nav class="tabs" role="tablist" id="tabs">
     <button class="tab active" role="tab" data-tab="dash">戰情總覽</button>
     <button class="tab" role="tab" data-tab="tech">技術面</button>
@@ -275,6 +310,22 @@ tr.drawer td { background: var(--surface-2); padding: 12px 14px; white-space: no
     <button class="tab" role="tab" data-tab="data">資料與方法</button>
   </nav></div>
 </header>
+
+<div class="hero"><div class="hero-inner">
+  <div class="hero-title">整合檢索</div>
+  <form class="herosearch" id="heroSearch" autocomplete="off">
+    <input id="heroInput" list="heroList" placeholder="輸入股票代號或名稱，例：2330 或 台積電" aria-label="股票檢索">
+    <datalist id="heroList"></datalist>
+    <button type="submit">檢索</button>
+  </form>
+  <div class="hero-quick">
+    <button type="button" data-goto="dash">📊 戰情總覽</button>
+    <button type="button" data-goto="scan">🔎 個股掃描</button>
+    <button type="button" data-goto="entry">🎯 進場策略</button>
+    <button type="button" data-goto="learn">🎓 訓練場</button>
+    <button type="button" data-goto="data">🗂️ 資料與方法</button>
+  </div>
+</div></div>
 
 <div class="instbar">
   <label for="instSel">分析標的</label>
@@ -1661,7 +1712,7 @@ const APP = (() => {
       <p><b>資訊面</b>：每檔權值股近 3 日的新聞標題來自 FinMind 新聞資料集（已濾除論壇貼文），大盤另彙整鉅亨網台股新聞與各權值股標題。情緒分數用利多／利空關鍵字字典計算，依時間加權；≥3 則才計分，佔溫度計 10%。「背書」是把技術、籌碼、國際、基本面、資訊面五個面向的方向並列，看是否一致。</p>
       <p><b>訓練場</b>：學習地圖六階段對應本站的觀察習慣；觀念題庫 48 題附解說；看圖練功從真實歷史隨機抽日，只顯示當天以前的資訊，作答後揭曉後續 20 日、當天的規則判定與訊號評分；訊號辨識與計算題由資料自動出題；判斷紀錄在資料更新後自動對答案。所有進度只存在你這台瀏覽器。</p>
       <p class="callout warn" style="margin-top:10px">所有訊號皆為歷史統計與規則，無法保證未來；回測未含手續費、證交稅、滑價與流動性限制，實際績效會較低。本頁不構成投資建議，請自行評估風險。</p>`;
-    $('#footer').innerHTML = `台股戰情室 · 資料：FinMind 開放 API 與臺灣證券交易所公開資訊 · 紅漲綠跌（台股慣例） · 本頁僅供研究參考，不構成任何投資建議。`;
+    $('#footer').innerHTML = `<div class="f-inner"><div><h3>關於本站</h3>台股戰情室是個人研究用的市場儀表板，整合技術面、籌碼面、國際連動與統計模型，並提供進場策略與訓練場功能。</div><div><h3>資料來源</h3>FinMind 開放 API · 臺灣證券交易所公開資訊。<br>顏色慣例：紅漲綠跌（台股慣例）。</div><div><h3>免責聲明</h3>本站內容僅供研究與教學參考，不構成任何投資建議；投資有風險，盈虧請自行判斷。</div></div><div class="f-bottom"><div class="f-bottom-inner"><span>台股戰情室 Taiwan Market War Room</span></div></div>`;
   }
 
   // ---------- live update ----------
@@ -2050,6 +2101,48 @@ const APP = (() => {
 
 </script>
 
+
+<script>
+(function () {
+  const form = document.getElementById('heroSearch');
+  if (!form) return;
+  const input = document.getElementById('heroInput');
+  const list = document.getElementById('heroList');
+  function app() { try { return APP; } catch (e) { return null; } }
+  function data() { const A = app(); return (A && A.DATA) || window.DATA; }
+  function fillList() {
+    try {
+      const D = data(); if (!D || !D.stocks) return;
+      list.innerHTML = '<option value="TAIEX 加權指數">' +
+        Object.keys(D.stocks).map(c => `<option value="${c} ${D.stocks[c].name || ''}">`).join('');
+    } catch (e) { }
+  }
+  fillList(); setTimeout(fillList, 800);
+  form.addEventListener('submit', ev => {
+    ev.preventDefault();
+    try {
+      const q = (input.value || '').trim(); if (!q) return;
+      const D = data(); let code = null;
+      if (/^taiex/i.test(q) || q.includes('加權') || q.includes('大盤')) code = 'TAIEX';
+      if (!code && D && D.stocks) {
+        const m = q.match(/\d{4,6}/);
+        if (m && D.stocks[m[0]]) code = m[0];
+        if (!code) for (const c of Object.keys(D.stocks)) {
+          const n = D.stocks[c].name || '';
+          if (n && (q.includes(n) || n.includes(q))) { code = c; break; }
+        }
+      }
+      const A = app();
+      if (code && A && A.setInstrument) {
+        A.setInstrument(code); A.showTab('dash', true);
+        window.scrollTo({ top: 0, behavior: 'smooth' }); input.value = '';
+      } else if (A && A.showTab) {
+        A.showTab('scan'); window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    } catch (e) { }
+  });
+})();
+</script>
 
 </body>
 </html>

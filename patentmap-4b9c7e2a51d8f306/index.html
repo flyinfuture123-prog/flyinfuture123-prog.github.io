@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>AI驅動專利論文地圖</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="《AI驅動專利論文地圖協助掌握創新研發致勝趨勢》之流程整理與全書導讀。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#eef0f3; --surface:#fff; --surface-2:#f5f6f8; --surface-3:#eaecef;
+  --border:rgba(18,26,38,.10); --border-strong:rgba(18,26,38,.20);
+  --ink:#141a21; --ink-2:#4b5563; --ink-3:#79828e;
+  --accent:#0f6e6a; --accent-ink:#0b514e; --accent-soft:rgba(15,110,106,.10);
+  --alt:#a4571c; --alt-ink:#83450f; --alt-soft:rgba(164,87,28,.11);
+  --util-bg:#0a3835; --util-ink:#d5e6e4; --nav-bg:#0f6e6a; --nav-ink:rgba(255,255,255,.9); --nav-active:#0b514e;
+  --hero-a:#0b514e; --hero-b:#158b84;
+  --warn:#b03a3a; --warn-soft:rgba(176,58,58,.10);
+  --pend:#8a6d1f; --pend-soft:rgba(138,109,31,.12);
+  --shadow:0 1px 2px rgba(18,26,38,.06),0 10px 28px -14px rgba(18,26,38,.22);
+  --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono","SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0c1013; --surface:#141a1e; --surface-2:#1a2126; --surface-3:#212a30;
+    --border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.18);
+    --ink:#e6eaed; --ink-2:#a9b3bc; --ink-3:#7a848e;
+    --accent:#3fb8b0; --accent-ink:#6fd6ce; --accent-soft:rgba(63,184,176,.15);
+    --alt:#d99143; --alt-ink:#eab173; --alt-soft:rgba(217,145,67,.15);
+    --util-bg:#061f1e; --util-ink:#b7d2d0; --nav-bg:#0d3f3d; --nav-ink:rgba(255,255,255,.85); --nav-active:#125754;
+    --hero-a:#082e2c; --hero-b:#125754;
+    --warn:#ef7d7d; --warn-soft:rgba(239,125,125,.14);
+    --pend:#d6b153; --pend-soft:rgba(214,177,83,.15);
+    --shadow:0 1px 2px rgba(0,0,0,.32),0 10px 28px -14px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0c1013; --surface:#141a1e; --surface-2:#1a2126; --surface-3:#212a30;
+  --border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.18);
+  --ink:#e6eaed; --ink-2:#a9b3bc; --ink-3:#7a848e;
+  --accent:#3fb8b0; --accent-ink:#6fd6ce; --accent-soft:rgba(63,184,176,.15);
+  --alt:#d99143; --alt-ink:#eab173; --alt-soft:rgba(217,145,67,.15);
+  --util-bg:#061f1e; --util-ink:#b7d2d0; --nav-bg:#0d3f3d; --nav-ink:rgba(255,255,255,.85); --nav-active:#125754;
+  --hero-a:#082e2c; --hero-b:#125754;
+  --warn:#ef7d7d; --warn-soft:rgba(239,125,125,.14);
+  --pend:#d6b153; --pend-soft:rgba(214,177,83,.15);
+  --shadow:0 1px 2px rgba(0,0,0,.32),0 10px 28px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;text-wrap:balance;line-height:1.35}
+a{color:var(--accent-ink)}
+p{margin:0 0 1em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.muted{color:var(--ink-3)}
+.small{font-size:13.5px}
+.mono{font-family:var(--mono)}
+
+/* header */
+.utilbar{background:var(--util-bg);color:var(--util-ink);font-size:12px}
+.utilbar .wrap{display:flex;align-items:center;gap:10px;padding-top:6px;padding-bottom:6px;flex-wrap:wrap}
+.utilbar .sep{opacity:.4}
+.util-actions{margin-left:auto;display:flex;gap:8px}
+.btn{background:transparent;border:1px solid var(--border-strong);color:inherit;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px;line-height:1.6}
+.btn:hover{border-color:currentColor}
+.utilbar .btn{border-color:rgba(255,255,255,.32)}
+.utilbar .btn:hover{border-color:#fff;color:#fff}
+.brandrow{background:var(--surface);border-bottom:1px solid var(--border)}
+.brandrow .wrap{display:flex;align-items:center;gap:14px;padding-top:16px;padding-bottom:14px;flex-wrap:wrap}
+.seal{width:48px;height:48px;border-radius:10px;background:var(--accent);color:#fff;font-family:var(--serif);font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none;letter-spacing:.02em;text-align:center;line-height:1.15}
+.brand-mark{font-family:var(--serif);font-weight:900;font-size:25px;letter-spacing:.06em;color:var(--accent-ink)}
+.brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase}
+.brand-right{margin-left:auto;text-align:right;color:var(--ink-2);font-size:13px}
+.hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b));color:#fff}
+.hero .wrap{padding:34px 20px 30px}
+.hero h1{font-family:var(--serif);font-size:clamp(26px,4.4vw,40px);font-weight:900;letter-spacing:.04em}
+.hero .sub{font-size:clamp(15px,2.2vw,19px);opacity:.93;margin-top:8px;font-family:var(--serif)}
+.hero .by{margin-top:14px;font-size:13.5px;opacity:.85}
+.hero .chips{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:3px 12px;font-size:12.5px}
+nav.tabs{background:var(--nav-bg);position:sticky;top:0;z-index:30;box-shadow:0 2px 10px rgba(0,0,0,.16)}
+nav.tabs .wrap{display:flex;gap:2px;overflow-x:auto;padding:0 20px}
+nav.tabs a{color:var(--nav-ink);text-decoration:none;padding:11px 15px;font-size:14.5px;white-space:nowrap;border-bottom:3px solid transparent}
+nav.tabs a:hover{background:var(--nav-active);color:#fff}
+nav.tabs a.on{background:var(--nav-active);color:#fff;border-bottom-color:#fff}
+
+main{padding:34px 0 60px}
+section.band{margin-bottom:46px;scroll-margin-top:64px}
+.sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.sec-head h2{font-family:var(--serif);font-size:26px;font-weight:900;letter-spacing:.03em}
+.sec-head .tag{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--accent-ink);background:var(--accent-soft);border-radius:4px;padding:2px 8px;text-transform:uppercase}
+.sec-lead{color:var(--ink-2);max-width:78ch;margin-bottom:20px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)}
+
+/* master workflow */
+.phases{display:flex;flex-direction:column;gap:14px}
+.phase{display:grid;grid-template-columns:88px 1fr;gap:0;overflow:hidden}
+.phase-rail{background:linear-gradient(160deg,var(--accent),var(--hero-a));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 8px;gap:4px}
+.phase-rail .n{font-family:var(--mono);font-size:26px;font-weight:600;line-height:1}
+.phase-rail .lbl{font-size:10px;letter-spacing:.18em;opacity:.8}
+.phase-body{padding:18px 20px}
+.phase-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.phase-title h3{font-size:19px;font-weight:700}
+.tool-pill{background:var(--alt-soft);color:var(--alt-ink);border:1px solid var(--alt-soft);border-radius:999px;padding:2px 11px;font-size:12.5px;font-weight:500}
+.src-pill{font-family:var(--mono);font-size:11px;color:var(--ink-3);border:1px dashed var(--border-strong);border-radius:4px;padding:1px 7px}
+.phase-goal{color:var(--ink-2);margin:8px 0 10px;font-size:15px}
+.phase ul{margin:0;padding-left:1.15em}
+.phase ul li{margin-bottom:5px}
+.phase-out{margin-top:12px;padding-top:11px;border-top:1px dashed var(--border);font-size:14px}
+.phase-out b{color:var(--accent-ink);font-weight:500;letter-spacing:.04em;font-size:11px;font-family:var(--mono);text-transform:uppercase;margin-right:8px}
+.readgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:10px}
+.readcell{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:11px 13px}
+.readcell b{display:block;color:var(--accent-ink);font-size:14px;margin-bottom:3px}
+.readcell span{font-size:13.5px;color:var(--ink-2)}
+.casebox{margin-top:12px;background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:11px 14px;font-size:14px}
+
+/* six stages */
+.stages{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.stage{flex:1 1 150px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;position:relative}
+.stage .sn{font-family:var(--mono);font-size:11px;color:var(--accent-ink);letter-spacing:.1em}
+.stage h4{font-size:15.5px;margin:3px 0 6px}
+.stage p{font-size:13.5px;color:var(--ink-2);margin:0;line-height:1.65}
+
+/* chapter reader */
+.chap{margin-bottom:16px;overflow:hidden}
+.chap-head{display:flex;align-items:center;gap:12px;padding:15px 20px;cursor:pointer;background:var(--surface-2);border:0;width:100%;text-align:left;border-bottom:1px solid transparent}
+.chap-head:hover{background:var(--surface-3)}
+.chap[open] .chap-head{border-bottom-color:var(--border)}
+.chap-no{font-family:var(--serif);font-weight:900;color:var(--accent-ink);font-size:15px;flex:none;min-width:52px}
+.chap-title{font-size:17.5px;font-weight:700;flex:1}
+.chap-pages{font-family:var(--mono);font-size:12px;color:var(--ink-3);flex:none}
+.caret{flex:none;transition:transform .18s;color:var(--ink-3)}
+.chap[open] .caret{transform:rotate(90deg)}
+.chap-body{padding:18px 22px 22px}
+.chap-summary{color:var(--ink-2);border-left:3px solid var(--accent);padding-left:13px;margin-bottom:20px}
+.sub{margin:0 0 26px;padding-bottom:4px}
+.sub:last-child{margin-bottom:0}
+.sub-head{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.sub-no{font-family:var(--mono);font-size:13px;color:var(--alt-ink);font-weight:500}
+.sub-title{font-size:16.5px;font-weight:700}
+.sub-pages{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);margin-left:auto}
+.blk-h{font-weight:700;font-size:15.5px;margin:18px 0 8px;color:var(--accent-ink)}
+ul.bul,ol.numl{margin:0 0 1em;padding-left:1.3em}
+ul.bul li,ol.numl li{margin-bottom:6px}
+dl.def{margin:0 0 1em}
+dl.def dt{font-weight:700;color:var(--accent-ink);margin-top:12px;font-size:15px}
+dl.def dd{margin:3px 0 0;color:var(--ink-2)}
+.figref{font-size:13.5px;color:var(--ink-3);font-style:italic;border-top:1px dotted var(--border-strong);padding-top:7px;margin:14px 0}
+.callout{background:var(--accent-soft);border-left:3px solid var(--accent);padding:13px 16px;border-radius:0 8px 8px 0;margin:16px 0}
+.eq{font-family:var(--mono);font-size:18px;text-align:center;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:16px;margin:16px 0;overflow-x:auto}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}
+.statcell{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:13px;text-align:center}
+.statcell .n{font-family:var(--mono);font-size:23px;font-weight:600;color:var(--accent-ink);display:block}
+.statcell .l{font-size:12.5px;color:var(--ink-2);display:block;margin-top:4px;line-height:1.5}
+.stepwrap{margin:16px 0;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.stepwrap>h4{background:var(--surface-2);padding:11px 16px;font-size:15px;border-bottom:1px solid var(--border)}
+.steplist{counter-reset:s;padding:6px 0;margin:0;list-style:none}
+.steplist li{display:grid;grid-template-columns:78px 1fr;gap:12px;padding:9px 16px;align-items:start}
+.steplist li+li{border-top:1px dashed var(--border)}
+.steplist .sn{font-family:var(--mono);font-size:12.5px;color:#fff;background:var(--accent);border-radius:5px;padding:2px 0;text-align:center;margin-top:2px}
+.steplist .sv{font-size:15px}
+.steplist .ss{display:block;font-size:13px;color:var(--ink-3);margin-top:3px}
+.stepnote{background:var(--surface-2);padding:9px 16px;font-size:13px;color:var(--ink-2);border-top:1px solid var(--border)}
+.twocol{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:14px 0}
+.twocol .col{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:14px 16px}
+.twocol .col h4{font-size:16px;color:var(--accent-ink);margin-bottom:5px}
+.twocol .col p{font-size:13.5px;color:var(--ink-2);margin-bottom:8px}
+.twocol .col ul{margin:0;padding-left:1.2em;font-size:14px}
+.cycle{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:center;margin:16px 0;padding:18px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px}
+.cycle .node{background:linear-gradient(150deg,var(--hero-a),var(--hero-b));color:#fff;border-radius:9px;padding:12px 22px;font-size:16px;font-weight:700;letter-spacing:.06em}
+.cycle .ctr{font-family:var(--serif);font-weight:900;font-size:17px;color:var(--ink-2);padding:0 6px}
+.flowrow{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin:14px 0}
+.flowrow .fnode{flex:1 1 190px;background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:13px 15px}
+.flowrow .fnode .fn{font-family:var(--mono);font-size:11px;color:var(--accent-ink)}
+.flowrow .fnode b{display:block;font-size:15px;margin:2px 0 3px}
+.flowrow .fnode span{font-size:13px;color:var(--ink-2)}
+.partners{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:14px 0}
+.pgroup{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:14px 16px}
+.pgroup h4{font-size:16px;color:var(--accent-ink)}
+.pgroup .en{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em}
+.pgroup p{font-size:13.5px;color:var(--ink-2);margin:7px 0 9px}
+.ptags{display:flex;flex-wrap:wrap;gap:5px}
+.ptag{background:var(--surface);border:1px solid var(--border-strong);border-radius:5px;padding:2px 8px;font-size:12.5px}
+.tblwrap{overflow-x:auto;margin:14px 0;border:1px solid var(--border);border-radius:9px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:480px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--surface-2);font-weight:700;font-size:13px;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+.tblcap{font-size:13px;color:var(--ink-3);padding:8px 12px;background:var(--surface-2);border-bottom:1px solid var(--border)}
+.tblnote{font-size:13px;color:var(--ink-2);padding:9px 12px;background:var(--surface-2);border-top:1px solid var(--border)}
+.caseflow{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0}
+.caseflow .cs{flex:1 1 180px;background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 9px 9px 0;padding:12px 14px}
+.caseflow .cs b{display:block;font-size:14.5px;color:var(--accent-ink);margin-bottom:5px}
+.caseflow .cs ul{margin:0;padding-left:1.15em;font-size:13.5px}
+.warnlist{margin:14px 0;display:grid;gap:9px}
+.warncell{background:var(--warn-soft);border-left:3px solid var(--warn);border-radius:0 8px 8px 0;padding:11px 14px}
+.warncell b{color:var(--warn);font-size:14.5px}
+.warncell p{margin:3px 0 0;font-size:14px;color:var(--ink-2)}
+
+/* AI tools */
+.toolgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:16px}
+.tool{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:17px 19px;box-shadow:var(--shadow)}
+.tool-top{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+.tool-top h3{font-size:18px;font-family:var(--mono);font-weight:600;color:var(--accent-ink)}
+.tool-cat{font-size:11.5px;background:var(--alt-soft);color:var(--alt-ink);border-radius:999px;padding:2px 9px}
+.tool-pg{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.tool-fn{font-size:14.5px;margin-bottom:8px}
+.tool-feat{font-size:13.5px;color:var(--ink-2);background:var(--surface-2);border-radius:7px;padding:8px 11px;margin-bottom:10px}
+.tool details{margin-top:9px}
+.tool summary{cursor:pointer;font-size:13.5px;color:var(--accent-ink);list-style:none;padding:5px 0}
+.tool summary::-webkit-details-marker{display:none}
+.tool summary::before{content:"▸ ";display:inline-block;transition:transform .15s}
+.tool details[open] summary::before{content:"▾ "}
+.tool details p{font-size:14px;margin:7px 0 0;color:var(--ink-2)}
+.tool .ex{border-left:2px solid var(--alt);padding-left:11px;margin-top:9px}
+.tool .ex b{font-size:11px;font-family:var(--mono);letter-spacing:.12em;color:var(--alt-ink);text-transform:uppercase}
+.tool .cau{border-left:2px solid var(--warn);padding-left:11px;margin-top:9px}
+.tool .cau b{font-size:11px;font-family:var(--mono);letter-spacing:.12em;color:var(--warn);text-transform:uppercase}
+
+/* master 5-step */
+.msteps{display:flex;flex-direction:column;gap:0;margin:18px 0}
+.mstep{display:grid;grid-template-columns:110px 1fr;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:11px;overflow:hidden;box-shadow:var(--shadow)}
+.mstep+.mstep{margin-top:10px}
+.mstep .lft{background:linear-gradient(160deg,var(--alt),#7a3f0e);color:#fff;padding:16px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px}
+.mstep .lft .s{font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:.08em}
+.mstep .rgt{padding:15px 19px}
+.mstep .rgt h4{font-size:17px;margin-bottom:3px}
+.mstep .rgt .tl{font-family:var(--mono);font-size:12.5px;color:var(--alt-ink);margin-bottom:8px}
+.mstep .rgt ol{margin:0;padding-left:1.25em;font-size:14.5px}
+.mstep .rgt ol li{margin-bottom:5px}
+
+/* pending */
+.pending{background:var(--pend-soft);border:1px dashed var(--pend);border-radius:9px;padding:13px 16px;margin:12px 0;font-size:14px;color:var(--ink-2)}
+.pending b{color:var(--pend);font-size:12px;font-family:var(--mono);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px}
+.covergrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px}
+.covercell{border-radius:9px;padding:14px 16px;border:1px solid var(--border)}
+.covercell.ok{background:var(--accent-soft);border-color:var(--accent)}
+.covercell.no{background:var(--pend-soft);border-color:var(--pend)}
+.covercell h4{font-family:var(--mono);font-size:14px;margin-bottom:7px}
+.covercell.ok h4{color:var(--accent-ink)}
+.covercell.no h4{color:var(--pend)}
+.covercell ul{margin:0;padding-left:1.15em;font-size:13.5px;color:var(--ink-2)}
+.covercell li{margin-bottom:4px}
+
+footer{border-top:1px solid var(--border);background:var(--surface);padding:24px 0;font-size:13px;color:var(--ink-3)}
+footer .wrap{display:flex;gap:14px;flex-wrap:wrap;align-items:baseline}
+footer .right{margin-left:auto}
+
+@media (max-width:640px){
+  body{font-size:15.5px}
+  .phase,.mstep{grid-template-columns:1fr}
+  .phase-rail{flex-direction:row;gap:9px;padding:9px}
+  .phase-rail .n{font-size:19px}
+  .mstep .lft{padding:9px}
+  .steplist li{grid-template-columns:1fr;gap:4px}
+  .steplist .sn{justify-self:start;padding:2px 12px}
+  .brand-right{margin-left:0;text-align:left;width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="utilbar"><div class="wrap">
+  <span>國立臺灣大學化學系</span><span class="sep">|</span><span>材料化學實驗室</span>
+  <span class="util-actions">
+    <button class="btn" id="themeBtn" type="button">深／淺色</button>
+    <button class="btn" id="expandBtn" type="button">全部展開</button>
+  </span>
+</div></div>
+
+<div class="brandrow"><div class="wrap">
+  <div class="seal">專利<br>地圖</div>
+  <div>
+    <div class="brand-mark">AI驅動專利論文地圖</div>
+    <div class="brand-sub">AI-Driven Patent &amp; Paper Mapping</div>
+  </div>
+  <div class="brand-right" id="brandRight"></div>
+</div></div>
+
+<div class="hero"><div class="wrap">
+  <h1>AI驅動專利論文地圖</h1>
+  <div class="sub">協助掌握創新研發致勝趨勢</div>
+  <div class="by" id="heroBy"></div>
+  <div class="chips" id="heroChips"></div>
+</div></div>
+
+<nav class="tabs"><div class="wrap" id="tabs">
+  <a href="#flow" class="on">端到端流程</a>
+  <a href="#master">AI 五步驟</a>
+  <a href="#timing">六個應用時機</a>
+  <a href="#tools">AI 工具</a>
+  <a href="#book">全書導讀</a>
+  <a href="#coverage">來源與缺頁</a>
+</div></nav>
+
+<main><div class="wrap">
+
+  <section class="band" id="flow">
+    <div class="sec-head"><h2>端到端研發流程</h2><span class="tag">workflow</span></div>
+    <p class="sec-lead" id="flowLead"></p>
+    <div class="phases" id="phases"></div>
+  </section>
+
+  <section class="band" id="master">
+    <div class="sec-head"><h2>AI 工具結合專利／論文地圖之應用策略</h2><span class="tag">圖四十二</span></div>
+    <p class="sec-lead">本書第 7-3 節的核心流程圖。五個 Step 各自綁定一組工具，從界定問題一路到產出簡報。</p>
+    <div id="masterFlow"></div>
+  </section>
+
+  <section class="band" id="timing">
+    <div class="sec-head"><h2>六個該拿出專利地圖的時機</h2><span class="tag">6-2</span></div>
+    <p class="sec-lead">專利情報於企業營運策略中不同階段提供決策關鍵資訊。</p>
+    <div class="stages" id="stages"></div>
+  </section>
+
+  <section class="band" id="tools">
+    <div class="sec-head"><h2>九項實用 AI 工具</h2><span class="tag">7-2</span></div>
+    <p class="sec-lead">書中逐一介紹並附上以本實驗室研究主題實測之範例。</p>
+    <div id="toolTable"></div>
+    <div class="toolgrid" id="toolCards"></div>
+  </section>
+
+  <section class="band" id="book">
+    <div class="sec-head"><h2>全書導讀</h2><span class="tag">chapters</span></div>
+    <p class="sec-lead">依原書章節順序整理。點擊章名展開；標示為待補者表示該段掃描頁尚未取得。</p>
+    <div id="chapters"></div>
+  </section>
+
+  <section class="band" id="coverage">
+    <div class="sec-head"><h2>來源與缺頁</h2><span class="tag">source</span></div>
+    <p class="sec-lead" id="srcNote"></p>
+    <div class="covergrid" id="coverGrid"></div>
+  </section>
+
+</div></main>
+
+<footer><div class="wrap">
+  <span id="footLeft"></span>
+  <span class="right muted">本頁為個人閱讀整理，非原書之電子版；著作權屬原作者。</span>
+</div></footer>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+  var esc=function(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+  var el=function(t,c,h){var e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e};
+
+  /* theme toggle */
+  var root=document.documentElement;
+  try{var st=localStorage.getItem("pm-theme"); if(st)root.setAttribute("data-theme",st);}catch(e){}
+  $("#themeBtn").addEventListener("click",function(){
+    var cur=root.getAttribute("data-theme");
+    if(!cur){cur=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+    var next=cur==="dark"?"light":"dark";
+    root.setAttribute("data-theme",next);
+    try{localStorage.setItem("pm-theme",next);}catch(e){}
+  });
+
+  /* ---------- block renderers ---------- */
+  function pendBox(txt){return '<div class="pending"><b>待補</b>'+esc(txt)+'</div>';}
+
+  var R={
+    p:function(b){return "<p>"+esc(b.v)+"</p>";},
+    h:function(b){return '<div class="blk-h">'+esc(b.v)+"</div>";},
+    bullets:function(b){
+      var h=b.title?'<div class="blk-h">'+esc(b.title)+"</div>":"";
+      return h+'<ul class="bul">'+b.v.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ul>";},
+    defList:function(b){
+      return '<dl class="def">'+b.v.map(function(d){
+        return "<dt>"+esc(d.k)+"</dt>"+(d.v?"<dd>"+esc(d.v)+"</dd>":"");}).join("")+"</dl>";},
+    numList:function(b){
+      var h=b.title?'<div class="blk-h">'+esc(b.title)+"</div>":"";
+      return h+'<ol class="numl">'+b.v.map(function(d){
+        var s="<li><b>"+esc(d.k)+"</b>"+(d.v?"：<span>"+esc(d.v)+"</span>":"");
+        if(d.sub)s+='<ul class="bul" style="margin-top:6px">'+d.sub.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ul>";
+        return s+"</li>";}).join("")+"</ol>";},
+    featureList:function(b){
+      return b.v.map(function(f){
+        return '<div class="blk-h">'+esc(f.n)+". "+esc(f.title)+'</div><ul class="bul">'+
+          f.items.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ul>";}).join("");},
+    stats:function(b){
+      var g='<div class="statgrid">'+b.v.map(function(s){
+        return '<div class="statcell"><span class="n">'+esc(s.n)+'</span><span class="l">'+esc(s.l)+"</span></div>";}).join("")+"</div>";
+      return g+(b.note?'<p class="small muted">'+esc(b.note)+"</p>":"");},
+    flow:function(b){
+      var g='<div class="flowrow">'+b.v.map(function(n){
+        return '<div class="fnode"><span class="fn">'+esc(n.n)+'</span><b>'+esc(n.title)+"</b>"+
+          (n.sub?"<span>"+esc(n.sub)+"</span>":"")+(n.note?'<span class="muted"><br>'+esc(n.note)+"</span>":"")+"</div>";}).join("")+"</div>";
+      return g+(b.caption?'<div class="figref">'+esc(b.caption)+"</div>":"");},
+    twoCol:function(b){
+      var g='<div class="twocol">'+b.v.map(function(c){
+        return '<div class="col"><h4>'+esc(c.k)+"</h4><p>"+esc(c.desc)+'</p><ul class="bul">'+
+          c.items.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ul></div>";}).join("")+"</div>";
+      return g+(b.caption?'<div class="figref">'+esc(b.caption)+"</div>":"");},
+    analogy:function(b){
+      return '<div class="readgrid">'+b.v.map(function(a){
+        return '<div class="readcell"><b>'+esc(a.k)+"</b><span>"+esc(a.v)+"</span></div>";}).join("")+"</div>";},
+    cycle:function(b){
+      var n=b.v.nodes;
+      var g='<div class="cycle"><div class="node">'+esc(n[0])+'</div><div class="ctr">'+esc(b.v.center)+
+        '</div><div class="node">'+esc(n[1])+'</div><div class="node">'+esc(n[2])+"</div></div>";
+      return g+(b.caption?'<div class="figref">'+esc(b.caption)+"</div>":"");},
+    figref:function(b){return '<div class="figref">'+esc(b.v)+"</div>";},
+    callout:function(b){return '<div class="callout">'+esc(b.v)+"</div>";},
+    equation:function(b){return '<div class="eq">'+esc(b.v)+"</div>";},
+    steps:function(b){
+      var s='<div class="stepwrap">'+(b.title?"<h4>"+esc(b.title)+"</h4>":"")+'<ol class="steplist">'+
+        b.v.map(function(st){
+          return '<li><span class="sn">'+esc(st.n)+'</span><span class="sv">'+esc(st.v)+
+            (st.sub?'<span class="ss">'+esc(st.sub)+"</span>":"")+"</span></li>";}).join("")+"</ol>";
+      if(b.pendingTail)s+='<div class="stepnote" style="color:var(--pend)">'+esc(b.pendingTail)+"</div>";
+      if(b.note)s+='<div class="stepnote">'+esc(b.note)+"</div>";
+      s+="</div>";
+      return s+(b.caption?'<div class="figref">'+esc(b.caption)+"</div>":"");},
+    insight:function(b){
+      var h=b.title?'<div class="blk-h">'+esc(b.title)+"</div>":"";
+      return h+'<div class="readgrid">'+b.v.map(function(a){
+        return '<div class="readcell"><b>'+esc(a.k)+"</b><span>"+esc(a.v)+"</span></div>";}).join("")+"</div>"+
+        (b.note?'<p class="small muted">'+esc(b.note)+"</p>":"");},
+    tableRef:function(b){
+      return b.v.map(function(t){
+        return '<div class="tblwrap"><div class="tblcap"><b>'+esc(t.n)+"</b> "+esc(t.cap)+"</div>"+
+          "<table><thead><tr>"+t.cols.map(function(c){return "<th>"+esc(c)+"</th>"}).join("")+
+          "</tr></thead></table>"+
+          '<div class="tblnote">'+esc(t.note)+"</div></div>";}).join("");},
+    techTransfer:function(b){
+      return '<div class="tblwrap"><div class="tblcap">'+esc(b.title)+"</div><table><thead><tr><th>產學合作公司</th><th>合作期間</th></tr></thead><tbody>"+
+        b.v.map(function(r){return "<tr><td>"+esc(r.co)+'</td><td class="mono">'+esc(r.period)+"</td></tr>"}).join("")+
+        "</tbody></table></div>";},
+    caseFlow:function(b){
+      var g='<div class="caseflow">'+b.v.map(function(s){
+        return '<div class="cs"><b>'+esc(s.stage)+"</b><ul>"+s.items.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ul></div>";}).join("")+"</div>";
+      return g+(b.caption?'<div class="figref">'+esc(b.caption)+"</div>":"");},
+    stageFlow:function(b){
+      var g='<div class="stages">'+b.v.map(function(s){
+        return '<div class="stage"><span class="sn">STAGE '+esc(s.n)+"</span><h4>"+esc(s.title)+"</h4><p>"+esc(s.v)+"</p></div>";}).join("")+"</div>";
+      return g+(b.caption?'<div class="figref">'+esc(b.caption)+"</div>":"");},
+    warnList:function(b){
+      var h=b.title?'<div class="blk-h">'+esc(b.title)+"</div>":"";
+      return h+'<div class="warnlist">'+b.v.map(function(w){
+        return '<div class="warncell"><b>'+esc(w.k)+"</b><p>"+esc(w.v)+"</p></div>";}).join("")+"</div>";},
+    partnerGroups:function(b){
+      var g='<div class="partners">'+b.v.map(function(p){
+        return '<div class="pgroup"><h4>'+esc(p.key)+'</h4><div class="en">'+esc(p.en)+"</div><p>"+esc(p.desc)+
+          '</p><div class="ptags">'+p.partners.map(function(x){return '<span class="ptag">'+esc(x)+"</span>"}).join("")+"</div></div>";}).join("")+"</div>";
+      return g+(b.caption?'<div class="figref">'+esc(b.caption)+"</div>":"");},
+    toolTable:function(b){
+      return '<div class="tblwrap"><div class="tblcap">'+esc(b.caption)+"</div><table><thead><tr><th>工具名稱</th><th>類別</th><th>主要功能</th><th>特點</th><th>頁</th></tr></thead><tbody>"+
+        b.v.map(function(t){return '<tr><td class="mono"><b>'+esc(t.name)+"</b></td><td>"+esc(t.cat)+"</td><td>"+
+          esc(t.fn)+"</td><td>"+esc(t.feat)+'</td><td class="mono">'+esc(t.page||"")+"</td></tr>"}).join("")+"</tbody></table></div>";},
+    toolCards:function(){return "";},
+    masterFlow:function(b){
+      var g='<div class="msteps">'+b.v.map(function(s){
+        return '<div class="mstep"><div class="lft"><span class="s">'+esc(s.step)+'</span></div><div class="rgt"><h4>'+
+          esc(s.title)+'</h4><div class="tl">'+esc(s.tool)+"</div><ol>"+
+          s.items.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ol></div></div>";}).join("")+"</div>";
+      return g+(b.caption?'<div class="figref">'+esc(b.caption)+"</div>":"");}
+  };
+
+  function renderBlocks(blocks){
+    return (blocks||[]).map(function(b){
+      var fn=R[b.t];
+      return fn?fn(b):"";
+    }).join("");
+  }
+
+  /* ---------- page build ---------- */
+  fetch("data/book.json").then(function(r){
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    return r.json();
+  }).then(function(D){
+    var M=D.meta;
+
+    $("#brandRight").innerHTML=esc(M.affiliation)+"<br><span class='small muted'>全書 "+M.totalPages+" 頁 · 完成於 "+esc(M.completed)+"</span>";
+    $("#heroBy").textContent=M.authors.join("、")+" 編著 ｜ "+M.affiliation;
+    $("#heroChips").innerHTML=["專利地圖","論文地圖","Derwent Innovation","9 項 AI 工具","產學合作"]
+      .map(function(c){return '<span class="chip">'+esc(c)+"</span>"}).join("");
+    $("#footLeft").textContent="《"+M.title+M.subtitle+"》 · "+M.authors.join("、")+" 編著 · "+M.completed;
+    $("#srcNote").textContent=M.sourceNote;
+
+    /* end-to-end workflow */
+    var W=D.workflow;
+    $("#flowLead").textContent=W.lead;
+    $("#phases").innerHTML=W.phases.map(function(p){
+      var s='<div class="card phase"><div class="phase-rail"><span class="n">'+esc(p.n)+'</span><span class="lbl">PHASE</span></div>'+
+        '<div class="phase-body"><div class="phase-title"><h3>'+esc(p.title)+'</h3>'+
+        '<span class="tool-pill">'+esc(p.tool)+'</span><span class="src-pill">'+esc(p.src)+"</span></div>"+
+        '<div class="phase-goal">'+esc(p.goal)+"</div>";
+      if(p.pending)s+=pendBox(p.pendingNote);
+      else if(p.partial)s+=pendBox(p.partialNote);
+      if(p.does)s+="<ul>"+p.does.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ul>";
+      if(p.reading)s+='<div class="readgrid">'+p.reading.map(function(a){
+        return '<div class="readcell"><b>'+esc(a.k)+"</b><span>"+esc(a.v)+"</span></div>";}).join("")+"</div>";
+      if(p.note)s+='<p class="small muted" style="margin-top:8px">'+esc(p.note)+"</p>";
+      if(p.caseNote)s+='<div class="casebox">'+esc(p.caseNote)+"</div>";
+      if(p.out)s+='<div class="phase-out"><b>產出</b>'+esc(p.out)+"</div>";
+      return s+"</div></div>";
+    }).join("");
+
+    /* master 5-step (pull the masterFlow block out of ch7 7-3) */
+    var ch7=D.chapters.filter(function(c){return c.id==="ch7"})[0];
+    var s73=ch7.sections.filter(function(s){return s.id==="ch7-3"})[0];
+    var mf=s73.blocks.filter(function(b){return b.t==="masterFlow"})[0];
+    if(mf)$("#masterFlow").innerHTML=R.masterFlow(mf);
+
+    /* six stages */
+    var ch6=D.chapters.filter(function(c){return c.id==="ch6"})[0];
+    var s62=ch6.sections.filter(function(s){return s.id==="ch6-2"})[0];
+    var sf=s62.blocks.filter(function(b){return b.t==="stageFlow"})[0];
+    if(sf)$("#stages").outerHTML=R.stageFlow(sf).replace('<div class="figref">','<div class="figref" style="grid-column:1/-1">');
+
+    /* AI tools */
+    var s72=ch7.sections.filter(function(s){return s.id==="ch7-2"})[0];
+    var tt=s72.blocks.filter(function(b){return b.t==="toolTable"})[0];
+    if(tt)$("#toolTable").innerHTML=R.toolTable(tt);
+    var tools=(s72.blocks.filter(function(b){return b.t==="toolCards"})[0]||{}).v||[];
+    $("#toolCards").innerHTML=tools.map(function(t){
+      var s='<div class="tool"><div class="tool-top"><h3>'+esc(t.name)+'</h3><span class="tool-cat">'+esc(t.cat)+
+        '</span><span class="tool-pg">p.'+esc(t.page)+'</span></div><div class="tool-fn">'+esc(t.fn)+
+        '</div><div class="tool-feat">'+esc(t.feat)+"</div>";
+      s+="<details><summary>詳細說明與實測範例</summary><p>"+esc(t.detail)+"</p>";
+      if(t.caution)s+='<div class="cau"><b>注意</b><p>'+esc(t.caution)+"</p></div>";
+      if(t.example)s+='<div class="ex"><b>書中範例</b><p>'+esc(t.example)+"</p></div>";
+      if(t.fig)s+='<div class="figref">'+esc(t.fig)+"</div>";
+      s+="</details>";
+      return s+"</div>";
+    }).join("");
+
+    /* chapters */
+    var all=[D.foreword].concat(D.chapters);
+    $("#chapters").innerHTML=all.map(function(c,i){
+      var s='<details class="card chap"><summary class="chap-head"><span class="chap-no">'+esc(c.no)+
+        '</span><span class="chap-title">'+esc(c.title)+'</span><span class="chap-pages">p.'+esc(c.pages)+
+        '</span><span class="caret">▸</span></summary><div class="chap-body">';
+      if(c.summary)s+='<div class="chap-summary">'+esc(c.summary)+"</div>";
+      if(c.pending)s+=pendBox(c.pendingNote);
+      if(c.blocks)s+=renderBlocks(c.blocks);
+      (c.sections||[]).forEach(function(sec){
+        s+='<div class="sub"><div class="sub-head">'+(sec.no?'<span class="sub-no">'+esc(sec.no)+"</span>":"")+
+          '<span class="sub-title">'+esc(sec.title)+'</span><span class="sub-pages">p.'+esc(sec.pages)+"</span></div>";
+        if(sec.note)s+='<p class="small muted">'+esc(sec.note)+"</p>";
+        if(sec.pending)s+=pendBox(sec.pendingNote);
+        else if(sec.partial)s+=pendBox(sec.partialNote);
+        s+=renderBlocks(sec.blocks)+"</div>";
+      });
+      return s+"</div></details>";
+    }).join("");
+
+    /* coverage */
+    var cov=M.coverage;
+    $("#coverGrid").innerHTML=
+      '<div class="covercell ok"><h4>已取得 '+cov.have.join("、")+' 頁</h4><ul>'+
+        "<li>第 1–15、78–81 頁：由頁面影像逐頁判讀，含圖表與手寫內容。</li>"+
+        "<li>第 27–36、46–77 頁：由 OCR 取得文字，圖片僅存圖說。</li></ul></div>"+
+      '<div class="covercell no"><h4>尚未取得 '+cov.missing.join("、")+' 頁</h4><ul>'+
+        cov.missingDetail.map(function(d){return "<li><b>"+esc(d.range)+"</b>："+esc(d.what)+"</li>"}).join("")+
+      "</ul></div>";
+
+    /* expand-all */
+    var expanded=false;
+    $("#expandBtn").addEventListener("click",function(){
+      expanded=!expanded;
+      document.querySelectorAll("details.chap, .tool details").forEach(function(d){d.open=expanded;});
+      this.textContent=expanded?"全部收合":"全部展開";
+    });
+
+    /* scrollspy */
+    var links=Array.prototype.slice.call(document.querySelectorAll("nav.tabs a"));
+    var secs=links.map(function(a){return document.querySelector(a.getAttribute("href"))}).filter(Boolean);
+    var spy=function(){
+      var y=window.scrollY+90,cur=0;
+      secs.forEach(function(s,i){if(s.offsetTop<=y)cur=i;});
+      links.forEach(function(a,i){a.classList.toggle("on",i===cur);});
+    };
+    window.addEventListener("scroll",spy,{passive:true});spy();
+  }).catch(function(e){
+    $("#phases").innerHTML='<div class="pending"><b>載入失敗</b>無法讀取 data/book.json（'+esc(e.message)+
+      '）。若於本機開啟，請改用 HTTP 伺服器（例如 <code>python3 -m http.server</code>），瀏覽器的 file:// 協定會擋下 fetch。</div>';
+  });
+})();
+</script>
+</body>
+</html>

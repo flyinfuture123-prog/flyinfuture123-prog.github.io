@@ -1,0 +1,351 @@
+# 全球服飾價格與時尚趨勢 —— 每日建置並回寫 GitHub Pages
+#
+# 與 daily-news.yml（台股站）同一套設計：每天抓新聞 → 逐則分析 → 產生 JSON
+# → commit 回預設分支，Pages 從分支直接提供靜態檔。兩個排程刻意錯開半小時，
+# 而且各自只動自己的網站目錄，就算撞在一起，push 重試的 rebase 也不會衝突。
+#
+# 設計前提：預設路徑不需要任何付費金鑰。ANTHROPIC_API_KEY 只是選配升級，
+# 沒設定時整條流程照跑，只是分析改用規則式引擎。
+
+name: 每日全球時尚新聞建置
+
+on:
+  schedule:
+    # 23:52 UTC = 台北時間隔日 07:52（UTC+8）。
+    # 與台股站（23:23）錯開，也避開整點/半點的 GitHub 排程壅塞分鐘。
+    - cron: "52 23 * * *"
+
+  workflow_dispatch:
+    inputs:
+      days:
+        description: "回溯天數（預設 2；事件型主題內建 14~30 天窗口）"
+        required: false
+        type: string
+        default: "2"
+      force_rules:
+        description: "強制使用規則式分析（即使有 ANTHROPIC_API_KEY 也不呼叫 Claude）"
+        required: false
+        type: boolean
+        default: false
+      dry_run:
+        description: "只建置與驗證，不 commit / push"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+# 單一車道，理由同 daily-news.yml：並行 push 一定打架，寧可排隊。
+concurrency:
+  group: daily-fashion-build-and-commit
+  cancel-in-progress: false
+
+env:
+  SITE_DIR: fashion-8fc308ee73649044
+  PYTHON_VERSION: "3.12"
+  TARGET_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+  MIN_ARTICLES: "8"
+
+jobs:
+  build:
+    name: 建置並回寫
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    # Fork 防護，理由同 daily-news.yml。
+    if: >-
+      github.event_name != 'schedule' ||
+      github.repository == 'flyinfuture123-prog/flyinfuture123-prog.github.io'
+
+    steps:
+      # ── 1. 取得原始碼 ────────────────────────────────────────────────
+      - name: Checkout 預設分支
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch || 'main' }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      # ── 2. Python 環境 ──────────────────────────────────────────────
+      - name: 安裝 Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v7
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: 安裝相依套件
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install --disable-pip-version-check -r requirements.txt
+          pip list
+
+      # ── 3. 判斷這次要不要走 Claude 深度分析 ─────────────────────────
+      - name: 檢查 ANTHROPIC_API_KEY 是否存在
+        id: llm
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FORCE_RULES: ${{ github.event.inputs.force_rules }}
+        run: |
+          set -euo pipefail
+          if [ "${FORCE_RULES}" = "true" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "reason=手動指定 force_rules" >> "$GITHUB_OUTPUT"
+          elif [ -n "${ANTHROPIC_API_KEY}" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "reason=已設定 ANTHROPIC_API_KEY" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "reason=未設定 ANTHROPIC_API_KEY（規則式分析）" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ── 4. 建置 ─────────────────────────────────────────────────────
+      - name: 抓新聞、逐則分析、產生資料
+        id: build
+        timeout-minutes: 30
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # 可用 repository variables 覆寫，不必改程式碼：
+          # Settings → Secrets and variables → Actions → Variables
+          FASHION_LLM_MODEL: ${{ vars.FASHION_LLM_MODEL }}
+          FASHION_LLM_MAX_ARTICLES: ${{ vars.FASHION_LLM_MAX_ARTICLES || '150' }}
+          FASHION_LLM_BATCH: ${{ vars.FASHION_LLM_BATCH || '10' }}
+          PYTHONUNBUFFERED: "1"
+          DAYS: ${{ github.event.inputs.days || '2' }}
+          LLM_ENABLED: ${{ steps.llm.outputs.enabled }}
+        run: |
+          set -euo pipefail
+          ARGS=(--site-dir "$SITE_DIR" --days "$DAYS")
+          if [ "$LLM_ENABLED" != "true" ]; then
+            ARGS+=(--no-llm)
+          fi
+          echo "執行：python scripts/fashion_build.py ${ARGS[*]}"
+          # 單一來源掛掉由 scripts/net.py 吞掉；能讓 build 回非 0 的只有
+          # 「整份資料是空的」，那就必須紅燈而不是把網站蓋成空白。
+          python scripts/fashion_build.py "${ARGS[@]}"
+
+      # ── 5. 獨立驗證（不信任 build 自己的檢查）───────────────────────
+      - name: 驗證產出資料完整性
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, os, sys
+          from datetime import datetime, timedelta, timezone
+
+          sys.path.insert(0, "scripts")
+          from fashion_brands import BRANDS
+
+          site = os.environ["SITE_DIR"]
+          min_articles = int(os.environ["MIN_ARTICLES"])
+          errs, warns = [], []
+
+          def fail(msg):
+              print(f"::error::{msg}")
+              errs.append(msg)
+
+          latest = os.path.join(site, "data", "latest.json")
+          index = os.path.join(site, "data", "index.json")
+          page = os.path.join(site, "index.html")
+
+          for p in (latest, index, page):
+              if not os.path.exists(p):
+                  fail(f"缺少產出檔案：{p}")
+          if errs:
+              sys.exit("產出檔案不齊全")
+
+          if os.path.getsize(page) < 4096:
+              fail(f"index.html 只有 {os.path.getsize(page)} bytes，疑似被截斷")
+          if os.path.getsize(latest) < 2048:
+              fail(f"latest.json 只有 {os.path.getsize(latest)} bytes，疑似不完整")
+
+          try:
+              with open(latest, encoding="utf-8") as fh:
+                  d = json.load(fh)
+          except (ValueError, OSError) as exc:
+              sys.exit(f"::error::latest.json 無法解析：{exc}")
+          try:
+              with open(index, encoding="utf-8") as fh:
+                  json.load(fh)
+          except (ValueError, OSError) as exc:
+              fail(f"index.json 無法解析：{exc}")
+
+          for key in ("schema_version", "generated_at", "date", "brief",
+                      "brands", "trends", "articles", "stats", "categories"):
+              if key not in d:
+                  fail(f"latest.json 缺少必要欄位 {key}")
+
+          arts = d.get("articles") or []
+          brands = d.get("brands") or []
+
+          if len(arts) < min_articles:
+              fail(f"新聞只有 {len(arts)} 則，低於門檻 {min_articles} —— 視為抓取失敗")
+          if len(brands) != len(BRANDS):
+              fail(f"品牌數為 {len(brands)}，應為 {len(BRANDS)}")
+
+          missing = [a.get("id", "?") for a in arts
+                     if not isinstance(a.get("analysis"), dict)]
+          if missing:
+              fail(f"有 {len(missing)} 則新聞沒有 analysis 區塊，例如 {missing[:3]}")
+
+          bad = []
+          for a in arts:
+              an = a.get("analysis") or {}
+              s = an.get("price_score")
+              if not isinstance(s, (int, float)) or not -100 <= s <= 100:
+                  bad.append(a.get("id", "?"))
+              if not a.get("title") or not a.get("url"):
+                  bad.append(a.get("id", "?"))
+          if bad:
+              fail(f"有 {len(set(bad))} 則新聞的欄位不合法，例如 {list(set(bad))[:3]}")
+
+          covered = d.get("stats", {}).get("covered_brands", 0)
+          if covered < 3:
+              fail(f"只有 {covered} 個品牌有新聞，明顯不正常")
+
+          today = datetime.now(timezone(timedelta(hours=8))).date()
+          try:
+              got = datetime.strptime(d["date"], "%Y-%m-%d").date()
+              if abs((got - today).days) > 1:
+                  fail(f"資料日期 {got} 與今天（台北）{today} 相差過大，疑似寫到舊檔")
+          except (KeyError, ValueError) as exc:
+              fail(f"date 欄位不合法：{exc}")
+
+          archive = os.path.join(site, "data", f"{d.get('date')}.json")
+          if not os.path.exists(archive):
+              fail(f"缺少當日封存 {archive}")
+          elif os.path.getsize(archive) != os.path.getsize(latest):
+              warns.append("當日封存與 latest.json 大小不一致")
+
+          for w in warns:
+              print(f"::warning::{w}")
+
+          if errs:
+              sys.exit(f"資料驗證未通過，共 {len(errs)} 項問題")
+
+          print(f"驗證通過：{len(arts)} 則新聞、{len(brands)} 個品牌、涵蓋 {covered} 個")
+
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as fh:
+              fh.write(f"DATA_DATE={d.get('date')}\n")
+              fh.write(f"DATA_ARTICLES={len(arts)}\n")
+              fh.write(f"DATA_COVERED={covered}\n")
+              fh.write(f"DATA_ENGINE={d.get('engine', 'rules')}\n")
+              fh.write(f"DATA_PRESSURE={d.get('brief', {}).get('price_pressure', 0)}\n")
+          PY
+
+      # ── 6. 保存本次產出，供 push 打架時重放 ─────────────────────────
+      - name: 快照本次產出
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/site-snapshot"
+          mkdir -p "$RUNNER_TEMP/site-snapshot"
+          cp -a "$SITE_DIR/." "$RUNNER_TEMP/site-snapshot/"
+          echo "已快照 $(find "$RUNNER_TEMP/site-snapshot" -type f | wc -l) 個檔案"
+
+      # ── 7. 是否真的有變動 ───────────────────────────────────────────
+      - name: 檢查有無變動
+        id: diff
+        run: |
+          set -euo pipefail
+          [ -f .nojekyll ] || touch .nojekyll
+          git add -A -- "$SITE_DIR" .nojekyll
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "沒有任何變動，略過 commit"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --cached --stat
+          fi
+
+      # ── 8. Commit + push（含 rebase 重試）───────────────────────────
+      - name: 提交並推送回預設分支
+        id: push
+        if: steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          SUBJECT="資料更新：${DATA_DATE} 全球時尚新聞（${DATA_ARTICLES} 則／${DATA_ENGINE}）"
+          BODY="由 ${GITHUB_WORKFLOW} run ${GITHUB_RUN_ID} 自動產生；涵蓋 ${DATA_COVERED} 個品牌，價格壓力 ${DATA_PRESSURE}。"
+
+          git commit -q -m "$SUBJECT" -m "$BODY"
+
+          SNAP="$RUNNER_TEMP/site-snapshot"
+
+          for attempt in 1 2 3 4 5; do
+            if git push origin "HEAD:${TARGET_BRANCH}"; then
+              echo "第 ${attempt} 次嘗試推送成功"
+              echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            echo "::warning::第 ${attempt} 次推送被拒（遠端已前進），重新同步後再試"
+            git fetch --prune origin "${TARGET_BRANCH}"
+
+            if git rebase -X theirs "origin/${TARGET_BRANCH}"; then
+              :
+            else
+              echo "::warning::rebase 失敗，改用「以遠端為底、重放本次產出」"
+              git rebase --abort >/dev/null 2>&1 || true
+              git reset --hard "origin/${TARGET_BRANCH}"
+              rm -rf "${SITE_DIR:?}/data"
+              cp -a "$SNAP/." "$SITE_DIR/"
+              [ -f .nojekyll ] || touch .nojekyll
+              git add -A -- "$SITE_DIR" .nojekyll
+              if git diff --cached --quiet; then
+                echo "遠端已包含相同內容，無須再推"
+                exit 0
+              fi
+              git commit -q -m "$SUBJECT" -m "$BODY"
+            fi
+
+            sleep $(( attempt * 5 ))
+          done
+
+          echo "::error::連續 5 次推送都失敗，請人工檢查分支保護或遠端狀態"
+          exit 1
+
+      # ── 9. 摘要 ─────────────────────────────────────────────────────
+      - name: 寫入執行摘要
+        if: always()
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          DIFF_CHANGED: ${{ steps.diff.outputs.changed }}
+          PUSH_OUTCOME: ${{ steps.push.outcome }}
+          PUSHED_SHA: ${{ steps.push.outputs.sha }}
+          LLM_REASON: ${{ steps.llm.outputs.reason }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          set -euo pipefail
+          {
+            echo ""
+            echo "### 本次執行"
+            echo ""
+            echo "| 項目 | 結果 |"
+            echo "| --- | --- |"
+            echo "| 觸發方式 | \`${GITHUB_EVENT_NAME}\` |"
+            echo "| 分析引擎 | ${LLM_REASON:-未知} |"
+            echo "| 建置 | ${BUILD_OUTCOME:-skipped} |"
+            echo "| 檔案有變動 | ${DIFF_CHANGED:-n/a} |"
+            if [ "${DRY_RUN}" = "true" ]; then
+              echo "| 推送 | 略過（dry_run） |"
+            elif [ "${DIFF_CHANGED}" = "false" ]; then
+              echo "| 推送 | 略過（內容未變動，不產生空 commit） |"
+            elif [ -z "${PUSH_OUTCOME}" ]; then
+              echo "| 推送 | 未執行（前面的步驟就失敗了） |"
+            else
+              echo "| 推送 | ${PUSH_OUTCOME} \`${PUSHED_SHA:-}\` |"
+            fi
+            echo ""
+            if [ "${BUILD_OUTCOME}" != "success" ]; then
+              echo "> **建置失敗，網站維持上一版內容。**"
+              echo "> 常見原因：Google 新聞 RSS 全面不可用、或產出的資料未通過完整性驗證。"
+              echo "> 站上仍是前一天的資料，不會被空白頁蓋掉。"
+            else
+              echo "網站：<https://flyinfuture123-prog.github.io/${SITE_DIR}/>"
+              echo ""
+              echo "_Pages 從分支提供，推送後約 30–60 秒生效；瀏覽器可能還會快取一小段時間。_"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"

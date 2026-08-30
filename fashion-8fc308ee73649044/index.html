@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>全球服飾價格與時尚趨勢</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="全球服飾穿搭價格與時尚趨勢變化的每日新聞蒐集與逐則分析">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f2eff0; --surface: #ffffff; --surface-2: #f7f4f6; --border: rgba(40,22,34,0.10); --border-strong: rgba(40,22,34,0.18);
+  --ink: #221520; --ink-2: #5c4a57; --ink-3: #8d7c88;
+  --accent: #7f3ea5; --accent-ink: #63307f; --accent-soft: rgba(127,62,165,0.11);
+  --up: #c22f4c; --down: #1c7f6b; --up-soft: rgba(194,47,76,0.11); --down-soft: rgba(28,127,107,0.12); --flat-soft: rgba(141,124,136,0.14);
+  --axis: #cabfc6;
+  --shadow: 0 1px 2px rgba(40,22,34,0.05), 0 8px 24px -12px rgba(40,22,34,0.16);
+  --serif: "Noto Serif TC", "Songti TC", "PMingLiU", serif;
+  --display: "Playfair Display", "Noto Serif TC", serif;
+  --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #131015; --surface: #1c171f; --surface-2: #241d28; --border: rgba(255,255,255,0.09); --border-strong: rgba(255,255,255,0.16);
+    --ink: #ece5ea; --ink-2: #b4a6b0; --ink-3: #857881;
+    --accent: #c393dd; --accent-ink: #d4b0e8; --accent-soft: rgba(195,147,221,0.14);
+    --up: #ef6b84; --down: #3cbfa2; --up-soft: rgba(239,107,132,0.15); --down-soft: rgba(60,191,162,0.15); --flat-soft: rgba(133,120,129,0.18);
+    --axis: #3a3140;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #131015; --surface: #1c171f; --surface-2: #241d28; --border: rgba(255,255,255,0.09); --border-strong: rgba(255,255,255,0.16);
+  --ink: #ece5ea; --ink-2: #b4a6b0; --ink-3: #857881;
+  --accent: #c393dd; --accent-ink: #d4b0e8; --accent-soft: rgba(195,147,221,0.14);
+  --up: #ef6b84; --down: #3cbfa2; --up-soft: rgba(239,107,132,0.15); --down-soft: rgba(60,191,162,0.15); --flat-soft: rgba(133,120,129,0.18);
+  --axis: #3a3140;
+  --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.6; }
+button, input, select { font: inherit; color: inherit; }
+a { color: var(--accent-ink); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3, h4 { margin: 0; text-wrap: balance; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.up { color: var(--up); } .down { color: var(--down); } .flat { color: var(--ink-2); }
+.muted { color: var(--ink-3); }
+.small { font-size: 12px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---- top bar ---- */
+.topbar { position: sticky; top: 0; z-index: 20; background: var(--surface); border-bottom: 1px solid var(--border); }
+.topbar-inner { max-width: 1320px; margin: 0 auto; padding: 10px 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.brand-mark { font-family: var(--serif); font-weight: 900; font-size: 22px; letter-spacing: 0.06em; }
+.brand-mark em { font-family: var(--display); font-style: italic; color: var(--accent-ink); letter-spacing: 0; }
+.brand-sub { font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--ink-3); text-transform: uppercase; }
+.topbar-meta { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--ink-2); }
+.btn { border: 1px solid var(--border-strong); background: var(--surface); border-radius: 6px; padding: 5px 11px; cursor: pointer; font-size: 12px; font-weight: 500; color: var(--ink); }
+.btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+.btn:focus-visible, select:focus-visible, input:focus-visible, .chip:focus-visible, .heat-cell:focus-visible, .trend-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn.sm { padding: 3px 8px; font-size: 11px; }
+select, input[type="search"] { border: 1px solid var(--border-strong); background: var(--surface); border-radius: 6px; padding: 5px 9px; max-width: 100%; }
+
+main { max-width: 1320px; margin: 0 auto; padding: 18px 20px 56px; }
+.stack { display: grid; gap: 16px; }
+.grid { display: grid; gap: 14px; }
+.g-tiles { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+.g-cards { grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.g-brief { grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr); }
+@media (max-width: 900px) { .g-brief { grid-template-columns: 1fr; } }
+
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); min-width: 0; }
+.card-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.card-h h2, .card-h h3 { font-family: var(--serif); font-weight: 700; font-size: 15px; letter-spacing: 0.03em; }
+.card-h .sub { font-size: 12px; color: var(--ink-3); }
+.section-title { font-family: var(--serif); font-weight: 900; font-size: 18px; letter-spacing: 0.04em; margin: 10px 0 0; }
+.eyebrow { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+
+.tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tile .label { font-size: 12px; color: var(--ink-3); }
+.tile .value { font-family: var(--mono); font-size: 26px; font-weight: 600; line-height: 1.15; }
+.tile .value.sm { font-size: 16px; font-family: var(--sans); font-weight: 700; }
+.tile .foot { font-size: 11.5px; color: var(--ink-2); }
+
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 500; font-family: var(--mono); white-space: nowrap; }
+.pill.up { background: var(--up-soft); color: var(--up); }
+.pill.down { background: var(--down-soft); color: var(--down); }
+.pill.flat { background: var(--flat-soft); color: var(--ink-2); }
+.pill.accent { background: var(--accent-soft); color: var(--accent-ink); }
+.pill.plain { background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--border); font-family: var(--sans); }
+.pill.warn { background: var(--up-soft); color: var(--up); font-family: var(--sans); }
+.pill.tag { background: var(--accent-soft); color: var(--accent-ink); font-family: var(--sans); }
+
+/* ---- price pressure meter ---- */
+.meter { height: 8px; border-radius: 999px; background: var(--flat-soft); position: relative; overflow: hidden; }
+.meter > i { position: absolute; top: 0; bottom: 0; display: block; }
+.meter > i.pos { left: 50%; background: var(--up); }
+.meter > i.neg { right: 50%; background: var(--down); }
+.meter::after { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--axis); }
+.legend-note { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-3); }
+
+/* ---- trend radar ---- */
+.trends { display: flex; gap: 8px; flex-wrap: wrap; }
+.trend-chip { border: 1px solid var(--border-strong); background: var(--surface-2); border-radius: 999px; padding: 5px 13px; cursor: pointer; display: inline-flex; align-items: baseline; gap: 7px; color: var(--ink); }
+.trend-chip:hover { border-color: var(--accent); }
+.trend-chip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); }
+.trend-chip .tn { font-weight: 500; font-size: 13px; }
+.trend-chip .tc { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); }
+.trend-chip .ts { font-family: var(--mono); font-size: 11px; }
+.trend-chip .ts.rising { color: var(--up); }
+.trend-chip .ts.fading { color: var(--down); }
+.trend-chip .ts.stable { color: var(--ink-3); }
+
+/* ---- brand heat ---- */
+.seg-block { display: grid; gap: 6px; margin-bottom: 10px; }
+.seg-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); }
+.heat { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 6px; }
+.heat-cell { border: 1px solid var(--border); border-radius: 8px; padding: 8px 9px; text-align: left; cursor: pointer; background: var(--surface-2); display: grid; gap: 2px; min-width: 0; }
+.heat-cell:hover { border-color: var(--accent); }
+.heat-cell.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.heat-cell .hn { font-weight: 500; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.heat-cell .hs { font-family: var(--mono); font-size: 15px; font-weight: 600; }
+.heat-cell .hm { font-size: 11px; color: var(--ink-3); }
+
+/* ---- price drivers ---- */
+.drivers { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.driver { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; display: grid; gap: 4px; min-width: 0; }
+.driver .dh { display: flex; gap: 8px; align-items: baseline; }
+.driver .dn { font-family: var(--serif); font-weight: 700; font-size: 14px; }
+.driver .dd { font-size: 12.5px; color: var(--ink-2); }
+
+/* ---- brand cards ---- */
+.stock { display: grid; gap: 8px; }
+.stock-h { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.stock-h .nm { font-family: var(--serif); font-weight: 700; font-size: 16px; }
+.stock-h .tk { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.stock-h .wt { margin-left: auto; font-size: 11.5px; color: var(--ink-3); }
+.stock .why { font-size: 12px; color: var(--ink-3); }
+.counts { display: flex; gap: 10px; font-family: var(--mono); font-size: 12px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ---- article list ---- */
+.arts { display: grid; gap: 0; }
+.art { border-top: 1px solid var(--border); padding: 12px 0; display: grid; gap: 6px; }
+.art:first-child { border-top: 0; }
+.art-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.art-title { font-weight: 500; font-size: 14.5px; line-height: 1.5; flex: 1 1 260px; min-width: 0; }
+.art-title a { color: inherit; }
+.art-meta { display: flex; gap: 8px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-3); align-items: center; }
+.art-analysis { background: var(--surface-2); border-left: 3px solid var(--border-strong); border-radius: 0 6px 6px 0; padding: 8px 11px; font-size: 13px; color: var(--ink-2); }
+.art-analysis.up { border-left-color: var(--up); }
+.art-analysis.down { border-left-color: var(--down); }
+.art-analysis .lead { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-3); display: block; margin-bottom: 3px; }
+.art-summary { font-size: 12.5px; color: var(--ink-3); }
+.stars { font-family: var(--mono); font-size: 11px; color: var(--accent-ink); letter-spacing: 0.1em; }
+.score { display: inline-block; min-width: 42px; text-align: center; font-family: var(--mono); font-weight: 600; font-size: 12px; padding: 2px 7px; border-radius: 5px; }
+.score.s2 { background: var(--up); color: #fff; }
+.score.s1 { background: var(--up-soft); color: var(--up); }
+.score.s0 { background: var(--flat-soft); color: var(--ink-2); }
+.score.sm1 { background: var(--down-soft); color: var(--down); }
+.score.sm2 { background: var(--down); color: #fff; }
+
+/* ---- filters ---- */
+.filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.filters label { font-size: 12px; color: var(--ink-3); }
+.filters input[type="search"] { min-width: 170px; flex: 1 1 170px; }
+
+details.more > summary { cursor: pointer; font-size: 12px; color: var(--accent-ink); list-style: none; padding-top: 4px; }
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before { content: "＋ "; }
+details.more[open] > summary::before { content: "－ "; }
+
+.state { padding: 40px 20px; text-align: center; color: var(--ink-2); }
+.state code { font-family: var(--mono); font-size: 12px; background: var(--surface-2); padding: 2px 6px; border-radius: 4px; }
+footer { max-width: 1320px; margin: 0 auto; padding: 0 20px 40px; color: var(--ink-3); font-size: 12px; line-height: 1.8; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="brand-mark">全球衣價<em>&amp;</em>風向</span>
+      <span class="brand-sub">Fashion Price &amp; Trend Desk</span>
+    </div>
+    <div class="topbar-meta">
+      <span id="meta-date" class="num">—</span>
+      <span id="meta-engine" class="pill plain">—</span>
+      <label class="sr" for="date-pick">選擇日期</label>
+      <select id="date-pick" hidden></select>
+      <button class="btn sm" id="theme-btn" type="button">深色</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div id="loading" class="state">載入資料中…</div>
+  <div id="error" class="state" hidden></div>
+  <div id="content" class="stack" hidden>
+
+    <!-- 快報 -->
+    <section class="grid g-brief" aria-labelledby="t-brief">
+      <div class="card">
+        <div class="card-h">
+          <h2 id="t-brief">今日衣價快報</h2>
+          <span class="sub" id="brief-window">—</span>
+        </div>
+        <p id="brief-text" style="margin:0 0 10px; font-size:14.5px;"></p>
+        <div class="meter" aria-hidden="true"><i id="brief-meter"></i></div>
+        <div class="legend-note" style="margin-top:8px;">
+          <span>← 降價／促銷</span><span class="muted">價格壓力 −100 … +100</span><span>漲價壓力 →</span>
+        </div>
+        <div class="legend-note num" id="brief-indices" style="margin-top:6px;" hidden></div>
+        <div class="chips" id="brief-themes" style="margin-top:12px;"></div>
+      </div>
+      <div class="grid g-tiles" style="align-content:start;">
+        <div class="tile">
+          <span class="label">整體價格壓力</span>
+          <span class="value" id="kpi-pressure">—</span>
+          <span class="foot" id="kpi-pressure-label">—</span>
+        </div>
+        <div class="tile">
+          <span class="label">分析則數</span>
+          <span class="value" id="kpi-count">—</span>
+          <span class="foot" id="kpi-lang">—</span>
+        </div>
+        <div class="tile">
+          <span class="label">漲價 / 降價訊號</span>
+          <span class="value sm"><span class="up" id="kpi-up">—</span> <span class="muted">/</span> <span class="down" id="kpi-down">—</span></span>
+          <span class="foot">價格相關報導的方向分佈</span>
+        </div>
+        <div class="tile">
+          <span class="label">今日最熱趨勢</span>
+          <span class="value sm" id="kpi-trend">—</span>
+          <span class="foot" id="kpi-brand">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 趨勢雷達 -->
+    <section class="card" aria-labelledby="t-trends">
+      <div class="card-h">
+        <h2 id="t-trends">趨勢雷達</h2>
+        <span class="sub">↑ 上升 · → 持平 · ↓ 退燒　點一下可篩選相關新聞</span>
+      </div>
+      <div class="trends" id="trend-radar"></div>
+    </section>
+
+    <!-- 品牌價格溫度 -->
+    <section class="card" aria-labelledby="t-heat">
+      <div class="card-h">
+        <h2 id="t-heat">品牌價格溫度</h2>
+        <span class="sub">正值＝漲價訊號、負值＝降價促銷　點一下可篩選該品牌新聞</span>
+      </div>
+      <div id="heat-groups"></div>
+    </section>
+
+    <!-- 價格驅動因素 -->
+    <section class="card" aria-labelledby="t-drivers" id="drivers-card" hidden>
+      <div class="card-h">
+        <h2 id="t-drivers">衣價為什麼變動</h2>
+        <span class="sub" id="drivers-asof">—</span>
+      </div>
+      <div class="drivers" id="drivers"></div>
+    </section>
+
+    <!-- 今日最重要 -->
+    <section class="card" aria-labelledby="t-top">
+      <div class="card-h">
+        <h2 id="t-top">今日最值得看的幾則</h2>
+        <span class="sub">依重要性排序</span>
+      </div>
+      <div class="arts" id="top-arts"></div>
+    </section>
+
+    <!-- 品牌 -->
+    <h2 class="section-title">品牌動態</h2>
+    <section class="grid g-cards" id="brand-cards" aria-label="品牌動態"></section>
+
+    <!-- 全部新聞 -->
+    <h2 class="section-title">全部新聞與逐則分析</h2>
+    <section class="card" aria-labelledby="t-all">
+      <div class="card-h">
+        <h2 id="t-all" class="sr">全部新聞</h2>
+        <div class="filters">
+          <label for="f-brand">品牌</label>
+          <select id="f-brand"></select>
+          <label for="f-cat">題材</label>
+          <select id="f-cat"></select>
+          <label for="f-region">地區</label>
+          <select id="f-region"></select>
+          <label for="f-dir">價格方向</label>
+          <select id="f-dir">
+            <option value="">全部</option>
+            <option value="up">漲價訊號</option>
+            <option value="down">降價促銷</option>
+            <option value="flat">中性</option>
+          </select>
+          <label for="f-sort">排序</label>
+          <select id="f-sort">
+            <option value="importance">重要性</option>
+            <option value="time">時間</option>
+            <option value="up">價格（漲→降）</option>
+            <option value="down">價格（降→漲）</option>
+          </select>
+          <input type="search" id="f-q" placeholder="搜尋標題或分析…" aria-label="搜尋新聞">
+          <button class="btn sm" id="f-reset" type="button">清除</button>
+        </div>
+      </div>
+      <div class="small muted" id="f-count" style="margin-bottom:4px;"></div>
+      <div class="arts" id="all-arts"></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <p id="foot-sources"></p>
+  <p>本頁由排程程式每日自動產生。價格訊號／重要性為程式依標題與摘要推估的結果，可能誤判；
+     趨勢狀態為人工策展的快照。所有內容僅供資訊整理與研究參考，不構成任何消費或投資建議。
+     請以各品牌正式公告與原始報導為準。</p>
+</footer>
+
+<script>
+"use strict";
+
+var DATA = null;
+var STATE = { brand: "", cat: "", region: "", dir: "", trend: "", sort: "importance", q: "" };
+
+/* ---------- 小工具 ---------- */
+function $(id) { return document.getElementById(id); }
+function el(tag, cls, text) {
+  var n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined && text !== null) n.textContent = String(text);
+  return n;
+}
+function toneClass(k) { return k === "up" ? "up" : (k === "down" ? "down" : "flat"); }
+function scoreClass(s) {
+  if (s >= 45) return "s2"; if (s >= 15) return "s1";
+  if (s <= -45) return "sm2"; if (s <= -15) return "sm1";
+  return "s0";
+}
+function signed(n) { return (n > 0 ? "+" : "") + n; }
+function stars(n) { return "★★★★★".slice(0, n) + "☆☆☆☆☆".slice(0, 5 - n); }
+function statusArrow(s) { return s === "rising" ? "↑" : (s === "fading" ? "↓" : "→"); }
+function fmtTime(iso) {
+  if (!iso) return "";
+  var d = new Date(iso);
+  if (isNaN(d)) return "";
+  var pad = function (x) { return x < 10 ? "0" + x : String(x); };
+  return (d.getMonth() + 1) + "/" + d.getDate() + " " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+
+/* ---------- 主題 ---------- */
+function initTheme() {
+  var saved = null;
+  try { saved = localStorage.getItem("fashion-theme"); } catch (e) { /* 無痕模式會丟例外 */ }
+  if (saved === "dark" || saved === "light") document.documentElement.setAttribute("data-theme", saved);
+  syncThemeBtn();
+  $("theme-btn").addEventListener("click", function () {
+    var cur = document.documentElement.getAttribute("data-theme");
+    if (!cur) cur = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    var next = cur === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem("fashion-theme", next); } catch (e) { /* 忽略 */ }
+    syncThemeBtn();
+  });
+}
+function syncThemeBtn() {
+  var cur = document.documentElement.getAttribute("data-theme");
+  var dark = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  $("theme-btn").textContent = dark ? "淺色" : "深色";
+}
+
+/* ---------- 載入 ---------- */
+function load(file) {
+  $("loading").hidden = false;
+  $("error").hidden = true;
+  return fetch(file + "?v=" + Date.now(), { cache: "no-store" })
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function (json) {
+      DATA = json;
+      render();
+      $("loading").hidden = true;
+      $("content").hidden = false;
+    })
+    .catch(function (err) {
+      $("loading").hidden = true;
+      $("content").hidden = true;
+      var box = $("error");
+      var missing = err.message.indexOf("404") !== -1;
+      box.hidden = false;
+      box.innerHTML = "";
+      if (missing) {
+        // 還沒跑過第一次排程是預期中的狀態，不該長得像壞掉。
+        box.appendChild(el("h2", "section-title", "尚未產生資料"));
+        box.appendChild(el("p", null,
+          "每日排程會在台灣時間早上抓取全球服飾新聞、逐則分析後把資料寫進來。"));
+        box.appendChild(el("p", "small muted",
+          "想立刻看到結果，可以到 GitHub 的 Actions 分頁手動執行「每日全球時尚新聞建置」。"));
+      } else {
+        box.appendChild(el("h2", "section-title", "讀不到資料"));
+        box.appendChild(el("p", null, err.message));
+        box.appendChild(el("p", "small muted",
+          "若是在本機直接開檔，瀏覽器會擋下 fetch；請透過 GitHub Pages 或本機伺服器瀏覽。"));
+      }
+      var p = el("p", "small muted");
+      p.appendChild(document.createTextNode("預期路徑："));
+      p.appendChild(el("code", null, "data/" + file.replace(/^data\//, "")));
+      box.appendChild(p);
+    });
+}
+
+function loadIndex() {
+  return fetch("data/index.json?v=" + Date.now(), { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (idx) {
+      if (!idx || !idx.days || idx.days.length < 2) return;
+      var sel = $("date-pick");
+      sel.hidden = false;
+      idx.days.forEach(function (d) {
+        var o = el("option", null, d.date + "（" + d.article_count + " 則）");
+        o.value = "data/" + d.file;
+        sel.appendChild(o);
+      });
+      sel.addEventListener("change", function () { load(sel.value); });
+    })
+    .catch(function () { /* 索引不存在不影響主要功能 */ });
+}
+
+/* ---------- 渲染 ---------- */
+function render() {
+  var b = DATA.brief, st = DATA.stats;
+  // 換日期時 DATA 整份被換掉，這些索引必須跟著作廢。
+  articleById._map = null;
+  brandOf._map = null;
+  trendOf._map = null;
+
+  $("meta-date").textContent = DATA.date + " 更新";
+  var eng = $("meta-engine");
+  eng.textContent = DATA.engine === "claude" ? "Claude 深度分析" : "規則式分析";
+  eng.className = "pill " + (DATA.engine === "claude" ? "accent" : "plain");
+
+  $("brief-text").textContent = b.text;
+  $("brief-window").textContent = "回溯 " + DATA.window_days + " 日 · " +
+    (DATA.generated_at || "").replace("T", " ").slice(0, 16);
+
+  var meter = $("brief-meter");
+  var pct = Math.min(50, Math.abs(b.price_pressure) / 2);
+  meter.className = b.price_pressure >= 0 ? "pos" : "neg";
+  meter.style.width = pct + "%";
+
+  $("kpi-pressure").textContent = signed(b.price_pressure);
+  $("kpi-pressure").className = "value " + toneClass(b.price_pressure_key);
+  $("kpi-pressure-label").textContent = b.price_pressure_label;
+  $("kpi-count").textContent = st.article_count;
+  $("kpi-lang").textContent = "中文 " + st.zh_count + " · 英文 " + st.en_count +
+    " · 涵蓋 " + st.covered_brands + " 個品牌";
+  $("kpi-up").textContent = b.price_counts.up + " 則";
+  $("kpi-down").textContent = b.price_counts.down + " 則";
+  $("kpi-trend").textContent = b.hot_trends.length
+    ? b.hot_trends[0].label + "（" + b.hot_trends[0].count + " 則）" : "—";
+  $("kpi-brand").textContent = b.hottest_brands.length
+    ? "最熱品牌：" + b.hottest_brands.map(function (x) { return x.name; }).join("、") : "";
+
+  var themes = $("brief-themes");
+  themes.innerHTML = "";
+  (b.themes || []).forEach(function (t) {
+    themes.appendChild(el("span", "pill plain", t.label + " " + t.count));
+  });
+  (b.regions || []).slice(0, 5).forEach(function (r) {
+    themes.appendChild(el("span", "pill accent", r.label + " " + r.count));
+  });
+
+  var sel = $("date-pick");
+  if (!sel.hidden) {
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value.indexOf(DATA.date) !== -1) { sel.selectedIndex = i; break; }
+    }
+  }
+
+  var idx = $("brief-indices");
+  idx.innerHTML = "";
+  var indices = DATA.price_indices || [];
+  idx.hidden = !indices.length;
+  indices.forEach(function (x) {
+    if (x.yoy === null || x.yoy === undefined) return;
+    var span = el("span", null, x.label + " " + signed(x.yoy) + "%（" + x.period + "）");
+    span.title = "來源：" + x.source;
+    idx.appendChild(span);
+  });
+
+  renderTrends();
+  renderDrivers();
+  renderHeat();
+  renderTop();
+  renderBrandCards();
+  initFilters();
+  renderAll();
+  renderFooter();
+}
+
+function renderDrivers() {
+  var box = $("drivers-card");
+  var d = DATA.price_drivers;
+  if (!d || !d.items || !d.items.length) { box.hidden = true; return; }
+  box.hidden = false;
+  $("drivers-asof").textContent = "人工整理的背景快照 · " + d.asof;
+  var host = $("drivers");
+  host.innerHTML = "";
+  d.items.forEach(function (it) {
+    var card = el("div", "driver");
+    var h = el("div", "dh");
+    h.appendChild(el("span", "dn", it.name));
+    var cls = it.direction === "推升" ? "up" : (it.direction === "壓低" ? "down" : "plain");
+    h.appendChild(el("span", "pill " + cls, it.direction));
+    card.appendChild(h);
+    card.appendChild(el("div", "dd", it.detail));
+    host.appendChild(card);
+  });
+}
+
+function renderTrends() {
+  var host = $("trend-radar");
+  host.innerHTML = "";
+  // 換日期後被選中的趨勢可能變成 0 則；chip 仍要顯示，否則篩選解不掉。
+  var shown = DATA.trends.filter(function (t) {
+    return t.article_count > 0 || t.id === STATE.trend;
+  });
+  if (!shown.length) {
+    host.appendChild(el("p", "muted small", "本期沒有命中任何趨勢標籤的報導。"));
+    return;
+  }
+  shown.forEach(function (t) {
+    var c = el("button", "trend-chip" + (STATE.trend === t.id ? " on" : ""));
+    c.type = "button";
+    c.setAttribute("aria-pressed", STATE.trend === t.id ? "true" : "false");
+    c.title = t.label + "（" + t.en + "）· " + t.status_label + "\n" + t.note;
+    c.appendChild(el("span", "ts " + t.status, statusArrow(t.status)));
+    c.appendChild(el("span", "tn", t.label));
+    c.appendChild(el("span", "tc", t.article_count + " 則"));
+    c.addEventListener("click", function () {
+      STATE.trend = STATE.trend === t.id ? "" : t.id;
+      renderTrends();
+      renderAll();
+      $("all-arts").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    host.appendChild(c);
+  });
+}
+
+function renderHeat() {
+  var host = $("heat-groups");
+  host.innerHTML = "";
+  (DATA.segments || []).forEach(function (seg) {
+    var brands = DATA.brands.filter(function (x) { return x.segment === seg.id; });
+    if (!brands.length) return;
+    brands.sort(function (a, b) { return (b.heat - a.heat) || (b.prominence - a.prominence); });
+    var block = el("div", "seg-block");
+    block.appendChild(el("div", "seg-label", seg.label));
+    var grid = el("div", "heat");
+    brands.forEach(function (s) {
+      var btn = el("button", "heat-cell" + (STATE.brand === s.slug ? " on" : ""));
+      btn.type = "button";
+      btn.setAttribute("aria-pressed", STATE.brand === s.slug ? "true" : "false");
+      btn.appendChild(el("span", "hn", s.name));
+      btn.appendChild(el("span", "hs " + toneClass(s.price_key),
+        s.article_count ? signed(s.price_score) : "—"));
+      btn.appendChild(el("span", "hm", s.article_count
+        ? (s.article_count + " 則 · " + s.price_label)
+        : "無新聞"));
+      btn.title = s.name + "（" + s.en_name + "，" + s.hq + "）\n" + s.summary_text;
+      btn.addEventListener("click", function () {
+        STATE.brand = STATE.brand === s.slug ? "" : s.slug;
+        $("f-brand").value = STATE.brand;
+        renderHeat();
+        renderAll();
+        $("all-arts").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      grid.appendChild(btn);
+    });
+    block.appendChild(grid);
+    host.appendChild(block);
+  });
+}
+
+function articleById(id) {
+  if (!articleById._map) {
+    articleById._map = {};
+    DATA.articles.forEach(function (a) { articleById._map[a.id] = a; });
+  }
+  return articleById._map[id];
+}
+function brandOf(slug) {
+  if (!brandOf._map) {
+    brandOf._map = {};
+    DATA.brands.forEach(function (s) { brandOf._map[s.slug] = s; });
+  }
+  return brandOf._map[slug];
+}
+function trendOf(id) {
+  if (!trendOf._map) {
+    trendOf._map = {};
+    DATA.trends.forEach(function (t) { trendOf._map[t.id] = t; });
+  }
+  return trendOf._map[id];
+}
+
+function renderTop() {
+  var host = $("top-arts");
+  host.innerHTML = "";
+  var ids = DATA.brief.top_article_ids || [];
+  if (!ids.length) { host.appendChild(el("p", "muted small", "今日沒有足夠的新聞可排序。")); return; }
+  ids.forEach(function (id) {
+    var a = articleById(id);
+    if (a) host.appendChild(articleNode(a, true));
+  });
+}
+
+function articleNode(a, showBrands) {
+  var an = a.analysis;
+  var wrap = el("article", "art");
+
+  var top = el("div", "art-top");
+  var sc = el("span", "score " + scoreClass(an.price_score), signed(an.price_score));
+  sc.title = "價格訊號 " + signed(an.price_score) + "（" + an.price_label +
+    "）· 信心 " + Math.round(an.confidence * 100) + "%";
+  top.appendChild(sc);
+
+  var t = el("div", "art-title");
+  if (a.url) {
+    var link = el("a", null, a.title);
+    link.href = a.url; link.target = "_blank"; link.rel = "noopener noreferrer";
+    t.appendChild(link);
+  } else {
+    t.textContent = a.title;
+  }
+  top.appendChild(t);
+  var st = el("span", "stars", stars(an.importance));
+  st.title = "重要性 " + an.importance + "/5";
+  top.appendChild(st);
+  wrap.appendChild(top);
+
+  var meta = el("div", "art-meta");
+  if (a.outlet) meta.appendChild(el("span", null, a.outlet));
+  if (a.dup_count > 1) meta.appendChild(el("span", "pill plain", a.dup_count + " 家報導"));
+  var tm = fmtTime(a.published);
+  if (tm) meta.appendChild(el("span", null, tm));
+  if (a.lang === "en") meta.appendChild(el("span", "pill plain", "EN"));
+  meta.appendChild(el("span", "pill accent", an.category_label));
+  meta.appendChild(el("span", "pill plain", an.region_label));
+  meta.appendChild(el("span", "pill plain", "信心 " + Math.round(an.confidence * 100) + "%"));
+  (an.trend_tags || []).forEach(function (tid) {
+    var tr = trendOf(tid);
+    if (tr) meta.appendChild(el("span", "pill tag", statusArrow(tr.status) + " " + tr.label));
+  });
+  (an.flags || []).forEach(function (f) { meta.appendChild(el("span", "pill warn", f)); });
+  if (showBrands) {
+    (a.brands || []).forEach(function (slug) {
+      var s = brandOf(slug);
+      if (s) meta.appendChild(el("span", "pill plain", s.name));
+    });
+  }
+  wrap.appendChild(meta);
+
+  var box = el("div", "art-analysis " + an.price_key);
+  box.appendChild(el("span", "lead", "逐則分析"));
+  box.appendChild(document.createTextNode(an.commentary));
+  wrap.appendChild(box);
+
+  if (a.summary) {
+    var d = el("details", "more");
+    d.appendChild(el("summary", null, "原文摘要"));
+    d.appendChild(el("div", "art-summary", a.summary));
+    wrap.appendChild(d);
+  }
+  return wrap;
+}
+
+function renderBrandCards() {
+  var host = $("brand-cards");
+  host.innerHTML = "";
+  var covered = DATA.brands.filter(function (s) { return s.article_count > 0; });
+  if (!covered.length) {
+    host.appendChild(el("p", "muted small", "本期沒有品牌被新聞提及。"));
+    return;
+  }
+  covered.forEach(function (s) {
+    var c = el("section", "card stock");
+    var h = el("div", "stock-h");
+    h.appendChild(el("span", "nm", s.name));
+    h.appendChild(el("span", "tk", s.en_name));
+    h.appendChild(el("span", "pill plain", s.segment_label));
+    h.appendChild(el("span", "wt", s.hq));
+    c.appendChild(h);
+
+    var row = el("div", "art-top");
+    row.appendChild(el("span", "score " + scoreClass(s.price_score),
+      s.article_count ? signed(s.price_score) : "—"));
+    row.appendChild(el("span", "small " + toneClass(s.price_key), s.price_label));
+    c.appendChild(row);
+
+    var meter = el("div", "meter");
+    var bar = el("i", s.price_score >= 0 ? "pos" : "neg");
+    bar.style.width = Math.min(50, Math.abs(s.price_score) / 2) + "%";
+    meter.appendChild(bar);
+    c.appendChild(meter);
+
+    var counts = el("div", "counts");
+    counts.appendChild(el("span", "up", "漲 " + s.counts.up));
+    counts.appendChild(el("span", "down", "降 " + s.counts.down));
+    counts.appendChild(el("span", "flat", "中性 " + s.counts.flat));
+    c.appendChild(counts);
+
+    if (s.top_categories.length) {
+      var chips = el("div", "chips");
+      s.top_categories.forEach(function (t) {
+        chips.appendChild(el("span", "pill plain", t.label + " " + t.count));
+      });
+      c.appendChild(chips);
+    }
+
+    c.appendChild(el("p", "small", s.summary_text));
+    c.appendChild(el("p", "why", "長期觀察重點：" + s.driver));
+
+    if (s.article_ids.length) {
+      var d = el("details", "more");
+      d.appendChild(el("summary", null, "展開 " + s.article_ids.length + " 則新聞與分析"));
+      var list = el("div", "arts");
+      s.article_ids.forEach(function (id) {
+        var a = articleById(id);
+        if (a) list.appendChild(articleNode(a, false));
+      });
+      d.appendChild(list);
+      c.appendChild(d);
+    }
+    host.appendChild(c);
+  });
+}
+
+/* ---------- 篩選 ---------- */
+function initFilters() {
+  // 品牌下拉列出全部品牌（熱度格涵蓋全部 32 個，點無新聞的品牌時
+  // 下拉也要找得到對應選項，不然 select 會顯示成空白）。
+  var fb = $("f-brand");
+  fb.innerHTML = "";
+  fb.appendChild(new Option("全部品牌", ""));
+  DATA.brands.forEach(function (s) {
+    fb.appendChild(new Option(
+      s.name + (s.article_count ? " · " + s.article_count : ""), s.slug));
+  });
+  fb.value = STATE.brand;
+  if (fb.value !== STATE.brand) { STATE.brand = ""; fb.value = ""; }
+
+  var used = {};
+  DATA.articles.forEach(function (a) { used[a.analysis.category] = a.analysis.category_label; });
+  var fc = $("f-cat");
+  fc.innerHTML = "";
+  fc.appendChild(new Option("全部題材", ""));
+  Object.keys(used).forEach(function (k) { fc.appendChild(new Option(used[k], k)); });
+  fc.value = STATE.cat;
+  // 換日期後原本篩選的題材/地區可能不存在於新資料，value 塞不進去時
+  // select 會顯示空白、篩選卻仍生效 —— 這種看不見的篩選一律重置。
+  if (fc.value !== STATE.cat) { STATE.cat = ""; fc.value = ""; }
+
+  var usedR = {};
+  DATA.articles.forEach(function (a) { usedR[a.analysis.region] = a.analysis.region_label; });
+  var fr = $("f-region");
+  fr.innerHTML = "";
+  fr.appendChild(new Option("全部地區", ""));
+  Object.keys(usedR).forEach(function (k) { fr.appendChild(new Option(usedR[k], k)); });
+  fr.value = STATE.region;
+  if (fr.value !== STATE.region) { STATE.region = ""; fr.value = ""; }
+
+  fb.onchange = function () { STATE.brand = fb.value; renderHeat(); renderAll(); };
+  fc.onchange = function () { STATE.cat = fc.value; renderAll(); };
+  fr.onchange = function () { STATE.region = fr.value; renderAll(); };
+  $("f-dir").onchange = function () { STATE.dir = $("f-dir").value; renderAll(); };
+  $("f-sort").onchange = function () { STATE.sort = $("f-sort").value; renderAll(); };
+  $("f-q").oninput = function () { STATE.q = $("f-q").value.trim(); renderAll(); };
+  $("f-reset").onclick = function () {
+    STATE = { brand: "", cat: "", region: "", dir: "", trend: "", sort: "importance", q: "" };
+    fb.value = ""; fc.value = ""; fr.value = ""; $("f-dir").value = "";
+    $("f-sort").value = "importance"; $("f-q").value = "";
+    renderTrends(); renderHeat(); renderAll();
+  };
+}
+
+function renderAll() {
+  var list = DATA.articles.filter(function (a) {
+    var an = a.analysis;
+    if (STATE.brand && (a.brands || []).indexOf(STATE.brand) === -1) return false;
+    if (STATE.cat && an.category !== STATE.cat) return false;
+    if (STATE.region && an.region !== STATE.region) return false;
+    if (STATE.dir && an.price_key !== STATE.dir) return false;
+    if (STATE.trend && (an.trend_tags || []).indexOf(STATE.trend) === -1) return false;
+    if (STATE.q) {
+      var hay = (a.title + " " + (a.summary || "") + " " + an.commentary + " " + (a.outlet || "")).toLowerCase();
+      if (hay.indexOf(STATE.q.toLowerCase()) === -1) return false;
+    }
+    return true;
+  });
+
+  list.sort(function (x, y) {
+    var ax = x.analysis, ay = y.analysis;
+    if (STATE.sort === "time") return (y.published_ts || 0) - (x.published_ts || 0);
+    if (STATE.sort === "up") return ay.price_score - ax.price_score;
+    if (STATE.sort === "down") return ax.price_score - ay.price_score;
+    return (ay.importance - ax.importance) || ((y.published_ts || 0) - (x.published_ts || 0));
+  });
+
+  var host = $("all-arts");
+  host.innerHTML = "";
+  var labels = [];
+  if (STATE.brand && brandOf(STATE.brand)) labels.push(brandOf(STATE.brand).name);
+  if (STATE.trend && trendOf(STATE.trend)) labels.push(trendOf(STATE.trend).label);
+  $("f-count").textContent = "顯示 " + list.length + " / " + DATA.articles.length + " 則" +
+    (labels.length ? "　·　已篩選：" + labels.join("、") : "");
+  if (!list.length) {
+    host.appendChild(el("p", "muted small", "沒有符合條件的新聞。試著放寬篩選條件。"));
+    return;
+  }
+  list.forEach(function (a) { host.appendChild(articleNode(a, true)); });
+}
+
+function renderFooter() {
+  var st = DATA.stats;
+  var ok = 0, bad = 0;
+  (st.sources.sources || []).forEach(function (s) { s.ok ? ok++ : bad++; });
+  var parts = ["資料來源：Google 新聞（台灣＋國際）與公開時尚媒體 RSS，共 " +
+    (ok + bad) + " 個查詢，成功 " + ok + " 個"];
+  if (bad) parts.push("失敗 " + bad + " 個（已略過）");
+  if (st.llm && st.llm.enabled) {
+    parts.push("深度分析模型：" + st.llm.model + "，升級 " + st.llm.upgraded + " 則");
+  }
+  parts.push("產生時間 " + (DATA.generated_at || "").replace("T", " "));
+  $("foot-sources").textContent = parts.join("　·　");
+}
+
+/* ---------- 啟動 ---------- */
+initTheme();
+loadIndex();
+load("data/latest.json");
+</script>
+</body>
+</html>

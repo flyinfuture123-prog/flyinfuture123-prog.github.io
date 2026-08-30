@@ -164,7 +164,7 @@ section[hidden] { display: none; }
 .chart-tip .tip-date { color: var(--ink-3); margin-bottom: 2px; }
 .chart-tip span { color: var(--ink-3); margin: 0 2px 0 6px; } .chart-tip span:first-child { margin-left: 0; }
 .chart-tip i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 6px; }
-.chart-h { height: 520px; } .chart-xl { height: 680px; } .chart-m { height: 340px; } .chart-s { height: 220px; }
+.chart-h { height: 560px; } .chart-xl { height: 780px; } .chart-m { height: 340px; } .chart-s { height: 220px; }
 .range { display: flex; gap: 2px; }
 .range button { border: 1px solid var(--border); background: var(--surface-2); padding: 3px 10px; font-size: 12.5px; font-family: var(--mono); cursor: pointer; border-radius: 4px; color: var(--ink-2); }
 .range button.active { background: var(--accent-soft); color: var(--accent-ink); border-color: var(--accent); }
@@ -304,11 +304,10 @@ tr.drawer td { background: var(--surface-2); padding: 12px 14px; white-space: no
   </div></div>
   <div class="tabs-wrap"><nav class="tabs" role="tablist" id="tabs">
     <button class="tab active" role="tab" data-tab="dash">戰情總覽</button>
-    <button class="tab" role="tab" data-tab="tech">技術面</button>
+    <button class="tab" role="tab" data-tab="tech">技術面・進場策略</button>
     <button class="tab" role="tab" data-tab="chips">籌碼面</button>
     <button class="tab" role="tab" data-tab="intl">國際連動</button>
     <button class="tab" role="tab" data-tab="models">統計模型</button>
-    <button class="tab" role="tab" data-tab="entry">進場策略</button>
     <button class="tab" role="tab" data-tab="scan">個股掃描</button>
     <button class="tab" role="tab" data-tab="learn">訓練場</button>
     <button class="tab" role="tab" data-tab="data">資料與方法</button>
@@ -361,7 +360,7 @@ tr.drawer td { background: var(--surface-2); padding: 12px 14px; white-space: no
     <div class="card">
       <div class="card-h"><h2>技術分析全圖</h2><div class="range pane-toggles" id="techTools"></div><div class="range" id="techRange"></div></div>
       <div class="legend" id="techLegend"></div>
-      <div id="techChart" style="height:640px"></div>
+      <div id="techChart" style="height:860px"></div>
     </div>
     <div class="grid g-2">
       <div class="card"><div class="card-h"><h2>技術訊號評分</h2><span class="sub" id="techScoreSub"></span></div><div class="siglist" id="techSignals"></div></div>
@@ -371,6 +370,28 @@ tr.drawer td { background: var(--surface-2); padding: 12px 14px; white-space: no
       <div class="card-h"><h2>權值股技術評分排行</h2><span class="sub">與個股掃描同一套訊號 · 點選即切換上方圖表</span></div>
       <div class="tbl-wrap" id="techRank"></div>
     </div>
+    <div class="section-title">進場策略</div>
+    <div class="grid g-main">
+      <div class="card">
+        <div class="card-h"><h2 id="entryChartTitle">進場地圖</h2><span class="sub">進場區間（金色帶）· 停損（綠線）· 目標（紅線）· 長線分批價（紫線）</span></div>
+        <div id="entryChart" style="height:500px"></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>技術面摘要</h2><span class="sub" id="entryTechSub"></span></div>
+        <div id="entryTech"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h2>資訊面背書</h2><div style="display:flex;gap:6px;flex-wrap:wrap" id="entryNewsBtns"></div></div>
+      <div id="entryNews"></div>
+    </div>
+    <div class="grid g-2" id="entryCards"></div>
+    <div class="card">
+      <div class="card-h"><h2>部位計算器</h2><span class="sub">以固定風險法決定部位大小</span></div>
+      <div class="form" id="sizerForm"></div>
+      <div class="result" id="sizerResult"></div>
+    </div>
+    <div class="card"><div class="card-h"><h2>策略訊號看板</h2><span class="sub">各回測策略目前的持有狀態與今日訊號</span></div><div class="tbl-wrap" id="entryStrategies"></div></div>
   </section>
 
   <section id="tab-chips" class="stack" hidden>
@@ -416,29 +437,6 @@ tr.drawer td { background: var(--surface-2); padding: 12px 14px; white-space: no
     </div>
   </section>
 
-  <section id="tab-entry" class="stack" hidden>
-    <div class="grid g-main">
-      <div class="card">
-        <div class="card-h"><h2 id="entryChartTitle">進場地圖</h2><span class="sub">進場區間（金色帶）· 停損（綠線）· 目標（紅線）· 長線分批價（紫線）</span></div>
-        <div id="entryChart" style="height:430px"></div>
-      </div>
-      <div class="card">
-        <div class="card-h"><h2>技術面摘要</h2><span class="sub" id="entryTechSub"></span></div>
-        <div id="entryTech"></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-h"><h2>資訊面背書</h2><div style="display:flex;gap:6px;flex-wrap:wrap" id="entryNewsBtns"></div></div>
-      <div id="entryNews"></div>
-    </div>
-    <div class="grid g-2" id="entryCards"></div>
-    <div class="card">
-      <div class="card-h"><h2>部位計算器</h2><span class="sub">以固定風險法決定部位大小</span></div>
-      <div class="form" id="sizerForm"></div>
-      <div class="result" id="sizerResult"></div>
-    </div>
-    <div class="card"><div class="card-h"><h2>策略訊號看板</h2><span class="sub">各回測策略目前的持有狀態與今日訊號</span></div><div class="tbl-wrap" id="entryStrategies"></div></div>
-  </section>
 
   <section id="tab-scan" class="stack" hidden>
     <div class="card">
@@ -1417,7 +1415,7 @@ const APP = (() => {
   function mainSpec(A, window_, full) {
     const { s, ind } = A;
     const panes = [
-      { weight: 3.2, title: 'K 線 · MA5 / MA20 / MA60 / MA240 · 布林通道', series: [
+      { weight: 4.4, title: 'K 線 · MA5 / MA20 / MA60 / MA240 · 布林通道', series: [
         { type: 'band', lo: ind.bb.lo, hi: ind.bb.up, color: '--band', alpha: 0.09 },
         { type: 'candle', data: { o: s.o, h: s.h, l: s.l, c: s.c } },
         { type: 'line', name: 'MA5', data: ind.ma5, color: '--s1', thin: true }, { type: 'line', name: 'MA20', data: ind.ma20, color: '--s2', thin: true }, { type: 'line', name: 'MA60', data: ind.ma60, color: '--s3', thin: true }, { type: 'line', name: 'MA240', data: ind.ma240, color: '--s4', thin: true }], noLegend: true },
@@ -1818,8 +1816,9 @@ const APP = (() => {
   }
 
   // ---------- tabs / instrument / init ----------
-  const RENDER = { dash: APP.renderDash, tech: APP.renderTech, chips: APP.renderChips, intl: APP.renderIntl, models: renderModels, entry: renderEntry, scan: renderScan, learn: () => APP.renderLearn(), data: renderData };
+  const RENDER = { dash: APP.renderDash, tech: () => { APP.renderTech(); renderEntry(); }, chips: APP.renderChips, intl: APP.renderIntl, models: renderModels, scan: renderScan, learn: () => APP.renderLearn(), data: renderData };
   function showTab(name, force) {
+    if (name === 'entry') name = 'tech';
     state.tab = name; $$('.tab').forEach(t => { const on = t.dataset.tab === name; t.classList.toggle('active', on); t.setAttribute('aria-selected', on); });
     $$('main > section').forEach(s => { s.hidden = s.id !== 'tab-' + name; });
     if (state.dirty[name] || force) { RENDER[name](); state.dirty[name] = 0; }

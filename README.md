@@ -268,3 +268,7 @@ python3 scripts/patentmap_build.py patentmap-4b9c7e2a51d8f306/data/book.json
 # 本機預覽（必須走 HTTP，file:// 會被瀏覽器擋下 fetch）
 python -m http.server 8000 --directory patentmap-4b9c7e2a51d8f306
 ```
+
+改了 `scripts/patentmap/` 的模組就要重跑產生器，否則頁面會跟原始資料對不上
+而且不會有任何錯誤訊息。`.github/workflows/check.yml` 有一步會重跑產生器並和
+`data/book.json` 做 diff，兩邊不同步時 CI 會直接紅燈。

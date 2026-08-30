@@ -168,6 +168,10 @@ section[hidden] { display: none; }
 .range { display: flex; gap: 2px; }
 .range button { border: 1px solid var(--border); background: var(--surface-2); padding: 3px 10px; font-size: 12.5px; font-family: var(--mono); cursor: pointer; border-radius: 4px; color: var(--ink-2); }
 .range button.active { background: var(--accent-soft); color: var(--accent-ink); border-color: var(--accent); }
+.pane-toggles { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+.pane-toggles [data-z] { font-weight: 700; min-width: 30px; }
+.pane-toggles .tog-sep { width: 1px; height: 16px; background: var(--border-strong); margin: 0 3px; }
+.pane-toggles .muted { font-size: 12px; }
 .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--ink-2); font-family: var(--mono); }
 .legend i { display: inline-block; width: 10px; height: 3px; vertical-align: middle; margin-right: 4px; border-radius: 1px; }
 
@@ -338,7 +342,7 @@ tr.drawer td { background: var(--surface-2); padding: 12px 14px; white-space: no
   <section id="tab-dash" class="stack">
     <div class="grid g-tiles" id="dashTiles"></div>
     <div class="card">
-      <div class="card-h"><h2 id="dashChartTitle">K 線與均線</h2><div class="range" id="dashRange"></div></div>
+      <div class="card-h"><h2 id="dashChartTitle">K 線與均線</h2><div class="range pane-toggles" id="dashTools"></div><div class="range" id="dashRange"></div></div>
       <div class="legend" id="dashLegend"></div>
       <div class="chart-xl" id="dashChart"></div>
     </div>
@@ -355,7 +359,7 @@ tr.drawer td { background: var(--surface-2); padding: 12px 14px; white-space: no
 
   <section id="tab-tech" class="stack" hidden>
     <div class="card">
-      <div class="card-h"><h2>技術分析全圖</h2><div class="range" id="techRange"></div></div>
+      <div class="card-h"><h2>技術分析全圖</h2><div class="range pane-toggles" id="techTools"></div><div class="range" id="techRange"></div></div>
       <div class="legend" id="techLegend"></div>
       <div id="techChart" style="height:640px"></div>
     </div>
@@ -1239,6 +1243,7 @@ const CHARTS = (() => {
     zoomable() { const sp = this.spec; return !!(sp && sp.dates && sp.dates.length > 30 && !sp.ticks); }
     pannable() { const sp = this.spec; return !!(sp && sp.dates.length > this.viewWin()); }
     zoomAt(factor, px) { const nv = Math.max(20, Math.min(this.spec.dates.length, Math.round(this.viewWin() * factor))); this.zoomTo(nv, px); }
+    zoomBy(factor) { if (this.view) this.zoomAt(factor, (this.view.x0 + this.view.x1) / 2); }
     zoomTo(nv, px) {
       const sp = this.spec; const t = sp.dates.length; nv = Math.max(20, Math.min(t, nv)); if (nv === this.viewWin()) return;
       const { x0, x1, start, n } = this.view; const f = Math.max(0, Math.min(1, (px - x0) / (x1 - x0)));
@@ -1372,7 +1377,7 @@ const APP = (() => {
   const fmtN = E.fmtN, fmtS = E.fmtS; const pct = (x, d = 2) => isN(x) ? fmtS(x, d) + '%' : '—';
   const cls = x => x > 0 ? 'up' : x < 0 ? 'down' : 'flat';
   const yi = x => (x / 1e8).toFixed(1);
-  const state = { code: 'TAIEX', tab: 'dash', ranges: { dash: 130, tech: 160, intl: 130 }, dirty: {}, charts: {}, btSel: null, scanSort: { key: 'score', dir: -1 }, scanFilters: {}, A: null, scan: null, intl: null };
+  const state = { code: 'TAIEX', tab: 'dash', ranges: { dash: 130, tech: 160, intl: 130 }, dirty: {}, charts: {}, btSel: null, scanSort: { key: 'score', dir: -1 }, scanFilters: {}, A: null, scan: null, intl: null, panesOff: (() => { try { return JSON.parse(localStorage.getItem('twstock-panes')) || {}; } catch (e) { return {}; } })() };
   let DATA = null;
 
   function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
@@ -1387,6 +1392,13 @@ const APP = (() => {
   }
   function facetsHtml(A) { const c = A.confluence; return `<div class="facets">${c.facets.map(f => `<span class="facet ${f.dir > 0 ? 'up' : f.dir < 0 ? 'down' : 'flat'}"><i></i>${esc(f.name)} ${f.dir > 0 ? '偏多' : f.dir < 0 ? '偏空' : '中性'}</span>`).join('')}</div><div class="callout ${c.bull > c.bear && c.bear === 0 ? '' : 'warn'}"><b>${esc(c.verdict)}</b>：${c.facets.length} 個面向中 ${c.bull} 個偏多、${c.bear} 個偏空、${c.neutral} 個中性。</div>`; }
   function chart(id, opts) { const el = $('#' + id); if (!state.charts[id] || state.charts[id].el !== el) state.charts[id] = new C.Chart(el, opts || {}); return state.charts[id]; }
+  const PANE_DEFS = [['vol', '成交量'], ['kd', 'KD'], ['macd', 'MACD']];
+  const PANE_DEFS_FULL = [['vol', '成交量'], ['kd', 'KD'], ['macd', 'MACD'], ['rsi', 'RSI'], ['adx', 'ADX']];
+  function chartTools(el, chartId, defs, onChange) {
+    el.innerHTML = `<button type="button" data-z="1.3" title="縮小（顯示更多天）">－</button><button type="button" data-z="0.75" title="放大（顯示更少天）">＋</button><span class="tog-sep"></span><span class="muted">副圖</span>` + defs.map(d => `<button type="button" data-k="${d[0]}" class="${state.panesOff[d[0]] ? '' : 'active'}">${d[1]}</button>`).join('');
+    el.querySelectorAll('[data-z]').forEach(b => b.addEventListener('click', () => chart(chartId).zoomBy(+b.dataset.z)));
+    el.querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', () => { state.panesOff[b.dataset.k] = !state.panesOff[b.dataset.k]; try { localStorage.setItem('twstock-panes', JSON.stringify(state.panesOff)); } catch (e) { } b.classList.toggle('active'); onChange(); }));
+  }
   function rangeButtons(el, key, opts, onChange) { el.innerHTML = opts.map(o => `<button data-n="${o.n}" class="${state.ranges[key] === o.n ? 'active' : ''}">${o.label}</button>`).join(''); el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => { state.ranges[key] = +b.dataset.n; el.querySelectorAll('button').forEach(x => x.classList.toggle('active', x === b)); onChange(); })); }
   const RANGES = [{ n: 65, label: '3M' }, { n: 130, label: '6M' }, { n: 250, label: '1Y' }, { n: 750, label: '3Y' }, { n: 9999, label: '全部' }];
 
@@ -1409,15 +1421,15 @@ const APP = (() => {
         { type: 'band', lo: ind.bb.lo, hi: ind.bb.up, color: '--band', alpha: 0.09 },
         { type: 'candle', data: { o: s.o, h: s.h, l: s.l, c: s.c } },
         { type: 'line', name: 'MA5', data: ind.ma5, color: '--s1', thin: true }, { type: 'line', name: 'MA20', data: ind.ma20, color: '--s2', thin: true }, { type: 'line', name: 'MA60', data: ind.ma60, color: '--s3', thin: true }, { type: 'line', name: 'MA240', data: ind.ma240, color: '--s4', thin: true }], noLegend: true },
-      { weight: 0.9, title: '成交量', series: [{ type: 'bar', data: s.v, colorBy: 'updown', ref: { o: s.o, c: s.c }, name: '量', noLegend: true }, { type: 'line', name: '20日均量', data: ind.vma20, color: '--s2', thin: true, noLegend: true }], zero: true, noLegend: true, yFmt: v => A.isIndex ? (v / 1e8).toFixed(0) + '億股' : fmtN(v / 1e3, 0) + '張' },
-      { weight: 1, title: 'KD(9,3,3)', series: [{ type: 'line', name: 'K', data: ind.K, color: '--s1', thin: true }, { type: 'line', name: 'D', data: ind.D, color: '--s2', thin: true }], fixed: [0, 100], hlines: [{ y: 20 }, { y: 80 }] },
-      { weight: 1, title: 'MACD(12,26,9)', series: [{ type: 'bar', name: 'OSC', data: ind.osc, colorBy: 'sign', noLegend: true }, { type: 'line', name: 'DIF', data: ind.dif, color: '--s1', thin: true }, { type: 'line', name: 'DEA', data: ind.dea, color: '--s2', thin: true }], zero: true },
+      { key: 'vol', weight: 0.9, title: '成交量', series: [{ type: 'bar', data: s.v, colorBy: 'updown', ref: { o: s.o, c: s.c }, name: '量', noLegend: true }, { type: 'line', name: '20日均量', data: ind.vma20, color: '--s2', thin: true, noLegend: true }], zero: true, noLegend: true, yFmt: v => A.isIndex ? (v / 1e8).toFixed(0) + '億股' : fmtN(v / 1e3, 0) + '張' },
+      { key: 'kd', weight: 1, title: 'KD(9,3,3)', series: [{ type: 'line', name: 'K', data: ind.K, color: '--s1', thin: true }, { type: 'line', name: 'D', data: ind.D, color: '--s2', thin: true }], fixed: [0, 100], hlines: [{ y: 20 }, { y: 80 }] },
+      { key: 'macd', weight: 1, title: 'MACD(12,26,9)', series: [{ type: 'bar', name: 'OSC', data: ind.osc, colorBy: 'sign', noLegend: true }, { type: 'line', name: 'DIF', data: ind.dif, color: '--s1', thin: true }, { type: 'line', name: 'DEA', data: ind.dea, color: '--s2', thin: true }], zero: true },
     ];
     if (full) {
-      panes.push({ weight: 1, title: 'RSI(14) / RSI(6)', series: [{ type: 'line', name: 'RSI14', data: ind.rsi14, color: '--s1', thin: true }, { type: 'line', name: 'RSI6', data: ind.rsi6, color: '--s3', thin: true }], fixed: [0, 100], hlines: [{ y: 30 }, { y: 70 }] });
-      panes.push({ weight: 1, title: 'ADX / +DI / -DI', series: [{ type: 'line', name: 'ADX', data: ind.adx, color: '--s4', thin: true }, { type: 'line', name: '+DI', data: ind.pdi, color: '--up', thin: true }, { type: 'line', name: '-DI', data: ind.mdi, color: '--down', thin: true }], hlines: [{ y: 25, label: 'ADX 25' }] });
+      panes.push({ key: 'rsi', weight: 1, title: 'RSI(14) / RSI(6)', series: [{ type: 'line', name: 'RSI14', data: ind.rsi14, color: '--s1', thin: true }, { type: 'line', name: 'RSI6', data: ind.rsi6, color: '--s3', thin: true }], fixed: [0, 100], hlines: [{ y: 30 }, { y: 70 }] });
+      panes.push({ key: 'adx', weight: 1, title: 'ADX / +DI / -DI', series: [{ type: 'line', name: 'ADX', data: ind.adx, color: '--s4', thin: true }, { type: 'line', name: '+DI', data: ind.pdi, color: '--up', thin: true }, { type: 'line', name: '-DI', data: ind.mdi, color: '--down', thin: true }], hlines: [{ y: 25, label: 'ADX 25' }] });
     }
-    return { dates: s.d, window: window_, panes };
+    return { dates: s.d, window: window_, panes: panes.filter(p => !p.key || !state.panesOff[p.key]) };
   }
   const MA_LEGEND = `<span><i style="background:var(--s1)"></i>MA5</span><span><i style="background:var(--s2)"></i>MA20 月線</span><span><i style="background:var(--s3)"></i>MA60 季線</span><span><i style="background:var(--s4)"></i>MA240 年線</span><span><i style="background:var(--band);opacity:.4"></i>布林 20,2</span><span><i style="background:var(--up)"></i>漲</span><span><i style="background:var(--down)"></i>跌</span>`;
 
@@ -1442,6 +1454,7 @@ const APP = (() => {
     $('#dashChartTitle').textContent = `${instName(state.code)} · K 線 / 均線 / KD / MACD`;
     $('#dashLegend').innerHTML = MA_LEGEND;
     rangeButtons($('#dashRange'), 'dash', RANGES, () => chart('dashChart').setSpec(mainSpec(A, state.ranges.dash)));
+    chartTools($('#dashTools'), 'dashChart', PANE_DEFS, () => chart('dashChart').setSpec(mainSpec(A, state.ranges.dash)));
     chart('dashChart').setSpec(mainSpec(A, state.ranges.dash));
     // action
     const failed = arr => arr.filter(c => !c.ok).map(c => c.label);
@@ -1474,6 +1487,7 @@ const APP = (() => {
     const A = state.A, ind = A.ind, s = A.s, i = s.c.length - 1;
     $('#techLegend').innerHTML = MA_LEGEND;
     rangeButtons($('#techRange'), 'tech', RANGES, () => chart('techChart').setSpec(mainSpec(A, state.ranges.tech, true)));
+    chartTools($('#techTools'), 'techChart', PANE_DEFS_FULL, () => chart('techChart').setSpec(mainSpec(A, state.ranges.tech, true)));
     chart('techChart').setSpec(mainSpec(A, state.ranges.tech, true));
     const g = A.parts[0].score; $('#techScoreSub').innerHTML = `技術面綜合 <span class="pill ${cls(g)}">${groupLabel(g)} ${fmtS(g * 100, 0)}</span>`;
     $('#techSignals').innerHTML = A.tech.map(sigRow).join('');

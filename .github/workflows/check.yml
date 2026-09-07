@@ -84,3 +84,8 @@ jobs:
           python scripts/patentmap_build.py /tmp/patentmap-book.json
           diff -u patentmap-4b9c7e2a51d8f306/data/book.json /tmp/patentmap-book.json \
             || { echo "::error::data/book.json 與 scripts/patentmap_build.py 的產出不一致，請重跑產生器"; exit 1; }
+
+      # 台股戰情室的每日更新腳本：離線測 mergeRows / normNews / 驗證守門，
+      # 並確認現有 data.js 能被腳本讀取且通過驗證（不打任何 API）。
+      - name: 戰情室更新腳本自我測試
+        run: node scripts/warroom_update.mjs --selftest

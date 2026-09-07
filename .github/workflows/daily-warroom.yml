@@ -1,0 +1,121 @@
+# 台股戰情室 —— 每日資料更新
+#
+# 每個交易日晚上抓取當日收盤後的完整資料（價量、三大法人、融資融券、
+# 台指期未平倉、美股、匯率、個股估值與月營收、新聞），合併進
+# tw-f7ae6d8241f3f8e1/data.js 後 commit 回預設分支；本 repo 是
+# GitHub Pages 使用者站台，推上去就等於上線。
+#
+# 預設路徑不需要任何金鑰。FINMIND_TOKEN 是選配（提高 FinMind 請求上限），
+# 沒設定時匿名額度也足夠一次全量更新。
+
+name: 每日台股戰情室更新
+
+on:
+  schedule:
+    # 13:41 UTC = 台北時間 21:41（UTC+8），週一到週五。
+    # 挑晚上是因為融資融券餘額與期貨未平倉要到傍晚才齊；
+    # 挑 :41 冷門分鐘是避開 GitHub 排程佇列在整點/半點的壅塞延遲。
+    # 台灣全年固定 UTC+8，不需要處理日光節約。
+    - cron: "41 13 * * 1-5"
+
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "只抓取與驗證，不 commit / push"
+        required: false
+        type: boolean
+        default: false
+
+# 只要能推 commit 就夠了，其餘權限一律不給。
+permissions:
+  contents: write
+
+# 單一車道：兩個 run 同時改 data.js 再 push 一定打架，寧可排隊。
+# cancel-in-progress 必須 false，砍掉正在 push 的 run 可能留下半套狀態。
+concurrency:
+  group: daily-warroom-update
+  cancel-in-progress: false
+
+env:
+  TARGET_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+
+jobs:
+  update:
+    name: 抓取並回寫
+    runs-on: ubuntu-latest
+    # 全量更新約 165 個 API 請求，正常十分鐘內跑完；上限保證卡死的 run
+    # 會被砍掉而不是佔著併發車道。
+    timeout-minutes: 30
+
+    # Fork 防護：排程只在上游 repo 生效；fork 仍可手動 dispatch 測試。
+    if: >-
+      github.event_name != 'schedule' ||
+      github.repository == 'flyinfuture123-prog/flyinfuture123-prog.github.io'
+
+    steps:
+      - name: Checkout 預設分支
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch || 'main' }}
+          # push 前要 rebase，需要完整歷史。
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: 安裝 Node
+        uses: actions/setup-node@v5
+        with:
+          # 固定 major 版本，避免 runner 換預設版本那天無預警換掉執行環境。
+          node-version: "22"
+
+      - name: 離線自我測試
+        run: node scripts/warroom_update.mjs --selftest
+
+      - name: 抓取增量並更新 data.js
+        id: fetch
+        env:
+          FINMIND_TOKEN: ${{ secrets.FINMIND_TOKEN }}
+        run: node scripts/warroom_update.mjs
+
+      - name: Commit 並推回
+        if: steps.fetch.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          DATA_DATE: ${{ steps.fetch.outputs.data_date }}
+          ROWS: ${{ steps.fetch.outputs.rows_added }}
+        run: |
+          set -euo pipefail
+          git add tw-f7ae6d8241f3f8e1/data.js
+          if git diff --cached --quiet; then
+            echo "資料無變化，跳過 commit。"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          SUBJECT="資料更新：${DATA_DATE} 台股戰情室（+${ROWS} 個交易日）"
+          BODY="由 ${GITHUB_WORKFLOW} run ${GITHUB_RUN_ID} 自動產生。"
+          # 用 GITHUB_TOKEN 推出去的 commit 不會觸發 on:push，不會遞迴。
+          git commit -q -m "$SUBJECT" -m "$BODY"
+
+          # 與其他每日工作（新聞站、時尚站）搶 push 時 rebase 重試。
+          # data.js 只有這條流程會動，rebase 不會撞出衝突。
+          for attempt in 1 2 3 4 5; do
+            if git push origin "HEAD:${TARGET_BRANCH}"; then
+              echo "push 成功（第 ${attempt} 次嘗試）"
+              exit 0
+            fi
+            echo "push 失敗，rebase 後重試（${attempt}/5）"
+            git pull --rebase origin "${TARGET_BRANCH}"
+            sleep $((attempt * 5))
+          done
+          echo "::error::push 連續失敗五次"
+          exit 1
+
+      - name: 摘要
+        if: always()
+        run: |
+          {
+            echo "## 台股戰情室每日更新"
+            echo ""
+            echo "- 資料日期：${{ steps.fetch.outputs.data_date || '（未完成）' }}"
+            echo "- 新增交易日：${{ steps.fetch.outputs.rows_added || 0 }}"
+            echo "- 有變更：${{ steps.fetch.outputs.changed || 'false' }}"
+          } >> "$GITHUB_STEP_SUMMARY"

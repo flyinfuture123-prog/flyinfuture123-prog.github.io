@@ -246,6 +246,29 @@ MATERIALS = {
          "apps": "日光燈管、省電燈泡（逐步退出）。",
          "src": "https://www.sciencedirect.com/science/article/abs/pii/0254058487901039", "srcName": "Phosphors based on rare-earths（1987）"},
     ],
+    "matrix": {
+        "lead": "同一個活化劑放進不同基質，顏色就不同；同一個基質換活化劑，用途也不同。這張表是螢光粉世界的「元素週期表」：橫列是活化劑（真正發光的離子），直欄是基質家族，格子裡是代表材料與顏色。",
+        "hosts": ["石榴石", "氮化物／氮氧化物", "氟化物", "矽酸鹽／鋁酸鹽", "磷酸鹽／硼酸鹽", "其他氧化物／鹵化物"],
+        "rows": [
+            {"activator": "Ce³⁺", "trait": "5d→4f，寬帶、奈秒級、藍光可激發", "cells": [
+                {"m": "YAG:Ce 黃", "peak": 555}, {"m": "La₃Si₆N₁₁:Ce 黃（雷射用）", "peak": 540}, {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "Ba₂Y₅B₅O₁₇:Ce 青", "peak": 490}, {"m": "LYSO:Ce 閃爍體 藍", "peak": 420}]},
+            {"activator": "Eu²⁺", "trait": "5d→4f，寬帶，顏色隨基質從藍到紅", "cells": [
+                {"m": "—", "peak": 0}, {"m": "CASN:Eu 紅／β-SiAlON:Eu 綠／SLA 紅", "peak": 625}, {"m": "—", "peak": 0}, {"m": "BOSE 綠黃／SrAl₂O₄:Eu 夜光綠", "peak": 530}, {"m": "Sr₅(PO₄)₃Cl:Eu 藍", "peak": 445}, {"m": "BAM 藍／UCr₄C₄ 型鋰矽酸鹽 青綠", "peak": 450}]},
+            {"activator": "Eu³⁺", "trait": "4f→4f，紅色細線，藍光激發弱", "cells": [
+                {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "YVO₄:Eu 紅（映像管）", "peak": 620}, {"m": "Y₂O₃:Eu 紅（螢光燈）", "peak": 611}]},
+            {"activator": "Tb³⁺", "trait": "4f→4f，綠色細線", "cells": [
+                {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "CeMgAl₁₁O₁₉:Tb 綠（螢光燈）", "peak": 543}, {"m": "LaPO₄:Ce,Tb 綠（螢光燈）", "peak": 543}, {"m": "Gd₂O₂S:Tb 綠（X 光板）", "peak": 545}]},
+            {"activator": "Mn⁴⁺", "trait": "3d³，紅色細線；不含稀土", "cells": [
+                {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "KSF 紅 631 nm", "peak": 631}, {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "MFG 深紅（植物燈）", "peak": 658}]},
+            {"activator": "Mn²⁺", "trait": "3d⁵，綠或橙，衰減慢（毫秒）", "cells": [
+                {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "Zn₂SiO₄:Mn 綠（電漿電視）", "peak": 525}, {"m": "鹵磷酸鹽:Sb,Mn 橙（日光燈）", "peak": 580}, {"m": "ZnS:Mn 橙（應力發光）", "peak": 585}]},
+            {"activator": "Cr³⁺", "trait": "3d³，弱晶場下寬頻近紅外", "cells": [
+                {"m": "Ga 石榴石:Cr 近紅外", "peak": 780}, {"m": "—", "peak": 0}, {"m": "AlF₃:Cr 近紅外", "peak": 800}, {"m": "—", "peak": 0}, {"m": "RbAl₃P₆O₂₀:Cr／ScBO₃:Cr 近紅外", "peak": 790}, {"m": "ZnGa₂O₄:Cr 近紅外夜光", "peak": 695}]},
+            {"activator": "Yb³⁺／Er³⁺", "trait": "多光子上轉換，紅外進、可見光出", "cells": [
+                {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "NaYF₄:Yb,Er 綠（上轉換）", "peak": 540}, {"m": "—", "peak": 0}, {"m": "—", "peak": 0}, {"m": "—", "peak": 0}]},
+        ],
+        "note": "格子顏色依代表材料的峰值波長示意（近紅外以暗紅表示）；「—」代表該組合沒有常見的商用或代表性材料，不代表不存在。",
+    },
     "compare": {
         "columns": ["材料", "化學式", "峰值 (nm)", "半高寬 (nm)", "顏色", "主要用途", "商業狀態"],
         "rows": [

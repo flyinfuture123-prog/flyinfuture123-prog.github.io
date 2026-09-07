@@ -183,6 +183,14 @@ th{background:var(--surface-2);font-weight:700;font-size:12.5px;white-space:nowr
 tr:last-child td{border-bottom:0}
 td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:12.5px}
 .tblnote{font-size:12.5px;color:var(--ink-2);padding:8px 11px;background:var(--surface-2);border-top:1px solid var(--border)}
+table.matrix{min-width:860px}
+table.matrix th{white-space:normal}
+table.matrix tbody th{background:var(--surface-2);font-weight:400;min-width:150px}
+table.matrix tbody th b{display:block;font-family:var(--mono);font-size:14px;color:var(--accent-ink)}
+table.matrix tbody th small{display:block;color:var(--ink-3);font-size:11.5px;line-height:1.4}
+table.matrix td{font-size:12.5px;line-height:1.45}
+table.matrix td .sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid rgba(0,0,0,.15)}
+table.matrix td.none{color:var(--ink-3);text-align:center}
 
 /* filter chips */
 .filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
@@ -413,6 +421,9 @@ footer .right{margin-left:auto}
     <p class="sec-lead" id="matLead"></p>
     <div class="filters" id="matFilters"></div>
     <div class="matgrid" id="matGrid"></div>
+    <div class="blk-h">螢光粉的「週期表」：活化劑 × 基質</div>
+    <p class="sec-lead" id="matrixLead"></p>
+    <div id="matMatrix"></div>
     <div class="blk-h">一張表比較主流商用螢光粉</div>
     <div id="matTable"></div>
   </section>
@@ -697,6 +708,12 @@ footer .right{margin-left:auto}
       fbox.querySelector(".count").textContent="顯示 "+n+" / "+mt.families.length+" 種";
     });
     fbox.querySelector(".count").textContent="共 "+mt.families.length+" 種";
+    var mx=mt.matrix;
+    $("#matrixLead").textContent=mx.lead;
+    $("#matMatrix").innerHTML='<div class="tblwrap"><table class="matrix"><thead><tr><th>活化劑</th>'+mx.hosts.map(function(hh){return '<th>'+esc(hh)+'</th>'}).join("")+'</tr></thead><tbody>'+
+      mx.rows.map(function(r){return '<tr><th><b>'+esc(r.activator)+'</b><small>'+esc(r.trait)+'</small></th>'+r.cells.map(function(c){
+        if(!c.peak)return '<td class="none">—</td>';
+        var col=nirColor(c.peak); return '<td><span class="sw" style="background:'+col+'"></span>'+esc(c.m)+'</td>';}).join("")+'</tr>'}).join("")+'</tbody></table><div class="tblnote">'+esc(mx.note)+'</div></div>';
     var t=mt.compare;
     $("#matTable").innerHTML='<div class="tblwrap"><table><thead><tr>'+t.columns.map(function(c,i){return '<th'+(i>=2&&i<=3?' class="num"':'')+'>'+esc(c)+'</th>'}).join("")+'</tr></thead><tbody>'+
       t.rows.map(function(r){return "<tr>"+r.map(function(c,i){return '<td'+(i>=2&&i<=3?' class="num"':'')+(i===1?' class="mono small"':'')+'>'+esc(c)+'</td>'}).join("")+"</tr>"}).join("")+'</tbody></table>'+(t.note?'<div class="tblnote">'+esc(t.note)+'</div>':'')+'</div>';

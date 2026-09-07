@@ -11,12 +11,14 @@ on:
       - "requirements.txt"
       - ".github/workflows/**"
       - "patentmap-4b9c7e2a51d8f306/data/**"
+      - "phosphor-f44f6e8f9e7fdd61/data/**"
   pull_request:
     paths:
       - "scripts/**"
       - "tests/**"
       - "requirements.txt"
       - "patentmap-4b9c7e2a51d8f306/data/**"
+      - "phosphor-f44f6e8f9e7fdd61/data/**"
   workflow_dispatch:
 
 permissions:
@@ -84,3 +86,11 @@ jobs:
           python scripts/patentmap_build.py /tmp/patentmap-book.json
           diff -u patentmap-4b9c7e2a51d8f306/data/book.json /tmp/patentmap-book.json \
             || { echo "::error::data/book.json 與 scripts/patentmap_build.py 的產出不一致，請重跑產生器"; exit 1; }
+
+      # phosphor 站同樣是「模組 → 產生器 → data/site.json」。產生器本身會做結構檢查
+      # （缺欄位、壞網址、壞日期、簡體字），再和 commit 進來的 json 比對。
+      - name: 檢查 phosphor 資料檔與產生器同步
+        run: |
+          python scripts/phosphor_build.py /tmp/phosphor-site.json
+          diff -u phosphor-f44f6e8f9e7fdd61/data/site.json /tmp/phosphor-site.json \
+            || { echo "::error::data/site.json 與 scripts/phosphor_build.py 的產出不一致，請重跑產生器"; exit 1; }

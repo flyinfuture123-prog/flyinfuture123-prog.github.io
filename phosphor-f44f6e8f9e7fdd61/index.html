@@ -741,12 +741,12 @@ footer .right{margin-left:auto}
     var items=nw.items.slice().sort(function(a,b){return a.date<b.date?1:-1});
     var list=$("#newsList");
     list.innerHTML=items.map(function(n){
-      return '<div class="nw" data-tag="'+esc((n.tags||[]).join("|"))+'" data-region="'+esc(n.region)+'" data-year="'+esc(n.date.slice(0,4))+'"><div class="d">'+esc(n.date)+'<small>'+esc(n.region)+'</small></div><div><b>'+esc(n.title)+'</b><p>'+esc(n.detail)+'</p>'+(n.why?'<div class="why"><b>為什麼重要</b>'+esc(n.why)+'</div>':'')+
+      return '<div class="nw" data-tag="'+esc((n.tags||[]).join("|"))+'" data-region="'+esc(String(n.region).split("／").join("|"))+'" data-year="'+esc(n.date.slice(0,4))+'"><div class="d">'+esc(n.date)+'<small>'+esc(n.region)+'</small></div><div><b>'+esc(n.title)+'</b><p>'+esc(n.detail)+'</p>'+(n.why?'<div class="why"><b>為什麼重要</b>'+esc(n.why)+'</div>':'')+
         (n.tags||[]).map(function(t){return '<span class="pill acc">'+esc(t)+'</span>'}).join("")+(n.entities||[]).map(function(t){return '<span class="pill">'+esc(t)+'</span>'}).join("")+confPill(n.confidence)+srcLink(n.src,n.srcName)+'</div></div>';}).join("");
-    var tags=uniq([].concat.apply([],items.map(function(n){return n.tags||[]}))), regions=uniq(items.map(function(n){return n.region})), years=uniq(items.map(function(n){return n.date.slice(0,4)})).sort().reverse();
+    var tags=uniq([].concat.apply([],items.map(function(n){return n.tags||[]}))), regions=uniq([].concat.apply([],items.map(function(n){return String(n.region).split("／")}))), years=uniq(items.map(function(n){return n.date.slice(0,4)})).sort().reverse();
     var fbox=$("#newsFilters");
     chipFilters(fbox,[{key:"year",label:"年份",values:years},{key:"tag",label:"主題",values:tags},{key:"region",label:"地區",values:regions}],function(st){
-      var n=0; list.querySelectorAll(".nw").forEach(function(c){var ok=(!st.year||c.dataset.year===st.year)&&(!st.region||c.dataset.region===st.region)&&(!st.tag||c.dataset.tag.split("|").indexOf(st.tag)>=0); c.classList.toggle("hide",!ok); if(ok)n++;});
+      var n=0; list.querySelectorAll(".nw").forEach(function(c){var ok=(!st.year||c.dataset.year===st.year)&&(!st.region||c.dataset.region.split("|").indexOf(st.region)>=0)&&(!st.tag||c.dataset.tag.split("|").indexOf(st.tag)>=0); c.classList.toggle("hide",!ok); if(ok)n++;});
       fbox.querySelector(".count").textContent="顯示 "+n+" / "+items.length+" 則";
     });
     fbox.querySelector(".count").textContent="共 "+items.length+" 則";

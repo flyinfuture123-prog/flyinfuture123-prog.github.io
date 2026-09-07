@@ -13,7 +13,7 @@ NEWS = {
          "detail": "Mini LED 背光電視 2025 年出貨年增 50%；2026 年 RGB Mini LED 電視預測上修至 170 萬台、有機會逼近 200 萬台。Mini LED 背光採用大量 LED，是 KSF／β-SiAlON 或量子點膜的主要出海口，而 RGB Mini LED 改用三色晶片則不需要螢光粉。",
          "why": "Mini LED 放量是螢光粉需求的正面訊號，RGB Mini LED 則是高階市場「去色轉換化」的隱憂。", "entities": ["TrendForce"], "confidence": "medium",
          "src": "https://www.ledinside.com/intelligence/2026/8/2026_08_24_05", "srcName": "LEDinside／TrendForce 2026-08"},
-        {"date": "2026-05-13", "title": "NIMS：CASN 紅粉中國專利歷經六年無效訴訟，全部請求項維持有效", "region": "日本／中國", "tags": ["專利授權", "氮化物紅粉"],
+        {"date": "2026-05-13", "title": "NIMS：CASN 紅粉中國專利歷經六年無效訴訟，全部請求項維持有效", "region": "日本／中國", "tags": ["專利授權", "氮化物"],
          "detail": "中國專利第 200580005112.5 號（涵蓋 CASN／SCASN 紅粉 LED 裝置）自 2019 年起被江蘇博睿多次提出無效請求，2020 年曾被裁定部分無效；2025 年 12 月 25 日中國最高人民法院撤銷該裁定並發回，博睿隨後撤回請求。",
          "why": "確認氮化物紅粉的專利在中國仍有效，對三菱化學、Denka 等授權製造商與中國廠商的競爭格局影響直接。", "entities": ["NIMS", "三菱化學", "江蘇博睿"], "confidence": "high",
          "src": "https://www.nims.go.jp/eng/press/2026/05/202605130.html", "srcName": "NIMS 新聞稿 2026-05-13"},

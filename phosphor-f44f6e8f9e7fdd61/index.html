@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>全球螢光粉進展</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="把全世界螢光粉（phosphor）的技術、材料、產業與最新進展整理成淺顯易懂的一頁式資訊站。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#eef0f5; --surface:#fff; --surface-2:#f5f6fa; --surface-3:#e9ebf2;
+  --border:rgba(20,24,40,.10); --border-strong:rgba(20,24,40,.22);
+  --ink:#151a26; --ink-2:#4a5266; --ink-3:#7a8294;
+  --accent:#3b3fa8; --accent-ink:#2c2f86; --accent-soft:rgba(59,63,168,.10);
+  --alt:#b7791f; --alt-ink:#8f5d12; --alt-soft:rgba(183,121,31,.13);
+  --util-bg:#1b1d4d; --util-ink:#d8daf2; --nav-bg:#2c2f86; --nav-ink:rgba(255,255,255,.9); --nav-active:#1f2266;
+  --hero-a:#1b1d4d; --hero-b:#3b3fa8;
+  --warn:#b03a3a; --warn-soft:rgba(176,58,58,.10);
+  --ok:#1f7a4d; --ok-soft:rgba(31,122,77,.12);
+  --pend:#8a6d1f; --pend-soft:rgba(138,109,31,.12);
+  --shadow:0 1px 2px rgba(20,24,40,.06),0 10px 28px -14px rgba(20,24,40,.22);
+  --grid:#e3e5ec; --axis:#c2c5d1;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948;
+  --serif:"Noto Serif TC","Songti TC","PMingLiU",serif;
+  --sans:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+  --mono:"IBM Plex Mono","SFMono-Regular",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0d0f18; --surface:#151827; --surface-2:#1b1f31; --surface-3:#232840;
+    --border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.2);
+    --ink:#e7e9f2; --ink-2:#aab0c4; --ink-3:#7d8399;
+    --accent:#8b8ff0; --accent-ink:#aeb1f6; --accent-soft:rgba(139,143,240,.16);
+    --alt:#e0a64a; --alt-ink:#efc27a; --alt-soft:rgba(224,166,74,.16);
+    --util-bg:#0b0c26; --util-ink:#b9bce0; --nav-bg:#1a1c55; --nav-ink:rgba(255,255,255,.85); --nav-active:#2a2d7a;
+    --hero-a:#0e1038; --hero-b:#2c2f86;
+    --warn:#ef7d7d; --warn-soft:rgba(239,125,125,.14);
+    --ok:#5fc48f; --ok-soft:rgba(95,196,143,.15);
+    --pend:#d6b153; --pend-soft:rgba(214,177,83,.15);
+    --shadow:0 1px 2px rgba(0,0,0,.32),0 10px 28px -14px rgba(0,0,0,.6);
+    --grid:#262a3d; --axis:#3a3f57;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0d0f18; --surface:#151827; --surface-2:#1b1f31; --surface-3:#232840;
+  --border:rgba(255,255,255,.09); --border-strong:rgba(255,255,255,.2);
+  --ink:#e7e9f2; --ink-2:#aab0c4; --ink-3:#7d8399;
+  --accent:#8b8ff0; --accent-ink:#aeb1f6; --accent-soft:rgba(139,143,240,.16);
+  --alt:#e0a64a; --alt-ink:#efc27a; --alt-soft:rgba(224,166,74,.16);
+  --util-bg:#0b0c26; --util-ink:#b9bce0; --nav-bg:#1a1c55; --nav-ink:rgba(255,255,255,.85); --nav-active:#2a2d7a;
+  --hero-a:#0e1038; --hero-b:#2c2f86;
+  --warn:#ef7d7d; --warn-soft:rgba(239,125,125,.14);
+  --ok:#5fc48f; --ok-soft:rgba(95,196,143,.15);
+  --pend:#d6b153; --pend-soft:rgba(214,177,83,.15);
+  --shadow:0 1px 2px rgba(0,0,0,.32),0 10px 28px -14px rgba(0,0,0,.6);
+  --grid:#262a3d; --axis:#3a3f57;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.75}
+button,input,select{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;text-wrap:balance;line-height:1.35}
+a{color:var(--accent-ink)}
+p{margin:0 0 1em}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.muted{color:var(--ink-3)}
+.small{font-size:13.5px}
+.mono{font-family:var(--mono)}
+.sr{position:absolute;left:-9999px}
+
+/* header */
+.utilbar{background:var(--util-bg);color:var(--util-ink);font-size:12px}
+.utilbar .wrap{display:flex;align-items:center;gap:10px;padding-top:6px;padding-bottom:6px;flex-wrap:wrap}
+.utilbar .sep{opacity:.4}
+.util-actions{margin-left:auto;display:flex;gap:8px}
+.btn{background:transparent;border:1px solid var(--border-strong);color:inherit;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:12px;line-height:1.6}
+.btn:hover{border-color:currentColor}
+.utilbar .btn{border-color:rgba(255,255,255,.32)}
+.utilbar .btn:hover{border-color:#fff;color:#fff}
+.brandrow{background:var(--surface);border-bottom:1px solid var(--border)}
+.brandrow .wrap{display:flex;align-items:center;gap:14px;padding-top:16px;padding-bottom:14px;flex-wrap:wrap}
+.seal{width:48px;height:48px;border-radius:10px;background:linear-gradient(150deg,#3b3fa8,#e8b43a);color:#fff;font-family:var(--serif);font-weight:900;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none;letter-spacing:.02em;text-align:center;line-height:1.15;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.brand-mark{font-family:var(--serif);font-weight:900;font-size:25px;letter-spacing:.06em;color:var(--accent-ink)}
+.brand-sub{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--ink-3);text-transform:uppercase}
+.brand-right{margin-left:auto;text-align:right;color:var(--ink-2);font-size:13px}
+.hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b));color:#fff;position:relative;overflow:hidden}
+.hero .wrap{padding:34px 20px 30px;position:relative}
+.hero h1{font-family:var(--serif);font-size:clamp(26px,4.4vw,40px);font-weight:900;letter-spacing:.04em}
+.hero .sub{font-size:clamp(15px,2.2vw,19px);opacity:.93;margin-top:8px;font-family:var(--serif)}
+.hero .by{margin-top:14px;font-size:13.5px;opacity:.85;max-width:820px}
+.hero .chips{margin-top:16px;display:flex;gap:8px;flex-wrap:wrap}
+.chip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:3px 12px;font-size:12.5px}
+.hero .glow{position:absolute;right:-40px;top:-60px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,102,.35),rgba(255,214,102,0) 65%);pointer-events:none}
+.hero .glow2{position:absolute;right:220px;top:40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(90,140,255,.35),rgba(90,140,255,0) 65%);pointer-events:none}
+nav.tabs{background:var(--nav-bg);position:sticky;top:0;z-index:30;box-shadow:0 2px 10px rgba(0,0,0,.16)}
+nav.tabs .wrap{display:flex;gap:2px;overflow-x:auto;padding:0 20px;scrollbar-width:none}
+nav.tabs a{color:var(--nav-ink);text-decoration:none;padding:11px 13px;font-size:14px;white-space:nowrap;border-bottom:3px solid transparent}
+nav.tabs a:hover{background:var(--nav-active);color:#fff}
+nav.tabs a.on{background:var(--nav-active);color:#fff;border-bottom-color:#fff}
+
+main{padding:30px 0 40px}
+.band{margin-bottom:44px}
+.sec-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.sec-head h2{font-family:var(--serif);font-size:clamp(21px,3vw,27px);font-weight:900;letter-spacing:.03em;color:var(--accent-ink)}
+.tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);background:var(--surface-3);padding:2px 9px;border-radius:5px}
+.sec-lead{color:var(--ink-2);max-width:860px;margin-bottom:18px;font-size:15.5px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)}
+.pad{padding:18px 22px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.callout{background:var(--accent-soft);border-left:3px solid var(--accent);padding:13px 16px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14.5px}
+.callout b{color:var(--accent-ink)}
+.altbox{background:var(--alt-soft);border-left:3px solid var(--alt);padding:13px 16px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14.5px}
+.warnbox{background:var(--warn-soft);border-left:3px solid var(--warn);padding:13px 16px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14.5px}
+.src{font-size:12.5px;color:var(--ink-3);margin-top:8px}
+.src a{color:var(--ink-3);text-decoration:underline dotted;word-break:break-all}
+.src a:hover{color:var(--accent-ink)}
+.pill{display:inline-block;font-size:11.5px;border-radius:999px;padding:1px 9px;background:var(--surface-3);color:var(--ink-2);margin:0 4px 4px 0;white-space:nowrap}
+.pill.acc{background:var(--accent-soft);color:var(--accent-ink)}
+.pill.alt{background:var(--alt-soft);color:var(--alt-ink)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.pend{background:var(--pend-soft);color:var(--pend)}
+.conf{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
+
+/* stat tiles */
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0}
+.statcell{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 15px;box-shadow:var(--shadow)}
+.statcell .n{font-size:26px;font-weight:700;color:var(--accent-ink);display:block;line-height:1.2;letter-spacing:-.01em}
+.statcell .n.long{font-size:20px}
+.statcell .l{font-size:13px;color:var(--ink-2);display:block;margin-top:5px;line-height:1.5}
+.statcell .s{font-size:11.5px;color:var(--ink-3);display:block;margin-top:5px}
+
+/* intro flow */
+.flowrow{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin:14px 0}
+.fnode{flex:1 1 200px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow)}
+.fnode .fn{font-family:var(--mono);font-size:11px;color:var(--accent-ink);letter-spacing:.1em}
+.fnode b{display:block;font-size:15.5px;margin:2px 0 4px}
+.fnode span{font-size:13.5px;color:var(--ink-2)}
+.ledfig{margin:14px 0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.ledfig svg{width:100%;height:auto;display:block}
+.figcap{font-size:13px;color:var(--ink-3);margin-top:8px;text-align:center}
+
+/* metrics */
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px}
+.metric .t{font-family:var(--mono);font-weight:600;color:var(--accent-ink);font-size:14px}
+.metric .z{font-weight:700;font-size:15px;margin-left:6px}
+.metric p{font-size:13.5px;color:var(--ink-2);margin:6px 0 0}
+.metric .typ{font-size:12.5px;color:var(--ink-3);margin-top:6px;font-family:var(--mono)}
+
+/* spectrum chart */
+.viz{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px 10px;box-shadow:var(--shadow);position:relative}
+.viz .ctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.viz .ctl .lbl{font-size:12.5px;color:var(--ink-3);margin-right:4px}
+.tog{border:1px solid var(--border-strong);background:var(--surface-2);border-radius:999px;padding:3px 11px;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.tog:hover{border-color:var(--accent)}
+.tog.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.tog .sw{width:10px;height:10px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.15)}
+.viz svg{width:100%;height:auto;display:block}
+.viz .tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border-strong);border-radius:8px;padding:8px 11px;font-size:12.5px;box-shadow:var(--shadow);z-index:5;min-width:150px;display:none}
+.viz .tip b{font-size:13px}
+.viz .tip .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.viz .tip .row i{width:14px;height:0;border-top:3px solid;display:inline-block}
+.viz .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);margin-top:6px}
+.viz .legend span{display:inline-flex;align-items:center;gap:6px}
+.viz .legend i{width:14px;height:0;border-top:3px solid;display:inline-block}
+.viz .legend i.box{width:12px;height:12px;border:0;border-radius:2px}
+.vizfoot{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.tblwrap{overflow-x:auto;margin:12px 0;border:1px solid var(--border);border-radius:9px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+th,td{padding:8px 11px;text-align:left;border-bottom:1px solid var(--border);vertical-align:top}
+th{background:var(--surface-2);font-weight:700;font-size:12.5px;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:12.5px}
+.tblnote{font-size:12.5px;color:var(--ink-2);padding:8px 11px;background:var(--surface-2);border-top:1px solid var(--border)}
+table.matrix{min-width:860px}
+table.matrix th{white-space:normal}
+table.matrix tbody th{background:var(--surface-2);font-weight:400;min-width:150px}
+table.matrix tbody th b{display:block;font-family:var(--mono);font-size:14px;color:var(--accent-ink)}
+table.matrix tbody th small{display:block;color:var(--ink-3);font-size:11.5px;line-height:1.4}
+table.matrix td{font-size:12.5px;line-height:1.45}
+table.matrix td .sw{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1px solid rgba(0,0,0,.15)}
+table.matrix td.none{color:var(--ink-3);text-align:center}
+
+/* filter chips */
+.filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+.filters .lbl{font-size:12.5px;color:var(--ink-3);margin-right:2px}
+.filters input[type=search]{border:1px solid var(--border-strong);background:var(--surface);border-radius:8px;padding:5px 10px;font-size:13.5px;min-width:200px}
+.fchip{border:1px solid var(--border-strong);background:var(--surface);border-radius:999px;padding:3px 11px;font-size:12.5px;cursor:pointer}
+.fchip:hover{border-color:var(--accent)}
+.fchip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.count{font-size:12.5px;color:var(--ink-3);margin-left:auto}
+
+/* timeline */
+.tl{position:relative;margin:10px 0 0;padding-left:0;list-style:none}
+.tl:before{content:"";position:absolute;left:92px;top:0;bottom:0;width:2px;background:var(--border-strong)}
+.tl li{display:grid;grid-template-columns:78px 1fr;gap:28px;margin-bottom:14px;position:relative}
+.tl .yr{font-family:var(--mono);font-weight:600;color:var(--accent-ink);text-align:right;padding-top:12px;font-size:14px}
+.tl .dot{position:absolute;left:86px;top:18px;width:14px;height:14px;border-radius:50%;background:var(--accent);border:3px solid var(--bg)}
+.tl .dot.alt{background:var(--alt)}
+.tl .ev{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow)}
+.tl .ev b{font-size:15.5px;display:block;margin-bottom:3px}
+.tl .ev p{font-size:14px;color:var(--ink-2);margin:0 0 6px}
+.tl li.hide{display:none}
+
+/* material cards */
+.matgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:12px}
+.mat{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.mat.hide{display:none}
+.mat .bar{height:7px}
+.mat .body{padding:14px 17px 15px;flex:1;display:flex;flex-direction:column}
+.mat .top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.mat h3{font-size:17px}
+.mat .f{font-family:var(--mono);font-size:12.5px;color:var(--ink-2);margin-top:2px;word-break:break-word}
+.mat .kv{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+.mat .kv div{background:var(--surface-2);border-radius:7px;padding:6px 8px;font-size:12px;color:var(--ink-3)}
+.mat .kv b{display:block;font-size:13.5px;color:var(--ink);font-family:var(--mono);font-weight:500}
+.mat p{font-size:13.5px;color:var(--ink-2);margin:0 0 8px}
+.mat .pc{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;margin:4px 0 8px}
+.mat .pc div{border-radius:7px;padding:7px 10px}
+.mat .pc .p{background:var(--ok-soft)} .mat .pc .c{background:var(--warn-soft)}
+.mat .pc b{display:block;font-size:11.5px;letter-spacing:.06em;margin-bottom:2px}
+.mat .pc .p b{color:var(--ok)} .mat .pc .c b{color:var(--warn)}
+.mat .pc ul{margin:0;padding-left:1.1em}
+.mat details{margin-top:auto}
+.mat summary{cursor:pointer;font-size:13px;color:var(--accent-ink);list-style:none;padding:4px 0}
+.mat summary::-webkit-details-marker{display:none}
+.mat summary::before{content:"▸ "}
+.mat details[open] summary::before{content:"▾ "}
+.mat details p{margin-top:6px}
+
+/* application cards */
+.appgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.app{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px}
+.app h3{font-size:17px;display:flex;align-items:center;gap:8px}
+.app .ic{width:34px;height:34px;border-radius:9px;background:var(--accent-soft);color:var(--accent-ink);display:inline-flex;align-items:center;justify-content:center;font-size:17px;flex:none}
+.app .lead{font-size:14px;color:var(--ink-2);margin:8px 0}
+.app ul{margin:0 0 8px;padding-left:1.15em;font-size:13.5px}
+.app ul li{margin-bottom:5px}
+.app .nums{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.app .nums span{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:12px;font-family:var(--mono)}
+
+/* world */
+.rtabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.rtab{border:1px solid var(--border-strong);background:var(--surface);border-radius:8px;padding:6px 14px;cursor:pointer;font-size:14px}
+.rtab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.region{display:none}
+.region.on{display:block}
+.region .lead{font-size:14.5px;color:var(--ink-2);margin-bottom:12px}
+.cogrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.co{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:12px 14px}
+.co b{font-size:15px}
+.co .en{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-left:6px}
+.co p{font-size:13.5px;color:var(--ink-2);margin:5px 0 4px}
+.co .tags{display:flex;flex-wrap:wrap;gap:4px}
+.co .tags span{background:var(--surface);border:1px solid var(--border-strong);border-radius:5px;padding:1px 7px;font-size:12px}
+.blk-h{font-weight:700;font-size:15.5px;margin:18px 0 8px;color:var(--accent-ink)}
+.bar-chart .row{display:grid;grid-template-columns:200px 1fr 90px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--grid)}
+.bar-chart .row:last-child{border-bottom:0}
+.bar-chart .lab{font-size:13px}
+.bar-chart .lab small{display:block;color:var(--ink-3);font-size:11.5px}
+.bar-chart .trk{height:22px;position:relative}
+.bar-chart .fill{position:absolute;left:0;top:2px;height:18px;background:var(--s1);border-radius:0 4px 4px 0}
+.bar-chart .val{font-family:var(--mono);font-size:12.5px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* news */
+.newslist{display:grid;gap:10px}
+.nw{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:grid;grid-template-columns:96px 1fr;gap:14px;box-shadow:var(--shadow)}
+.nw.hide{display:none}
+.nw .d{font-family:var(--mono);font-size:13px;color:var(--accent-ink);font-weight:600;padding-top:2px}
+.nw .d small{display:block;color:var(--ink-3);font-weight:400;font-size:11.5px;margin-top:3px}
+.nw b{font-size:15.5px;display:block;margin-bottom:3px}
+.nw p{font-size:14px;color:var(--ink-2);margin:0 0 6px}
+.nw .why{font-size:13.5px;background:var(--alt-soft);border-radius:7px;padding:6px 10px;margin:4px 0 6px}
+.nw .why b{display:inline;font-size:12px;color:var(--alt-ink);letter-spacing:.06em;margin-right:4px}
+
+/* frontier */
+.frgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.fr{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px;border-top:4px solid var(--accent)}
+.fr h3{font-size:16.5px}
+.fr .lead{font-size:14px;color:var(--ink-2);margin:6px 0 8px}
+.fr .why{font-size:13.5px;margin:4px 0 8px}
+.fr .why b{color:var(--alt-ink);font-size:12px;letter-spacing:.06em}
+.fr ul{margin:0 0 6px;padding-left:1.15em;font-size:13.5px}
+
+/* faq */
+.faq{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:8px;overflow:hidden}
+.faq summary{cursor:pointer;padding:13px 18px;font-weight:700;font-size:15.5px;list-style:none;display:flex;gap:10px;align-items:baseline}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:before{content:"Q";font-family:var(--mono);color:var(--accent-ink);font-size:13px;flex:none}
+.faq .a{padding:0 18px 14px 40px;font-size:14.5px;color:var(--ink-2)}
+.faq .a p{margin-bottom:8px}
+
+/* glossary */
+.glist{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:8px}
+.gl{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px}
+.gl.hide{display:none}
+.gl b{font-family:var(--mono);color:var(--accent-ink);font-size:13.5px}
+.gl .z{font-weight:700;margin-left:6px}
+.gl p{font-size:13.5px;color:var(--ink-2);margin:4px 0 0}
+
+/* sources */
+.srclist{font-size:13.5px;margin:0;padding-left:1.2em}
+.srclist li{margin-bottom:5px;word-break:break-all}
+.srclist .k{color:var(--ink-3);font-size:12px;margin-left:4px}
+.covergrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:14px}
+.covercell{border-radius:9px;padding:14px 16px;border:1px solid var(--border)}
+.covercell.ok{background:var(--ok-soft);border-color:var(--ok)}
+.covercell.no{background:var(--pend-soft);border-color:var(--pend)}
+.covercell h4{font-family:var(--mono);font-size:14px;margin-bottom:7px}
+.covercell.ok h4{color:var(--ok)} .covercell.no h4{color:var(--pend)}
+.covercell ul{margin:0;padding-left:1.15em;font-size:13.5px;color:var(--ink-2)}
+
+footer{border-top:1px solid var(--border);background:var(--surface);padding:24px 0;font-size:13px;color:var(--ink-3)}
+footer .wrap{display:flex;gap:14px;flex-wrap:wrap;align-items:baseline}
+footer .right{margin-left:auto}
+.loading{padding:60px 20px;text-align:center;color:var(--ink-3)}
+
+@media (max-width:640px){
+  body{font-size:15.5px}
+  .tl:before{left:14px}
+  .tl li{grid-template-columns:1fr;gap:4px;padding-left:34px}
+  .tl .yr{text-align:left;padding-top:0}
+  .tl .dot{left:8px;top:6px}
+  .nw{grid-template-columns:1fr;gap:4px}
+  .bar-chart .row{grid-template-columns:1fr;gap:4px}
+  .bar-chart .val{text-align:left}
+  .brand-right{margin-left:0;text-align:left;width:100%}
+  .mat .kv{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="utilbar"><div class="wrap">
+  <span>全球螢光粉進展</span><span class="sep">|</span><span>Global Phosphor Progress</span>
+  <span class="util-actions">
+    <button class="btn" id="themeBtn" type="button">深／淺色</button>
+    <button class="btn" id="expandBtn" type="button">全部展開</button>
+  </span>
+</div></div>
+
+<div class="brandrow"><div class="wrap">
+  <div class="seal">螢光<br>粉</div>
+  <div>
+    <div class="brand-mark">全球螢光粉進展</div>
+    <div class="brand-sub">Global Phosphor Progress · Plain-Language Digest</div>
+  </div>
+  <div class="brand-right" id="brandRight"></div>
+</div></div>
+
+<div class="hero"><div class="glow"></div><div class="glow2"></div><div class="wrap">
+  <h1 id="heroTitle">全球螢光粉進展</h1>
+  <div class="sub" id="heroSub"></div>
+  <div class="by" id="heroBy"></div>
+  <div class="chips" id="heroChips"></div>
+</div></div>
+
+<nav class="tabs"><div class="wrap" id="tabs">
+  <a href="#intro" class="on">一分鐘看懂</a>
+  <a href="#spectrum">光譜圖</a>
+  <a href="#timeline">里程碑</a>
+  <a href="#materials">材料家族</a>
+  <a href="#apps">應用</a>
+  <a href="#world">全球版圖</a>
+  <a href="#news">最新動態</a>
+  <a href="#frontier">研究前沿</a>
+  <a href="#faq">常見問題</a>
+  <a href="#glossary">名詞解釋</a>
+  <a href="#sources">來源說明</a>
+</div></nav>
+
+<main><div class="wrap" id="main">
+  <div class="loading" id="loading">載入資料中…（若長時間沒有內容，請確認是透過 http:// 而非 file:// 開啟）</div>
+
+  <section class="band" id="intro" hidden>
+    <div class="sec-head"><h2>一分鐘看懂螢光粉</h2><span class="tag">intro</span></div>
+    <p class="sec-lead" id="introLead"></p>
+    <div class="flowrow" id="howFlow"></div>
+    <div class="ledfig" id="ledFig"></div>
+    <div class="statgrid" id="introStats"></div>
+    <div id="whyBox"></div>
+    <div class="blk-h">看懂規格表：七個關鍵指標</div>
+    <div class="grid g3" id="metrics"></div>
+  </section>
+
+  <section class="band" id="spectrum" hidden>
+    <div class="sec-head"><h2>光譜看圖說故事</h2><span class="tag">spectra</span></div>
+    <p class="sec-lead" id="specLead"></p>
+    <div class="viz" id="specViz">
+      <div class="ctl" id="specPresets"></div>
+      <div class="ctl" id="specToggles"></div>
+      <div id="specSvg"></div>
+      <div class="legend" id="specLegend"></div>
+      <div class="tip" id="specTip"></div>
+      <div class="vizfoot"><button class="btn" id="specTableBtn" type="button">顯示數據表</button><span class="small muted">曲線為依「峰值波長」與「半高寬」畫出的示意高斯曲線，不是實測光譜；顏色代表該波長的可見光顏色。</span></div>
+      <div id="specTable" hidden></div>
+    </div>
+    <div id="specNotes"></div>
+  </section>
+
+  <section class="band" id="timeline" hidden>
+    <div class="sec-head"><h2>發展里程碑</h2><span class="tag">timeline</span></div>
+    <p class="sec-lead" id="tlLead"></p>
+    <div class="filters" id="tlFilters"></div>
+    <ol class="tl" id="tlList"></ol>
+  </section>
+
+  <section class="band" id="materials" hidden>
+    <div class="sec-head"><h2>材料家族</h2><span class="tag">materials</span></div>
+    <p class="sec-lead" id="matLead"></p>
+    <div class="filters" id="matFilters"></div>
+    <div class="matgrid" id="matGrid"></div>
+    <div class="blk-h">螢光粉的「週期表」：活化劑 × 基質</div>
+    <p class="sec-lead" id="matrixLead"></p>
+    <div id="matMatrix"></div>
+    <div class="blk-h">一張表比較主流商用螢光粉</div>
+    <div id="matTable"></div>
+  </section>
+
+  <section class="band" id="apps" hidden>
+    <div class="sec-head"><h2>螢光粉用在哪裡</h2><span class="tag">applications</span></div>
+    <p class="sec-lead" id="appLead"></p>
+    <div class="appgrid" id="appGrid"></div>
+  </section>
+
+  <section class="band" id="world" hidden>
+    <div class="sec-head"><h2>全球版圖</h2><span class="tag">landscape</span></div>
+    <p class="sec-lead" id="worldLead"></p>
+    <div class="rtabs" id="rtabs"></div>
+    <div id="regions"></div>
+    <div class="blk-h">市場規模：各家研究機構的估計並不一致</div>
+    <div class="card pad" id="marketBox"></div>
+    <div class="blk-h">專利與智慧財產</div>
+    <div id="patentBox"></div>
+  </section>
+
+  <section class="band" id="news" hidden>
+    <div class="sec-head"><h2>最新動態</h2><span class="tag">2024–2026</span></div>
+    <p class="sec-lead" id="newsLead"></p>
+    <div class="filters" id="newsFilters"></div>
+    <div class="newslist" id="newsList"></div>
+  </section>
+
+  <section class="band" id="frontier" hidden>
+    <div class="sec-head"><h2>研究前沿</h2><span class="tag">frontier</span></div>
+    <p class="sec-lead" id="frLead"></p>
+    <div class="frgrid" id="frGrid"></div>
+  </section>
+
+  <section class="band" id="faq" hidden>
+    <div class="sec-head"><h2>常見問題</h2><span class="tag">faq</span></div>
+    <p class="sec-lead">一般讀者最常問的問題，用白話回答。</p>
+    <div id="faqList"></div>
+  </section>
+
+  <section class="band" id="glossary" hidden>
+    <div class="sec-head"><h2>名詞解釋</h2><span class="tag">glossary</span></div>
+    <div class="filters"><span class="lbl">搜尋</span><input type="search" id="glSearch" placeholder="輸入中英文關鍵字…"><span class="count" id="glCount"></span></div>
+    <div class="glist" id="glList"></div>
+  </section>
+
+  <section class="band" id="sources" hidden>
+    <div class="sec-head"><h2>來源與說明</h2><span class="tag">sources</span></div>
+    <p class="sec-lead" id="srcLead"></p>
+    <div class="covergrid" id="coverGrid"></div>
+    <div class="blk-h">引用來源清單</div>
+    <div class="card pad"><ol class="srclist" id="srcList"></ol></div>
+  </section>
+</div></main>
+
+<footer><div class="wrap">
+  <span id="footLeft"></span>
+  <span class="right muted">本頁為個人資訊整理，內容僅供學習與研究參考；技術數據以原始文獻與廠商規格書為準。</span>
+</div></footer>
+
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s)};
+  var esc=function(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
+  var el=function(t,c,h){var e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e};
+  var srcLink=function(s,name){ if(!s)return ""; return '<div class="src">來源：<a href="'+esc(s)+'" target="_blank" rel="noopener">'+esc(name||s.replace(/^https?:\/\//,"").split("/")[0])+'</a></div>'; };
+  var confPill=function(c){ if(!c)return ""; var m={high:["ok","可信度高"],medium:["pend","可信度中"],low:["warn","待確認"]}[c]; return m?'<span class="pill '+m[0]+' conf">'+m[1]+'</span>':""; };
+
+  /* theme */
+  var root=document.documentElement;
+  try{var st=localStorage.getItem("ph-theme"); if(st)root.setAttribute("data-theme",st);}catch(e){}
+  $("#themeBtn").addEventListener("click",function(){
+    var cur=root.getAttribute("data-theme");
+    if(!cur){cur=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}
+    var next=cur==="dark"?"light":"dark";
+    root.setAttribute("data-theme",next);
+    try{localStorage.setItem("ph-theme",next);}catch(e){}
+    if(window.__redrawSpec)window.__redrawSpec();
+  });
+  $("#expandBtn").addEventListener("click",function(){
+    var all=document.querySelectorAll("details"); var anyClosed=false;
+    all.forEach(function(d){if(!d.open)anyClosed=true;});
+    all.forEach(function(d){d.open=anyClosed;});
+    this.textContent=anyClosed?"全部收合":"全部展開";
+  });
+
+  /* nav highlight */
+  var tabs=Array.prototype.slice.call(document.querySelectorAll("nav.tabs a"));
+  function syncNav(){
+    var y=window.scrollY+80, cur=tabs[0];
+    tabs.forEach(function(a){var s=document.querySelector(a.getAttribute("href")); if(s&&!s.hidden&&s.offsetTop<=y)cur=a;});
+    tabs.forEach(function(a){a.classList.toggle("on",a===cur);});
+  }
+  window.addEventListener("scroll",syncNav,{passive:true});
+
+  /* wavelength -> approx sRGB colour (CIE-ish approximation, for display only) */
+  function wlColor(w){
+    var r=0,g=0,b=0;
+    if(w<380)w=380; if(w>780)w=780;
+    if(w<440){r=-(w-440)/60;g=0;b=1}
+    else if(w<490){r=0;g=(w-440)/50;b=1}
+    else if(w<510){r=0;g=1;b=-(w-510)/20}
+    else if(w<580){r=(w-510)/70;g=1;b=0}
+    else if(w<645){r=1;g=-(w-645)/65;b=0}
+    else {r=1;g=0;b=0}
+    var f=1; if(w<420)f=.3+.7*(w-380)/40; else if(w>700)f=.3+.7*(780-w)/80;
+    var gm=function(x){return Math.round(255*Math.pow(x*f,0.8))};
+    return "rgb("+gm(r)+","+gm(g)+","+gm(b)+")";
+  }
+  function nirColor(w){ return w>=760?"#7a2a2a":wlColor(w); }
+
+  var DATA=null;
+
+  function render(d){
+    DATA=d;
+    $("#loading").hidden=true;
+    document.querySelectorAll("section.band").forEach(function(s){s.hidden=false;});
+    var m=d.meta;
+    $("#heroSub").textContent=m.subtitle||"";
+    $("#heroBy").textContent=m.lead||"";
+    $("#brandRight").innerHTML="整理時點："+esc(m.compiled)+"<br><span class='small muted'>"+esc(m.compiledNote||"")+"</span>";
+    $("#heroChips").innerHTML=(m.chips||[]).map(function(c){return '<span class="chip">'+esc(c)+'</span>'}).join("");
+    $("#footLeft").textContent="全球螢光粉進展 · 整理時點 "+m.compiled+"（"+m.version+"）";
+    renderIntro(d.intro);
+    renderSpectrum(d.spectra);
+    renderTimeline(d.timeline);
+    renderMaterials(d.materials);
+    renderApps(d.applications);
+    renderWorld(d.landscape);
+    renderNews(d.news);
+    renderFrontier(d.frontier);
+    renderFaq(d.faq);
+    renderGlossary(d.glossary);
+    renderSources(d.sources,d.meta);
+    syncNav();
+  }
+
+  /* ---------- intro ---------- */
+  function renderIntro(it){
+    $("#introLead").textContent=it.lead;
+    $("#howFlow").innerHTML=it.how.map(function(s,i){
+      return '<div class="fnode"><span class="fn">STEP '+(i+1)+'</span><b>'+esc(s.title)+'</b><span>'+esc(s.text)+'</span></div>';}).join("");
+    $("#ledFig").innerHTML=ledFigure()+'<div class="figcap">'+esc(it.figCaption)+'</div>';
+    $("#introStats").innerHTML=it.stats.map(function(s){
+      return '<div class="statcell"><span class="n'+(String(s.n).length>7?" long":"")+'">'+esc(s.n)+'</span><span class="l">'+esc(s.l)+'</span>'+(s.s?'<span class="s">'+esc(s.s)+'</span>':'')+'</div>';}).join("");
+    $("#whyBox").innerHTML='<div class="callout"><b>為什麼值得關心？</b><ul style="margin:6px 0 0;padding-left:1.2em">'+it.why.map(function(w){return "<li>"+esc(w)+"</li>"}).join("")+"</ul></div>";
+    $("#metrics").innerHTML=it.metrics.map(function(k){
+      return '<div class="metric"><span class="t">'+esc(k.term)+'</span><span class="z">'+esc(k.zh)+'</span><p>'+esc(k.plain)+'</p>'+(k.typical?'<div class="typ">'+esc(k.typical)+'</div>':'')+'</div>';}).join("");
+  }
+  function ledFigure(){
+    // schematic of a phosphor-converted white LED
+    return '<svg viewBox="0 0 760 230" role="img" aria-label="藍光晶片加黃色螢光粉混成白光的示意圖">'+
+    '<defs><linearGradient id="gb" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#4f7cff"/><stop offset="1" stop-color="#2b4bd6"/></linearGradient>'+
+    '<radialGradient id="gw" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff8dc" stop-opacity=".95"/><stop offset="1" stop-color="#fff8dc" stop-opacity="0"/></radialGradient></defs>'+
+    '<g font-family="var(--sans)" font-size="13" fill="var(--ink-2)">'+
+    '<rect x="40" y="150" width="140" height="18" rx="3" fill="var(--ink-3)"/><text x="110" y="190" text-anchor="middle" font-weight="700" fill="var(--ink)">藍光 LED 晶片（在導線架上）</text>'+
+    '<rect x="85" y="126" width="50" height="24" rx="2" fill="url(#gb)"/><text x="110" y="212" text-anchor="middle">GaN／InGaN，約 450 nm</text>'+
+    '<path d="M110 126 L 80 60 M110 126 L110 55 M110 126 L140 60" stroke="#4f7cff" stroke-width="3" stroke-linecap="round"/>'+
+    '<text x="110" y="45" text-anchor="middle" fill="#3b5fd9" font-weight="700">藍光</text>'+
+    '<path d="M215 120 L 265 120" stroke="var(--ink-3)" stroke-width="2" marker-end="url(#ar)"/>'+
+    '<g transform="translate(300,0)"><rect x="40" y="150" width="140" height="18" rx="3" fill="var(--ink-3)"/><rect x="85" y="126" width="50" height="24" rx="2" fill="url(#gb)"/>'+
+    '<path d="M50 150 Q110 40 170 150 Z" fill="#f2c94c" fill-opacity=".85"/>'+
+    '<circle cx="90" cy="110" r="3" fill="#b7791f"/><circle cx="118" cy="95" r="3" fill="#b7791f"/><circle cx="135" cy="120" r="3" fill="#b7791f"/><circle cx="75" cy="130" r="3" fill="#b7791f"/><circle cx="105" cy="130" r="3" fill="#b7791f"/><circle cx="150" cy="138" r="3" fill="#b7791f"/>'+
+    '<text x="110" y="190" text-anchor="middle">矽膠＋黃色螢光粉（YAG:Ce）</text><text x="110" y="212" text-anchor="middle">部分藍光被吸收，轉成黃光</text>'+
+    '<path d="M110 70 L 85 25 M110 70 L110 20 M110 70 L135 25" stroke="#f2c94c" stroke-width="3" stroke-linecap="round"/><path d="M110 70 L 60 35 M110 70 L160 35" stroke="#4f7cff" stroke-width="3" stroke-linecap="round"/>'+
+    '<text x="110" y="14" text-anchor="middle" fill="var(--ink)" font-weight="700">藍光＋黃光</text></g>'+
+    '<path d="M515 120 L 565 120" stroke="var(--ink-3)" stroke-width="2"/>'+
+    '<g transform="translate(600,0)"><circle cx="80" cy="105" r="70" fill="url(#gw)"/><circle cx="80" cy="105" r="34" fill="#fffdf5" stroke="#e8b43a" stroke-width="2"/>'+
+    '<text x="80" y="110" text-anchor="middle" font-weight="700" fill="#151a26">白光</text><text x="80" y="190" text-anchor="middle">人眼看到混合後的白色</text><text x="80" y="212" text-anchor="middle">黃光多偏暖、少偏冷</text></g>'+
+    '<text x="240" y="108" text-anchor="middle" fill="var(--ink-3)">穿過</text><text x="540" y="108" text-anchor="middle" fill="var(--ink-3)">混合</text>'+
+    '</g></svg>';
+  }
+
+  /* ---------- spectrum ---------- */
+  function renderSpectrum(sp){
+    $("#specLead").textContent=sp.lead;
+    var curves=sp.curves, active={};
+    var presets=sp.presets;
+    var pbox=$("#specPresets"), tbox=$("#specToggles");
+    pbox.innerHTML='<span class="lbl">情境</span>'+presets.map(function(p,i){return '<button type="button" class="tog'+(i===0?" on":"")+'" data-p="'+i+'">'+esc(p.name)+'</button>'}).join("");
+    tbox.innerHTML='<span class="lbl">曲線</span>'+curves.map(function(c){return '<button type="button" class="tog" data-c="'+esc(c.id)+'"><i class="sw" style="background:'+nirColor(c.peak)+'"></i>'+esc(c.name)+'</button>'}).join("");
+    function applyPreset(i){
+      active={}; presets[i].curves.forEach(function(id){active[id]=true;});
+      pbox.querySelectorAll(".tog").forEach(function(b){b.classList.toggle("on",+b.dataset.p===i);});
+      $("#specNotes").innerHTML='<div class="altbox"><b>'+esc(presets[i].name)+'：</b>'+esc(presets[i].note)+'</div>';
+      draw();
+    }
+    pbox.addEventListener("click",function(e){var b=e.target.closest(".tog"); if(b)applyPreset(+b.dataset.p);});
+    tbox.addEventListener("click",function(e){var b=e.target.closest(".tog"); if(!b)return; var id=b.dataset.c; active[id]=!active[id]; pbox.querySelectorAll(".tog").forEach(function(x){x.classList.remove("on")}); draw();});
+
+    var W=760,H=316,L=44,R=16,T=18,B=58, x0=380,x1=1000;
+    var xs=function(w){return L+(w-x0)/(x1-x0)*(W-L-R)}, ys=function(v){return T+(1-v)*(H-T-B)};
+    function gauss(w,c){var s=c.fwhm/2.3548; var v=Math.exp(-0.5*Math.pow((w-c.peak)/s,2)); return v*(c.rel||1);}
+    function draw(){
+      tbox.querySelectorAll(".tog").forEach(function(b){b.classList.toggle("on",!!active[b.dataset.c]);});
+      var on=curves.filter(function(c){return active[c.id]});
+      var s='<svg viewBox="0 0 '+W+' '+H+'" id="specChart">';
+      // visible spectrum strip
+      s+='<defs><linearGradient id="vis" x1="0" x2="1">';
+      for(var w=380;w<=780;w+=20){s+='<stop offset="'+((w-x0)/(x1-x0)*100).toFixed(1)+'%" stop-color="'+wlColor(w)+'"/>';}
+      s+='<stop offset="'+((780-x0)/(x1-x0)*100).toFixed(1)+'%" stop-color="#4a1c1c"/><stop offset="100%" stop-color="#2a1010"/></linearGradient></defs>';
+      s+='<rect x="'+L+'" y="'+(H-B+6)+'" width="'+(W-L-R)+'" height="8" fill="url(#vis)" opacity=".85" rx="2"/>';
+      // grid
+      for(var g=0;g<=1;g+=.25){s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+ys(g)+'" y2="'+ys(g)+'" stroke="var(--grid)" stroke-width="1"/>';}
+      for(var w2=400;w2<=1000;w2+=100){s+='<line x1="'+xs(w2)+'" x2="'+xs(w2)+'" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--grid)"/><text x="'+xs(w2)+'" y="'+(H-B+30)+'" text-anchor="middle" font-size="11" fill="var(--ink-3)" font-family="var(--mono)">'+w2+'</text>';}
+      s+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+ys(0)+'" y2="'+ys(0)+'" stroke="var(--axis)"/>';
+            s+='<text transform="translate(12 '+((T+H-B)/2)+') rotate(-90)" text-anchor="middle" font-size="11" fill="var(--ink-3)">相對強度</text>';
+      s+='<text x="'+(L+(W-L-R)/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="11" fill="var(--ink-3)">波長 (nm)　　紫外 ← 可見光 → 近紅外</text>';
+      on.forEach(function(c){
+        var col=nirColor(c.peak), pts=[];
+        for(var w=x0;w<=x1;w+=2){pts.push(xs(w).toFixed(1)+","+ys(gauss(w,c)).toFixed(1));}
+        s+='<path d="M'+pts.join(" L")+' L'+xs(x1)+','+ys(0)+' L'+xs(x0)+','+ys(0)+'Z" fill="'+col+'" fill-opacity=".10"/>';
+        s+='<path d="M'+pts.join(" L")+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round"/>';
+        s+='<text x="'+xs(c.peak)+'" y="'+(ys(c.rel||1)-6)+'" text-anchor="middle" font-size="11" fill="var(--ink-2)">'+esc(c.short||c.name)+'</text>';
+      });
+      s+='<line id="specX" x1="0" x2="0" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--ink-3)" stroke-width="1" opacity="0"/>';
+      s+='<rect x="'+L+'" y="'+T+'" width="'+(W-L-R)+'" height="'+(H-T-B)+'" fill="transparent" id="specHit"/>';
+      s+='</svg>';
+      $("#specSvg").innerHTML=s;
+      $("#specLegend").innerHTML=on.map(function(c){return '<span><i style="border-color:'+nirColor(c.peak)+'"></i>'+esc(c.name)+'（'+c.peak+' nm，半高寬 '+c.fwhm+' nm）</span>'}).join("")+'<span><i class="box" style="background:linear-gradient(90deg,#3b3fa8,#e8b43a,#7a2a2a)"></i>色帶＝該波長的顏色</span>';
+      // table
+      $("#specTable").innerHTML='<div class="tblwrap"><table><thead><tr><th>曲線</th><th>材料</th><th class="num">峰值 (nm)</th><th class="num">半高寬 (nm)</th><th>顏色</th><th>備註</th></tr></thead><tbody>'+
+        curves.map(function(c){return '<tr><td>'+esc(c.name)+'</td><td class="mono small">'+esc(c.formula)+'</td><td class="num">'+c.peak+'</td><td class="num">'+c.fwhm+'</td><td>'+esc(c.color)+'</td><td class="small">'+esc(c.note||"")+'</td></tr>'}).join("")+'</tbody></table></div>';
+      // hover
+      var svg=$("#specChart"), hit=$("#specHit"), tip=$("#specTip"), xl=$("#specX");
+      function move(ev){
+        var r=svg.getBoundingClientRect(); var px=(ev.clientX-r.left)/r.width*W; var w=x0+(px-L)/(W-L-R)*(x1-x0); w=Math.round(Math.max(x0,Math.min(x1,w)));
+        xl.setAttribute("x1",xs(w)); xl.setAttribute("x2",xs(w)); xl.setAttribute("opacity","1");
+        tip.style.display="block";
+        tip.innerHTML='<b>'+w+' nm</b>'+on.map(function(c){return '<div class="row"><span><i style="border-color:'+nirColor(c.peak)+'"></i> '+esc(c.short||c.name)+'</span><b>'+(gauss(w,c)*100).toFixed(0)+'%</b></div>'}).join("");
+        var box=$("#specViz").getBoundingClientRect(); var lx=ev.clientX-box.left+14, ly=ev.clientY-box.top-10; if(lx+180>box.width)lx-=200; tip.style.left=lx+"px"; tip.style.top=ly+"px";
+      }
+      hit.addEventListener("pointermove",move); hit.addEventListener("pointerleave",function(){tip.style.display="none";xl.setAttribute("opacity","0");});
+    }
+    window.__redrawSpec=draw;
+    $("#specTableBtn").addEventListener("click",function(){var t=$("#specTable"); t.hidden=!t.hidden; this.textContent=t.hidden?"顯示數據表":"隱藏數據表";});
+    applyPreset(0);
+  }
+
+  /* ---------- timeline ---------- */
+  function chipFilters(box,groups,onChange){
+    // groups: [{key,label,values:[...]}]; state: {key: value|null}
+    var state={};
+    box.innerHTML=groups.map(function(g){return '<span class="lbl">'+esc(g.label)+'</span><button type="button" class="fchip on" data-k="'+g.key+'" data-v="">全部</button>'+g.values.map(function(v){return '<button type="button" class="fchip" data-k="'+g.key+'" data-v="'+esc(v)+'">'+esc(v)+'</button>'}).join("")+'<span style="flex-basis:100%;height:0"></span>'}).join("")+'<span class="count"></span>';
+    box.addEventListener("click",function(e){var b=e.target.closest(".fchip"); if(!b)return; var k=b.dataset.k; state[k]=b.dataset.v||null; box.querySelectorAll('.fchip[data-k="'+k+'"]').forEach(function(x){x.classList.toggle("on",x===b)}); onChange(state);});
+    return state;
+  }
+  function renderTimeline(tl){
+    $("#tlLead").textContent=tl.lead;
+    var regions=uniq(tl.events.map(function(e){return e.region})), cats=uniq(tl.events.map(function(e){return e.category}));
+    var list=$("#tlList");
+    list.innerHTML=tl.events.map(function(e){
+      return '<li data-region="'+esc(e.region)+'" data-cat="'+esc(e.category)+'"><span class="yr">'+esc(e.year)+'</span><span class="dot'+(e.category==="產業"||e.category==="市場"?" alt":"")+'"></span><div class="ev"><b>'+esc(e.title)+'</b><p>'+esc(e.detail)+'</p><span class="pill acc">'+esc(e.region)+'</span><span class="pill">'+esc(e.category)+'</span>'+(e.entities||[]).map(function(x){return '<span class="pill">'+esc(x)+'</span>'}).join("")+srcLink(e.src,e.srcName)+'</div></li>';}).join("");
+    var fbox=$("#tlFilters");
+    chipFilters(fbox,[{key:"region",label:"地區",values:regions},{key:"cat",label:"類別",values:cats}],function(st){
+      var n=0; list.querySelectorAll("li").forEach(function(li){var ok=(!st.region||li.dataset.region===st.region)&&(!st.cat||li.dataset.cat===st.cat); li.classList.toggle("hide",!ok); if(ok)n++;});
+      fbox.querySelector(".count").textContent="顯示 "+n+" / "+tl.events.length+" 則";
+    });
+    fbox.querySelector(".count").textContent="共 "+tl.events.length+" 則";
+  }
+  function uniq(a){var s=[];a.forEach(function(x){if(x&&s.indexOf(x)<0)s.push(x)});return s;}
+
+  /* ---------- materials ---------- */
+  function renderMaterials(mt){
+    $("#matLead").textContent=mt.lead;
+    var grid=$("#matGrid");
+    grid.innerHTML=mt.families.map(function(f){
+      var col=f.peak?nirColor(f.peak):"#888";
+      return '<div class="mat" data-color="'+esc(f.colorGroup)+'" data-status="'+esc(f.status)+'"><div class="bar" style="background:'+col+'"></div><div class="body">'+
+        '<div class="top"><h3>'+esc(f.name)+'</h3><span class="pill '+(f.status==="商用主流"?"ok":f.status==="商用"?"acc":f.status==="商用初期"?"alt":"pend")+'">'+esc(f.status)+'</span></div>'+
+        '<div class="f">'+esc(f.formula)+'</div>'+
+        '<div class="kv"><div>發光顏色<b>'+esc(f.color)+'</b></div><div>峰值<b>'+esc(f.peakText||(f.peak+" nm"))+'</b></div><div>半高寬<b>'+esc(f.fwhmText||(f.fwhm?f.fwhm+" nm":"—"))+'</b></div></div>'+
+        '<p>'+esc(f.plain)+'</p>'+
+        '<div class="pc"><div class="p"><b>優點</b><ul>'+f.pros.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+'</ul></div><div class="c"><b>限制</b><ul>'+f.cons.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+'</ul></div></div>'+
+        '<div>'+(f.makers||[]).map(function(x){return '<span class="pill">'+esc(x)+'</span>'}).join("")+'</div>'+
+        '<details><summary>誰做的、專利在誰手上、用在哪</summary><p>'+esc(f.history)+'</p>'+(f.apps?'<p><b>主要用途：</b>'+esc(f.apps)+'</p>':'')+srcLink(f.src,f.srcName)+'</details>'+
+        '</div></div>';}).join("");
+    var colors=uniq(mt.families.map(function(f){return f.colorGroup})), statuses=uniq(mt.families.map(function(f){return f.status}));
+    var fbox=$("#matFilters");
+    chipFilters(fbox,[{key:"color",label:"顏色",values:colors},{key:"status",label:"狀態",values:statuses}],function(st){
+      var n=0; grid.querySelectorAll(".mat").forEach(function(c){var ok=(!st.color||c.dataset.color===st.color)&&(!st.status||c.dataset.status===st.status); c.classList.toggle("hide",!ok); if(ok)n++;});
+      fbox.querySelector(".count").textContent="顯示 "+n+" / "+mt.families.length+" 種";
+    });
+    fbox.querySelector(".count").textContent="共 "+mt.families.length+" 種";
+    var mx=mt.matrix;
+    $("#matrixLead").textContent=mx.lead;
+    $("#matMatrix").innerHTML='<div class="tblwrap"><table class="matrix"><thead><tr><th>活化劑</th>'+mx.hosts.map(function(hh){return '<th>'+esc(hh)+'</th>'}).join("")+'</tr></thead><tbody>'+
+      mx.rows.map(function(r){return '<tr><th><b>'+esc(r.activator)+'</b><small>'+esc(r.trait)+'</small></th>'+r.cells.map(function(c){
+        if(!c.peak)return '<td class="none">—</td>';
+        var col=nirColor(c.peak); return '<td><span class="sw" style="background:'+col+'"></span>'+esc(c.m)+'</td>';}).join("")+'</tr>'}).join("")+'</tbody></table><div class="tblnote">'+esc(mx.note)+'</div></div>';
+    var t=mt.compare;
+    $("#matTable").innerHTML='<div class="tblwrap"><table><thead><tr>'+t.columns.map(function(c,i){return '<th'+(i>=2&&i<=3?' class="num"':'')+'>'+esc(c)+'</th>'}).join("")+'</tr></thead><tbody>'+
+      t.rows.map(function(r){return "<tr>"+r.map(function(c,i){return '<td'+(i>=2&&i<=3?' class="num"':'')+(i===1?' class="mono small"':'')+'>'+esc(c)+'</td>'}).join("")+"</tr>"}).join("")+'</tbody></table>'+(t.note?'<div class="tblnote">'+esc(t.note)+'</div>':'')+'</div>';
+  }
+
+  /* ---------- applications ---------- */
+  function renderApps(ap){
+    $("#appLead").textContent=ap.lead;
+    $("#appGrid").innerHTML=ap.items.map(function(a){
+      return '<div class="app"><h3><span class="ic">'+esc(a.icon)+'</span>'+esc(a.name)+'</h3><div class="lead">'+esc(a.lead)+'</div>'+
+        (a.numbers&&a.numbers.length?'<div class="nums">'+a.numbers.map(function(n){return "<span>"+esc(n)+"</span>"}).join("")+'</div>':'')+
+        '<ul>'+a.points.map(function(p){return "<li>"+esc(p)+"</li>"}).join("")+'</ul>'+
+        '<div>'+(a.materials||[]).map(function(x){return '<span class="pill acc">'+esc(x)+'</span>'}).join("")+(a.players||[]).map(function(x){return '<span class="pill">'+esc(x)+'</span>'}).join("")+'</div>'+
+        (a.srcs||[]).map(function(s){return srcLink(s.url,s.name)}).join("")+'</div>';}).join("");
+  }
+
+  /* ---------- world ---------- */
+  function renderWorld(ls){
+    $("#worldLead").textContent=ls.lead;
+    var rt=$("#rtabs"), rg=$("#regions");
+    rt.innerHTML=ls.regions.map(function(r,i){return '<button type="button" class="rtab'+(i===0?" on":"")+'" data-i="'+i+'">'+esc(r.name)+'</button>'}).join("");
+    rg.innerHTML=ls.regions.map(function(r,i){
+      return '<div class="region'+(i===0?" on":"")+'"><div class="card pad"><div class="lead">'+esc(r.lead)+'</div>'+
+        (r.stats&&r.stats.length?'<div class="statgrid">'+r.stats.map(function(s){return '<div class="statcell"><span class="n">'+esc(s.n)+'</span><span class="l">'+esc(s.l)+'</span>'+(s.s?'<span class="s">'+esc(s.s)+'</span>':'')+'</div>'}).join("")+'</div>':'')+
+        '<div class="blk-h">主要企業</div><div class="cogrid">'+r.companies.map(function(c){return '<div class="co"><b>'+esc(c.name)+'</b>'+(c.en?'<span class="en">'+esc(c.en)+'</span>':'')+'<p>'+esc(c.note)+'</p><div class="tags">'+(c.products||[]).map(function(p){return "<span>"+esc(p)+"</span>"}).join("")+'</div>'+srcLink(c.src,c.srcName)+'</div>'}).join("")+'</div>'+
+        (r.research&&r.research.length?'<div class="blk-h">研究團隊</div><div class="cogrid">'+r.research.map(function(c){return '<div class="co"><b>'+esc(c.name)+'</b>'+(c.org?'<span class="en">'+esc(c.org)+'</span>':'')+'<p>'+esc(c.note)+'</p>'+srcLink(c.src,c.srcName)+'</div>'}).join("")+'</div>':'')+
+        (r.notes&&r.notes.length?'<div class="callout"><ul style="margin:0;padding-left:1.2em">'+r.notes.map(function(n){return "<li>"+esc(n)+"</li>"}).join("")+'</ul></div>':'')+
+        '</div></div>';}).join("");
+    rt.addEventListener("click",function(e){var b=e.target.closest(".rtab"); if(!b)return; var i=+b.dataset.i; rt.querySelectorAll(".rtab").forEach(function(x,j){x.classList.toggle("on",j===i)}); rg.querySelectorAll(".region").forEach(function(x,j){x.classList.toggle("on",j===i)});});
+    // market
+    var mk=ls.market, mx=Math.max.apply(null,mk.estimates.map(function(e){return e.value}));
+    $("#marketBox").innerHTML='<p class="small" style="color:var(--ink-2)">'+esc(mk.lead)+'</p><div class="bar-chart">'+mk.estimates.map(function(e){
+      return '<div class="row" title="'+esc(e.source+"："+e.label)+'"><div class="lab">'+esc(e.source)+'<small>'+esc(e.label)+'</small></div><div class="trk"><div class="fill" style="width:'+(e.value/mx*100).toFixed(1)+'%"></div></div><div class="val">'+esc(e.display)+'</div></div>';}).join("")+'</div>'+
+      '<div class="tblwrap" style="margin-top:14px"><table><thead><tr><th>來源</th><th>範圍定義</th><th class="num">基準年市值</th><th class="num">預測</th><th>年均成長率</th></tr></thead><tbody>'+mk.estimates.map(function(e){return '<tr><td>'+esc(e.source)+'</td><td class="small">'+esc(e.scope)+'</td><td class="num">'+esc(e.display)+'</td><td class="num">'+esc(e.forecast||"—")+'</td><td class="small">'+esc(e.cagr||"—")+'</td></tr>'}).join("")+'</tbody></table><div class="tblnote">'+esc(mk.note)+'</div></div>'+
+      (mk.srcs||[]).map(function(s){return srcLink(s.url,s.name)}).join("");
+    $("#patentBox").innerHTML='<div class="grid g2">'+ls.patents.map(function(p){return '<div class="card pad"><b style="font-size:15.5px">'+esc(p.title)+'</b><p class="small" style="color:var(--ink-2);margin:6px 0 4px">'+esc(p.detail)+'</p>'+srcLink(p.src,p.srcName)+'</div>'}).join("")+'</div>';
+  }
+
+  /* ---------- news ---------- */
+  function renderNews(nw){
+    $("#newsLead").textContent=nw.lead;
+    var items=nw.items.slice().sort(function(a,b){return a.date<b.date?1:-1});
+    var list=$("#newsList");
+    list.innerHTML=items.map(function(n){
+      return '<div class="nw" data-tag="'+esc((n.tags||[]).join("|"))+'" data-region="'+esc(String(n.region).split("／").join("|"))+'" data-year="'+esc(n.date.slice(0,4))+'"><div class="d">'+esc(n.date)+'<small>'+esc(n.region)+'</small></div><div><b>'+esc(n.title)+'</b><p>'+esc(n.detail)+'</p>'+(n.why?'<div class="why"><b>為什麼重要</b>'+esc(n.why)+'</div>':'')+
+        (n.tags||[]).map(function(t){return '<span class="pill acc">'+esc(t)+'</span>'}).join("")+(n.entities||[]).map(function(t){return '<span class="pill">'+esc(t)+'</span>'}).join("")+confPill(n.confidence)+srcLink(n.src,n.srcName)+'</div></div>';}).join("");
+    var tags=uniq([].concat.apply([],items.map(function(n){return n.tags||[]}))), regions=uniq([].concat.apply([],items.map(function(n){return String(n.region).split("／")}))), years=uniq(items.map(function(n){return n.date.slice(0,4)})).sort().reverse();
+    var fbox=$("#newsFilters");
+    chipFilters(fbox,[{key:"year",label:"年份",values:years},{key:"tag",label:"主題",values:tags},{key:"region",label:"地區",values:regions}],function(st){
+      var n=0; list.querySelectorAll(".nw").forEach(function(c){var ok=(!st.year||c.dataset.year===st.year)&&(!st.region||c.dataset.region.split("|").indexOf(st.region)>=0)&&(!st.tag||c.dataset.tag.split("|").indexOf(st.tag)>=0); c.classList.toggle("hide",!ok); if(ok)n++;});
+      fbox.querySelector(".count").textContent="顯示 "+n+" / "+items.length+" 則";
+    });
+    fbox.querySelector(".count").textContent="共 "+items.length+" 則";
+  }
+
+  /* ---------- frontier ---------- */
+  function renderFrontier(fr){
+    $("#frLead").textContent=fr.lead;
+    $("#frGrid").innerHTML=fr.items.map(function(f){
+      return '<div class="fr"><h3>'+esc(f.title)+'</h3><div class="lead">'+esc(f.lead)+'</div><div class="why"><b>為什麼難／為什麼重要</b><br>'+esc(f.why)+'</div><ul>'+f.points.map(function(p){return "<li>"+esc(p)+"</li>"}).join("")+'</ul><div>'+(f.groups||[]).map(function(g){return '<span class="pill">'+esc(g)+'</span>'}).join("")+'</div>'+(f.srcs||[]).map(function(s){return srcLink(s.url,s.name)}).join("")+'</div>';}).join("");
+  }
+
+  /* ---------- faq ---------- */
+  function renderFaq(fq){
+    $("#faqList").innerHTML=fq.map(function(f){return '<details class="faq"><summary>'+esc(f.q)+'</summary><div class="a">'+f.a.map(function(p){return "<p>"+esc(p)+"</p>"}).join("")+(f.src?srcLink(f.src,f.srcName):'')+'</div></details>'}).join("");
+  }
+
+  /* ---------- glossary ---------- */
+  function renderGlossary(gl){
+    var list=$("#glList");
+    list.innerHTML=gl.map(function(g){return '<div class="gl" data-k="'+esc((g.term+" "+g.zh+" "+g.explain).toLowerCase())+'"><b>'+esc(g.term)+'</b><span class="z">'+esc(g.zh)+'</span><p>'+esc(g.explain)+'</p></div>'}).join("");
+    var cnt=$("#glCount"); cnt.textContent="共 "+gl.length+" 條";
+    $("#glSearch").addEventListener("input",function(){var q=this.value.trim().toLowerCase(), n=0; list.querySelectorAll(".gl").forEach(function(c){var ok=!q||c.dataset.k.indexOf(q)>=0; c.classList.toggle("hide",!ok); if(ok)n++;}); cnt.textContent=q?"符合 "+n+" 條":"共 "+gl.length+" 條";});
+  }
+
+  /* ---------- sources ---------- */
+  function renderSources(sr,meta){
+    $("#srcLead").textContent=sr.lead;
+    $("#coverGrid").innerHTML='<div class="covercell ok"><h4>這個頁面怎麼做出來的</h4><ul>'+sr.method.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+'</ul></div><div class="covercell no"><h4>已知限制</h4><ul>'+sr.caveats.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+'</ul></div>';
+    $("#srcList").innerHTML=sr.list.map(function(s){return '<li><a href="'+esc(s.url)+'" target="_blank" rel="noopener">'+esc(s.name)+'</a><span class="k">'+esc(s.kind)+(s.year?" · "+esc(s.year):"")+'</span></li>'}).join("");
+  }
+
+  if(window.__SITE_DATA__){ render(window.__SITE_DATA__); }
+  else fetch("data/site.json",{cache:"no-store"}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(render).catch(function(e){
+    $("#loading").textContent="資料載入失敗："+e.message+"。請以 http:// 方式開啟（例如 python -m http.server），file:// 會被瀏覽器擋下。";
+  });
+})();
+</script>
+</body>
+</html>

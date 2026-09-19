@@ -5,7 +5,7 @@
 <title>學測數A預測題庫</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="針對 116 學年度學測數學 A 的預測試題：一份完整的 20 題預測卷，每一題都附有可互動的動畫，解釋題目背後的核心觀念。">
+<meta name="description" content="針對 116 學年度學測數學 A 的預測試題：每週更新一份完整的 20 題預測卷，每一題都附有可互動的動畫，解釋題目背後的核心觀念；上一週的卷子會封存成教用版與學用版 PDF。">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+TC:wght@700;900&display=swap">
@@ -141,6 +141,21 @@ section.block { padding: 40px 0 8px; }
 .unit .u-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); border-radius: 3px; }
 .unit .u-note { font-size: 12.5px; color: var(--ink-2); }
 
+/* week bar & archive */
+.weekbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: -6px 0 14px; font-size: 14px; color: var(--ink-2); }
+.weekbar select { padding: 5px 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface); font-size: 14px; }
+.weekbar .pill { font-size: 12px; padding: 2px 9px; border-radius: 999px; background: var(--ok-soft); color: var(--ok); font-weight: 500; }
+.weekbar .pill.old { background: var(--warn-soft); color: var(--warn); }
+.arch-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.arch { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.arch .row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.arch .round { font-family: var(--serif); font-weight: 900; font-size: 20px; color: var(--accent-ink); }
+.arch .dates { font-size: 12.5px; color: var(--ink-3); font-family: var(--mono); }
+.arch .links { display: flex; gap: 8px; flex-wrap: wrap; }
+.arch .links .btn { font-size: 13px; padding: 5px 11px; }
+.arch .btn.pdf-s { border-color: var(--ok); color: var(--ok); } .arch .btn.pdf-t { border-color: var(--accent-2); color: var(--accent-2); }
+.arch.cur { border-left: 4px solid var(--ok); }
+.arch-empty { padding: 18px 20px; color: var(--ink-2); font-size: 14.5px; }
 /* paper toolbar */
 .paperbar { position: sticky; top: 56px; z-index: 20; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); padding: 10px 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
 .paperbar .prog { flex: 1 1 180px; min-width: 140px; }
@@ -283,7 +298,8 @@ footer { padding: 30px 16px 40px; color: var(--ink-3); font-size: 13px; text-ali
     </a>
     <nav class="nav" aria-label="頁面導覽">
       <a href="#heat">考點熱度</a>
-      <a href="#paper">預測卷</a>
+      <a href="#paper">本週預測卷</a>
+      <a href="#archive">歷屆卷 PDF</a>
       <a href="#about">怎麼用</a>
     </nav>
     <div class="top-actions">
@@ -299,10 +315,11 @@ footer { padding: 30px 16px 40px; color: var(--ink-3); font-size: 13px; text-ali
     <div>
       <div class="hero-kicker">116 學年度 學測 數學 A · 預測試題</div>
       <h1>每一題都有動畫<br>把「為什麼」演給你看</h1>
-      <p>依 108 課綱數學 1、2、3A、4A 的命題趨勢，編出一份完整的 20 題預測卷：單選、多選、選填與混合題的配分都比照正式學測。作答後除了詳解，還有一段逐步動畫，直接演示題目背後的核心觀念。</p>
+      <p>依 108 課綱數學 1、2、3A、4A 的命題趨勢，<b>每週一</b>自動產生一份新的 20 題預測卷：單選、多選、選填與混合題的配分都比照正式學測。作答後除了詳解，還有一段逐步動畫，直接演示題目背後的核心觀念。上一週的卷子會封存成<b>教用版</b>與<b>學用版</b> PDF，方便列印。</p>
       <div class="hero-cta">
         <a class="btn" href="#paper" id="cta-start">開始作答</a>
         <a class="btn ghost" href="#heat">先看考點熱度</a>
+        <a class="btn ghost" href="#archive">歷屆卷與 PDF</a>
       </div>
     </div>
     <div class="hero-stats" id="hero-stats"></div>
@@ -323,11 +340,22 @@ footer { padding: 30px 16px 40px; color: var(--ink-3); font-size: 13px; text-ali
 <section class="block" id="paper">
   <div class="wrap">
     <div class="sec-head">
-      <h2>116 學測數A 預測卷</h2>
-      <span class="lede">共 20 題／100 分，考試時間 100 分鐘。單選 6 題、多選 6 題、選填 5 題（各 5 分），混合題 3 小題（15 分）。</span>
+      <h2 id="paper-title">116 學測數A 預測卷</h2>
+      <span class="lede" id="paper-lede">共 20 題／100 分，考試時間 100 分鐘。單選 6 題、多選 6 題、選填 5 題（各 5 分），混合題 3 小題（15 分）。</span>
     </div>
+    <div class="weekbar" id="weekbar"></div>
     <div class="paperbar" id="paperbar"></div>
     <div id="paper-body"></div>
+  </div>
+</section>
+
+<section class="block" id="archive">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>歷屆預測卷與 PDF</h2>
+      <span class="lede">每週一換卷時，上一週的卷子會自動封存：仍可線上作答、看動畫，並提供學用版（純題目＋答案卡）與教用版（含答案、詳解、命題說明）兩種 PDF。</span>
+    </div>
+    <div id="archive-list"></div>
   </div>
 </section>
 
@@ -347,6 +375,12 @@ footer { padding: 30px 16px 40px; color: var(--ink-3); font-size: 13px; text-ali
         <li>動畫演的不是計算過程，而是「這題到底在考什麼觀念」：例如絕對值就是距離、行列式就是面積倍率、取對數就是把乘法變加法。</li>
         <li>若你的系統開啟了「減少動態效果」，動畫不會自動播放，改用逐步點按。</li>
       </ul>
+      <h3>每週更新與 PDF</h3>
+      <ul>
+        <li>每週一清晨由 GitHub Actions 依當週週次為種子重新組卷：20 個題型固定，但數字、情境、正誤選項都會重新抽，答案由程式計算與驗證。</li>
+        <li>換卷時上一週的卷子會封存到「歷屆預測卷」，可切換回去線上作答；同時產生兩種 PDF：<b>學用版</b>只有題目與答案卡，<b>教用版</b>加上答案總表、詳解、核心意義、命題說明與每題動畫連結。</li>
+        <li>各週的作答紀錄分開保存在瀏覽器裡，互不影響。</li>
+      </ul>
       <h3>命題依據</h3>
       <ul>
         <li>範圍：108 課綱普通型高中數學 1、數學 2、數學 3A、數學 4A，與學測數學 A 考試範圍一致。</li>
@@ -357,8 +391,10 @@ footer { padding: 30px 16px 40px; color: var(--ink-3); font-size: 13px; text-ali
   </div>
 </section>
 
-<footer>學測數A預測題庫 · 題目與動畫皆為自行編寫的練習教材，與大考中心無關 · 若發現錯誤歡迎回報</footer>
+<footer>學測數A預測題庫 · 每週一自動換卷 · 題目與動畫皆為自行編寫的練習教材，與大考中心無關 · 若發現錯誤歡迎回報</footer>
 
+<script src="math.js"></script>
+<script src="archive.js"></script>
 <script src="questions.js"></script>
 <script src="anim.js"></script>
 <script src="app.js"></script>

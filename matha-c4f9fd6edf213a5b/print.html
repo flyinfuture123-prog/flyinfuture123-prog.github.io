@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>學測數A預測卷 列印版</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+@page { size: A4; margin: 16mm 14mm 18mm 14mm; }
+:root { --ink: #111; --ink-2: #444; --ink-3: #777; --line: #999; --accent: #1b2f66; --soft: #eef1f7; --math: "Cambria Math", "STIX Two Math", "Latin Modern Math", "Times New Roman", "Noto Serif CJK TC", "Noto Serif TC", serif; }
+html, body { margin: 0; padding: 0; }
+body { font-family: "Noto Sans CJK TC", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "WenQuanYi Zen Hei", sans-serif; color: var(--ink); font-size: 11.5pt; line-height: 1.6; }
+@media screen { body { max-width: 190mm; margin: 20px auto; padding: 0 12px; background: #fff; } }
+h1, h2, h3 { margin: 0; }
+.cover { border: 1.5px solid var(--ink); padding: 10px 14px; margin-bottom: 12px; }
+.cover .kicker { font-size: 9.5pt; letter-spacing: 0.2em; color: var(--ink-2); }
+.cover h1 { font-size: 17pt; letter-spacing: 0.08em; margin: 2px 0 4px; }
+.cover .meta { font-size: 10pt; color: var(--ink-2); display: flex; gap: 16px; flex-wrap: wrap; }
+.cover .edition { float: right; font-weight: 700; font-size: 13pt; border: 2px solid var(--accent); color: var(--accent); padding: 2px 10px; border-radius: 6px; }
+.notes { font-size: 9.5pt; color: var(--ink-2); border: 1px solid var(--line); padding: 6px 10px; margin-bottom: 12px; line-height: 1.55; }
+.notes b { color: var(--ink); }
+.part { font-weight: 700; font-size: 12.5pt; margin: 14px 0 4px; letter-spacing: 0.05em; }
+.sec { font-weight: 700; margin: 8px 0 2px; }
+.sec-note { font-size: 9.5pt; color: var(--ink-2); margin-bottom: 6px; }
+.q { break-inside: avoid; margin: 0 0 10px; }
+.q .stem { display: flex; gap: 6px; }
+.q .no { flex: none; font-weight: 700; min-width: 2em; }
+.q .body { flex: 1; min-width: 0; }
+.q table { border-collapse: collapse; margin: 4px 0; font-size: 10.5pt; }
+.q td, .q th { border: 1px solid var(--line); padding: 1px 8px; text-align: center; }
+.q th { background: var(--soft); font-weight: 500; }
+.opts { list-style: none; padding: 0; margin: 3px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(45%, 1fr)); gap: 1px 14px; }
+.opts.long { grid-template-columns: 1fr; }
+.opts li { display: flex; gap: 6px; }
+.opts .on { flex: none; }
+.ctx { background: var(--soft); border-left: 3px solid var(--accent); padding: 6px 10px; margin: 6px 0 8px; break-inside: avoid; }
+.ctx .lbl { font-size: 9.5pt; font-weight: 700; color: var(--accent); letter-spacing: 0.1em; }
+.blank-space { height: 70px; border-bottom: 1px dashed var(--line); }
+.answer-sheet { break-before: page; }
+.answer-sheet h2 { font-size: 14pt; margin-bottom: 8px; }
+.sheet { border-collapse: collapse; width: 100%; font-size: 10.5pt; }
+.sheet td, .sheet th { border: 1px solid var(--ink); padding: 4px 6px; text-align: center; }
+.sheet .bub { display: inline-block; width: 16px; height: 16px; border: 1px solid var(--ink); border-radius: 50%; margin: 0 2px; vertical-align: middle; font-size: 8pt; line-height: 15px; }
+.sheet .box { display: inline-block; width: 26px; height: 26px; border: 1px solid var(--ink); margin: 0 2px; vertical-align: middle; }
+.sheet .open { height: 150px; text-align: left; vertical-align: top; }
+.key { margin: 0; break-inside: avoid; }
+.key-table { border-collapse: collapse; width: 100%; font-size: 10pt; margin: 6px 0 10px; }
+.key-table th, .key-table td { border: 1px solid var(--line); padding: 2px 6px; text-align: center; }
+.key-table th { background: var(--soft); }
+.key-table td.l { text-align: left; }
+.ans { margin-top: 4px; padding: 4px 8px; background: var(--soft); border-radius: 4px; font-size: 10.5pt; break-inside: avoid; }
+.ans b { color: var(--accent); }
+.sol { font-size: 10.5pt; margin: 4px 0 0 0; }
+.sol ol { margin: 2px 0; padding-left: 1.4em; }
+.sol li { margin: 0 0 1px; }
+.tag { display: inline-block; font-size: 8.5pt; padding: 0 6px; border: 1px solid var(--line); border-radius: 3px; color: var(--ink-2); margin-right: 4px; vertical-align: middle; }
+.core { font-size: 10pt; color: var(--ink-2); margin-top: 3px; }
+.core b, .why b { color: var(--ink); }
+.why { font-size: 9.5pt; color: var(--ink-3); margin-top: 2px; }
+.link { font-size: 9pt; color: var(--ink-3); word-break: break-all; }
+.m { font-family: var(--math); font-size: 1.05em; white-space: nowrap; }
+.m i { font-style: italic; letter-spacing: 0.02em; }
+.m .op { padding: 0 0.1em; }
+.m .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: -0.55em; line-height: 1.15; margin: 0 0.15em; font-size: 0.94em; }
+.m .frac > span { padding: 0 0.2em; }
+.m .frac > span:first-child { border-bottom: 1px solid currentColor; }
+.m .sqrt { display: inline-block; padding-left: 0.1em; }
+.m .sqrt .rad { border-top: 1px solid currentColor; padding: 0.05em 0.15em 0 0.15em; }
+.m sup, .m sub { font-size: 0.72em; line-height: 0; }
+.m .vec { font-weight: 700; font-style: normal; position: relative; }
+.m .vec::after { content: "→"; position: absolute; left: 50%; top: -0.75em; transform: translateX(-50%); font-size: 0.6em; }
+.m .ol { text-decoration: overline; }
+.m .blank { display: inline-block; min-width: 1.3em; height: 1.3em; border: 1px solid var(--ink); border-radius: 50%; text-align: center; line-height: 1.25; font-size: 0.85em; margin: 0 0.1em; vertical-align: -0.2em; font-family: sans-serif; }
+.m .fn { font-style: normal; margin-right: 0.08em; }
+.m .txt { font-family: inherit; font-style: normal; font-size: 0.92em; }
+.m .mat { display: inline-table; vertical-align: middle; margin: 0 0.15em; padding: 0.05em 0.3em; border-left: 1.5px solid currentColor; border-right: 1.5px solid currentColor; border-radius: 4px; font-size: 0.95em; line-height: 1.25; }
+.m .mat .mr { display: table-row; }
+.m .mat .mr > span { display: table-cell; text-align: center; padding: 0 0.3em; }
+.m.d { display: block; text-align: center; margin: 0.4em 0; white-space: normal; }
+.pb { break-before: page; }
+.err { color: #b00020; font-weight: 700; padding: 20px; }
+</style>
+</head>
+<body>
+<div id="root"><p class="muted">載入中…</p></div>
+<script src="math.js"></script>
+<script src="archive.js"></script>
+<script src="questions.js"></script>
+<script src="print.js"></script>
+</body>
+</html>

@@ -12,6 +12,7 @@ on:
       - ".github/workflows/**"
       - "patentmap-4b9c7e2a51d8f306/data/**"
       - "phosphor-f44f6e8f9e7fdd61/data/**"
+      - "matha-c4f9fd6edf213a5b/**"
   pull_request:
     paths:
       - "scripts/**"
@@ -19,6 +20,7 @@ on:
       - "requirements.txt"
       - "patentmap-4b9c7e2a51d8f306/data/**"
       - "phosphor-f44f6e8f9e7fdd61/data/**"
+      - "matha-c4f9fd6edf213a5b/**"
   workflow_dispatch:
 
 permissions:
@@ -99,3 +101,7 @@ jobs:
           python scripts/phosphor_build.py /tmp/phosphor-site.json
           diff -u phosphor-f44f6e8f9e7fdd61/data/site.json /tmp/phosphor-site.json \
             || { echo "::error::data/site.json 與 scripts/phosphor_build.py 的產出不一致，請重跑產生器"; exit 1; }
+
+      # 學測數A預測題庫：題目資料結構、配分、答案格式，以及 20 段動畫的離線繪製煙霧測試。
+      - name: 學測數A預測題庫自我檢查
+        run: node scripts/gsat_check.mjs matha-c4f9fd6edf213a5b

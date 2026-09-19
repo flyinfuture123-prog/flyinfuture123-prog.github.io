@@ -1,0 +1,166 @@
+# 學測數A預測題庫 —— 每週換卷並封存上一回為 PDF
+#
+# 每週一台北時間清晨跑一次：
+#   1. scripts/gsat_build.mjs --rotate  把目前上線的卷子封存到 data/papers/<週次>.js，
+#      並以新的週次為種子產生下一回（20 題的數字、敘述與正誤選項都會重新抽）。
+#   2. scripts/gsat_pdf.mjs            用 Chromium 把封存的那一回印成 學用版 / 教用版 PDF。
+#   3. scripts/gsat_check.mjs          離線驗證新卷與動畫。
+#   4. commit 回預設分支（本站是從分支提供的 Pages，推上去就等於上線）。
+# 同一週內重跑不會有任何變動（--rotate 是冪等的），所以手動觸發很安全。
+
+name: 每週學測數A換卷
+
+on:
+  schedule:
+    # 22:07 UTC（週日）= 台北時間週一 06:07。避開整點以減少排程延遲。
+    - cron: "7 22 * * 0"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "只建置與驗證，不 commit / push"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-matha-build-and-commit
+  cancel-in-progress: false
+
+env:
+  SITE_DIR: matha-c4f9fd6edf213a5b
+  TARGET_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
+  PLAYWRIGHT_VERSION: "1.56.1"
+
+jobs:
+  rotate:
+    name: 換卷、封存 PDF 並回寫
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    if: >-
+      github.event_name != 'schedule' ||
+      github.repository == 'flyinfuture123-prog/flyinfuture123-prog.github.io'
+
+    steps:
+      - name: Checkout 預設分支
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.repository.default_branch || 'main' }}
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: 安裝 Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      # ── 換卷（冪等：本週已是最新就什麼都不做）──────────────────────
+      - name: 判斷是否需要換卷並產生新卷
+        id: rotate
+        run: |
+          set -euo pipefail
+          node scripts/gsat_build.mjs --status
+          node scripts/gsat_build.mjs --rotate
+
+      # ── 只有真的換卷時才需要 Chromium 與中文字型 ────────────────────
+      - name: 安裝中文字型與 Playwright Chromium
+        if: steps.rotate.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk fonts-noto-cjk-extra > /dev/null
+          fc-cache -f > /dev/null
+          npm init -y > /dev/null
+          npm i --no-save --no-audit --no-fund "playwright@${PLAYWRIGHT_VERSION}"
+          npx playwright install --with-deps chromium
+
+      - name: 封存上一回為 PDF（學用版／教用版）
+        if: steps.rotate.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          node scripts/gsat_pdf.mjs --week "${{ steps.rotate.outputs.prev_week }}"
+          ls -la "$SITE_DIR/pdf"
+
+      - name: 驗證新卷與動畫
+        run: node scripts/gsat_check.mjs "$SITE_DIR"
+
+      # ── 快照，push 打架時可重放 ──────────────────────────────────────
+      - name: 快照本次產出
+        if: steps.rotate.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/site-snapshot"; mkdir -p "$RUNNER_TEMP/site-snapshot"
+          cp -a "$SITE_DIR/." "$RUNNER_TEMP/site-snapshot/"
+
+      - name: 檢查有無變動
+        id: diff
+        run: |
+          set -euo pipefail
+          # 只 stage 站台目錄；npm init 產生的 package.json / node_modules 一律不進版控。
+          git add -A -- "$SITE_DIR"
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"; echo "沒有任何變動，略過 commit"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"; git diff --cached --stat
+          fi
+
+      - name: 提交並推送回預設分支
+        id: push
+        if: steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
+        env:
+          PREV_WEEK: ${{ steps.rotate.outputs.prev_week }}
+          PREV_ROUND: ${{ steps.rotate.outputs.prev_round }}
+          NEW_WEEK: ${{ steps.rotate.outputs.new_week }}
+          NEW_ROUND: ${{ steps.rotate.outputs.new_round }}
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          SUBJECT="學測數A預測卷：第 ${NEW_ROUND} 回（${NEW_WEEK}）上線，第 ${PREV_ROUND} 回封存為 PDF"
+          BODY="由 ${GITHUB_WORKFLOW} run ${GITHUB_RUN_ID} 自動產生；${PREV_WEEK} 的學用版與教用版 PDF 已放到 ${SITE_DIR}/pdf/。"
+          git commit -q -m "$SUBJECT" -m "$BODY"
+          SNAP="$RUNNER_TEMP/site-snapshot"
+          for attempt in 1 2 3 4 5; do
+            if git push origin "HEAD:${TARGET_BRANCH}"; then
+              echo "第 ${attempt} 次嘗試推送成功"; echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"; exit 0
+            fi
+            echo "::warning::第 ${attempt} 次推送被拒，重新同步後再試"
+            git fetch --prune origin "${TARGET_BRANCH}"
+            if ! git rebase -X theirs "origin/${TARGET_BRANCH}"; then
+              git rebase --abort >/dev/null 2>&1 || true
+              git reset --hard "origin/${TARGET_BRANCH}"
+              cp -a "$SNAP/." "$SITE_DIR/"
+              git add -A -- "$SITE_DIR"
+              if git diff --cached --quiet; then echo "遠端已包含相同內容"; exit 0; fi
+              git commit -q -m "$SUBJECT" -m "$BODY"
+            fi
+            sleep $(( attempt * 5 ))
+          done
+          echo "::error::連續 5 次推送都失敗"; exit 1
+
+      - name: 寫入執行摘要
+        if: always()
+        env:
+          ROTATED: ${{ steps.rotate.outputs.changed }}
+          PREV_WEEK: ${{ steps.rotate.outputs.prev_week }}
+          NEW_WEEK: ${{ steps.rotate.outputs.new_week }}
+          NEW_ROUND: ${{ steps.rotate.outputs.new_round }}
+          PUSH_OUTCOME: ${{ steps.push.outcome }}
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
+        run: |
+          {
+            echo "### 每週學測數A換卷"
+            echo ""
+            if [ "${ROTATED}" = "true" ]; then
+              echo "- 上線：第 ${NEW_ROUND} 回（${NEW_WEEK}）"
+              echo "- 封存：${PREV_WEEK} → \`${SITE_DIR}/pdf/${PREV_WEEK}-student.pdf\`、\`${PREV_WEEK}-teacher.pdf\`"
+            else
+              echo "- 本週卷子仍是最新，未換卷。"
+            fi
+            [ "${DRY_RUN}" = "true" ] && echo "- dry_run：未推送"
+            [ -n "${PUSH_OUTCOME}" ] && echo "- 推送：${PUSH_OUTCOME}"
+            echo ""
+            echo "網站：<https://flyinfuture123-prog.github.io/${SITE_DIR}/>"
+          } >> "$GITHUB_STEP_SUMMARY"

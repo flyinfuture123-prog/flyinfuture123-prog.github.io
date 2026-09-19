@@ -10,7 +10,7 @@
 | 全球服飾價格與時尚趨勢 | `fashion-8fc308ee73649044/` | 每天早上自動更新 |
 | AI驅動專利論文地圖 | `patentmap-4b9c7e2a51d8f306/` | 一次性整理，資料寫在 `data/book.json` |
 | 全球螢光粉進展 | `phosphor-f44f6e8f9e7fdd61/` | 一次性整理，資料寫在 `data/site.json` |
-| 學測數A預測題庫 | `matha-c4f9fd6edf213a5b/` | 純前端；題目在 `questions.js`、動畫在 `anim.js` |
+| 學測數A預測題庫 | `matha-c4f9fd6edf213a5b/` | 每週一自動換卷；上一週封存為教用版／學用版 PDF |
 
 ---
 
@@ -352,8 +352,9 @@ python -m http.server 8000 --directory phosphor-f44f6e8f9e7fdd61
 
 ## 學測數A預測題庫
 
-針對 **116 學年度學測數學 A** 編寫的一份完整預測卷（20 題／100 分），每一題都附一段
-可互動的「核心意義動畫」，用畫面解釋題目背後在考什麼觀念，而不是只列計算過程。
+針對 **116 學年度學測數學 A** 的預測卷網站：**每週一**自動產生一份新的完整預測卷
+（20 題／100 分），每一題都附一段可互動的「核心意義動畫」，用畫面解釋題目背後在考什麼
+觀念；換卷時，上一週的卷子會封存並印成**學用版**與**教用版** PDF。
 
 網址：`https://flyinfuture123-prog.github.io/matha-c4f9fd6edf213a5b/`
 
@@ -368,7 +369,13 @@ python -m http.server 8000 --directory phosphor-f44f6e8f9e7fdd61
   選填題要全部空格填對，非選擇題對照評分要點自評。
 - **動畫播放器**：每段動畫分成 3～5 個步驟，可自動播放、逐步點按、拖曳進度條
   回看、調整速度；系統開啟「減少動態效果」時不自動播放。
-- **作答紀錄**只存在瀏覽器 `localStorage`，附 100 分鐘模擬計時與「清除紀錄」。
+- **作答紀錄**只存在瀏覽器 `localStorage`（各週分開），附 100 分鐘模擬計時與「清除紀錄」。
+- **每週換卷**：`.github/workflows/weekly-matha.yml` 在台北時間每週一 06:07 執行
+  `scripts/gsat_build.mjs --rotate`，以 ISO 週次（如 `2026-W39`）為亂數種子重新組卷。
+  20 個題型固定（對應 20 個題型模板），但數字、情境與正誤選項會重新抽，答案由程式計算。
+  上一回封存到 `data/papers/<週次>.js`，網頁可切換回去作答；並用 Chromium 把
+  `print.html` 印成 `pdf/<週次>-student.pdf`（題目＋答案卡）與 `pdf/<週次>-teacher.pdf`
+  （加答案總表、詳解、核心意義、命題說明、每題動畫連結）。
 
 題目與動畫皆為自行編寫的練習教材，不是任何洩題或內部資訊，也不保證會出現在
 正式考試中。
@@ -378,11 +385,24 @@ python -m http.server 8000 --directory phosphor-f44f6e8f9e7fdd61
 ```
 matha-c4f9fd6edf213a5b/
   index.html    頁面骨架與樣式（不依賴任何外部 JS 函式庫）
-  questions.js  題目資料：單元熱度、題組、20 題的題幹／選項／答案／詳解
-  anim.js       動畫框架（座標平面、向量、3D 斜投影等繪圖工具、播放器）與 20 段動畫
-  app.js        頁面邏輯：輕量數學排版、作答與計分、計時、路由（#q5 直接開第 5 題）
+  math.js       輕量數學排版（網頁與 PDF 共用）
+  questions.js  本週卷子（由 gsat_build.mjs 產生，請勿手改）
+  archive.js    封存清單（週次、回數、封存檔與 PDF 路徑）
+  data/papers/  封存的各週卷子（<週次>.js）
+  pdf/          封存卷的 PDF（<週次>-student.pdf、<週次>-teacher.pdf）
+  anim.js       動畫框架與 20 段參數化動畫（同一段動畫能演不同數字的題目）
+  app.js        頁面邏輯：作答與計分、計時、週次切換、路由（#q5、#2026-W38/q5）
+  print.html/js 列印版（?week=&edition=student|teacher），供 PDF 轉檔
 scripts/
-  gsat_check.mjs 離線自我檢查（見下）
+  gsat/util.mjs      亂數（以週次為種子）、分數／根號／π 的排版、ISO 週次
+  gsat/slots-a.mjs   第 1～10 題的題型模板
+  gsat/slots-b.mjs   第 11～20 題的題型模板（含 18～20 題組）
+  gsat/paper.mjs     組卷、題號與空格編號、序列化；第 1 回的固定參數
+  gsat_build.mjs     --init / --status / --preview <週次> / --rotate [--dry-run]
+  gsat_pdf.mjs       Playwright + Chromium 把 print.html 印成 PDF
+  gsat_check.mjs     離線自我檢查（見下）
+.github/workflows/
+  weekly-matha.yml   每週一換卷、產 PDF、回推
 ```
 
 ### 數學排版
@@ -394,13 +414,18 @@ HTML＋CSS。好處是完全離線、載入快、不受 CDN 影響；限制是�
 
 ### 要調整什麼
 
-- **改題目／加題目**：編輯 `questions.js`。每題要有 `anim` 指向 `anim.js` 裡
-  `define()` 註冊的動畫 id；選填題的每個空格用 `\b{編號}` 標在題幹裡，編號全卷不重複。
-- **改動畫**：`anim.js` 裡每段動畫是 `{ w, h, steps, draw(c) }`；`draw` 每一影格
-  重畫整個畫面，用 `c.P(i)` 取得第 i 步的進度（0～1，已套用緩動），前面的步驟為 1、
-  後面的為 0，所以畫面永遠是「到目前為止所有步驟的疊加」。
-- **自我檢查**：`node scripts/gsat_check.mjs` 會驗證題號連續、配分合計 100、
-  答案格式、空格編號、每題都有動畫，並用假 DOM 把 20 段動畫在多個時間點各畫一次，
-  抓出執行期錯誤。`check.yml` 在 push / PR 時會跑。
+- **改題目／加變化**：編輯 `scripts/gsat/slots-*.mjs` 的題型模板（參數池、敘述、詳解），
+  再跑 `node scripts/gsat_build.mjs --preview 2026-W41` 看某一週會長什麼樣。
+  第 1 回的固定參數在 `paper.mjs` 的 `WEEK1`。`questions.js` 是產出物，不要手改。
+- **改動畫**：`anim.js` 裡每段動畫是 `{ w, h, defaults, steps(p), draw(c) }`；`c.p` 是該題
+  的 `params`，`draw` 每一影格重畫整個畫面，用 `c.P(i)` 取得第 i 步的進度（0～1，已套用
+  緩動），前面的步驟為 1、後面的為 0，所以畫面永遠是「到目前為止所有步驟的疊加」。
+- **自我檢查**：`node scripts/gsat_check.mjs` 會驗證上線卷與所有封存卷的結構（題號、配分、
+  答案格式、空格編號、封存檔與 PDF 是否存在），另外模擬未來 10 週的卷子，並用假 DOM 把每一題
+  的動畫（帶該題參數）在多個時間點各畫一次，抓出執行期錯誤。`check.yml` 在 push / PR 時會跑。
+- **手動換卷**：到 Actions 手動執行「每週學測數A換卷」；同一週內重跑不會有變動。
+  本機測試：`node scripts/gsat_build.mjs --rotate --date 2026-09-21 --dry-run`。
+- **本機產 PDF**：`node scripts/gsat_pdf.mjs --week 2026-W38 --out /tmp/pdf`
+  （需要 playwright 與 Chromium，中文字型建議安裝 Noto Sans CJK）。
 - **本機預覽**：直接開 `index.html` 即可（沒有 fetch，不會被 CORS 擋）。
 

@@ -1,96 +1,69 @@
 /* 學測數A預測題庫 —— 頁面邏輯 */
 (function () {
   "use strict";
-  const D = window.GSAT, A = window.ANIM;
+  const A = window.ANIM;
+  const CURRENT = window.GSAT; const ARCHIVE = window.GSAT_ARCHIVE || [];
+  let D = CURRENT;
   const $ = (s, r) => (r || document).querySelector(s);
-  const STORE = "gsat-matha-116-v1";
+  const storeKey = () => `gsat-matha-116-${D.meta.week}`;
   const KIND = { single: "單選題", multi: "多選題", fill: "選填題", open: "非選擇題" };
   const KIND_CLS = { single: "k1", multi: "k2", fill: "k3", open: "k4" };
 
-  /* ---------- 數學排版 ---------- */
-  const FUNCS = ["sin", "cos", "tan", "log", "ln", "det", "lim", "max", "min"];
-  const SYM = { le: "≤", leq: "≤", ge: "≥", geq: "≥", ne: "≠", neq: "≠", approx: "≈", cdot: "·", times: "×", div: "÷", pi: "π", theta: "θ", alpha: "α", beta: "β", mu: "μ", sigma: "σ", lambda: "λ", omega: "ω", Gamma: "Γ", Delta: "Δ", to: "→", Rightarrow: "⇒", Leftrightarrow: "⇔", iff: "⇔", sum: "∑", in: "∈", notin: "∉", pm: "±", mp: "∓", infty: "∞", deg: "°", circ: "°", triangle: "△", angle: "∠", perp: "⊥", parallel: "∥", langle: "⟨", rangle: "⟩", cdots: "⋯", ldots: "…", dots: "…", mid: "|", subset: "⊂", cup: "∪", cap: "∩", emptyset: "∅", quad: " ", qquad: "  ", therefore: "∴", because: "∵", prime: "′", ast: "∗" };
-  const OPS = new Set(["=", "+", "−", "<", ">", "≤", "≥", "≠", "≈", "→", "⇒", "⇔", "±", "×", "·", "∓"]);
-  const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  function circled(n) {
-    n = Number(n);
-    if (n >= 1 && n <= 20) return String.fromCharCode(0x2460 + n - 1);
-    if (n >= 21 && n <= 35) return String.fromCharCode(0x3251 + n - 21);
-    if (n >= 36 && n <= 50) return String.fromCharCode(0x32b1 + n - 36);
-    return "(" + n + ")";
-  }
-  function tex(src) {
-    let i = 0; const n = src.length; let out = "";
-    const isAlpha = (ch) => /[a-zA-Z]/.test(ch);
-    function readGroup() { let depth = 0; const start = i + 1; for (; i < n; i++) { if (src[i] === "{") depth++; else if (src[i] === "}") { depth--; if (depth === 0) { const inner = src.slice(start, i); i++; return inner; } } } return src.slice(start); }
-    function readArg() {
-      if (i >= n) return "";
-      if (src[i] === "{") return readGroup();
-      if (src[i] === "\\") { let j = i + 1; while (j < n && isAlpha(src[j])) j++; if (j === i + 1) j++; const cmd = src.slice(i, j); i = j; return cmd; }
-      return src[i++];
-    }
-    const op = (s) => `<span class="op">${s}</span>`;
-    while (i < n) {
-      const ch = src[i];
-      if (ch === "\\") {
-        const j0 = i + 1;
-        if (j0 < n && !isAlpha(src[j0])) {
-          const sym = src[j0]; i = j0 + 1;
-          if (sym === "," || sym === ";" || sym === " ") out += "&thinsp;"; else if (sym === "!") out += ""; else if (sym === "\\") out += "<br>"; else out += esc(sym);
-          continue;
-        }
-        let j = j0; while (j < n && isAlpha(src[j])) j++;
-        const cmd = src.slice(j0, j); i = j;
-        if (cmd === "frac" || cmd === "tfrac" || cmd === "dfrac") { const a = readArg(), b = readArg(); out += `<span class="frac"><span>${tex(a)}</span><span>${tex(b)}</span></span>`; }
-        else if (cmd === "sqrt") { const a = readArg(); out += `<span class="sqrt">√<span class="rad">${tex(a)}</span></span>`; }
-        else if (cmd === "vec") { const a = readArg(); out += `<span class="vec">${tex(a)}</span>`; }
-        else if (cmd === "ol" || cmd === "overline" || cmd === "bar") { const a = readArg(); out += `<span class="ol">${tex(a)}</span>`; }
-        else if (cmd === "b") { const a = readArg(); out += `<span class="blank">${circled(a)}</span>`; }
-        else if (cmd === "text" || cmd === "mathrm") { const a = readArg(); out += `<span class="txt">${esc(a)}</span>`; }
-        else if (cmd === "mathbb") { const a = readArg(); out += a === "R" ? "ℝ" : a === "N" ? "ℕ" : a === "Z" ? "ℤ" : esc(a); }
-        else if (cmd === "mat") { const a = readArg(); const rows = a.split("\\\\").map(r => r.split("&")); out += `<span class="mat">${rows.map(r => `<span class="mr">${r.map(x => `<span>${tex(x.trim())}</span>`).join("")}</span>`).join("")}</span>`; }
-        else if (cmd === "left" || cmd === "right") { if (i < n) { if (src[i] === "\\") { i++; out += esc(src[i] || ""); i++; } else if (src[i] === ".") i++; else { out += esc(src[i]); i++; } } }
-        else if (cmd === "begin" || cmd === "end") { readArg(); }
-        else if (SYM[cmd] !== undefined) { out += OPS.has(SYM[cmd]) ? op(SYM[cmd]) : SYM[cmd]; }
-        else if (FUNCS.includes(cmd)) { out += `<span class="fn">${cmd}</span>`; }
-        else out += esc("\\" + cmd);
-        continue;
-      }
-      if (ch === "^") { i++; const a = readArg(); out += (a === "\\circ") ? "°" : `<sup>${tex(a)}</sup>`; continue; }
-      if (ch === "_") { i++; const a = readArg(); out += `<sub>${tex(a)}</sub>`; continue; }
-      if (ch === "{") { out += tex(readGroup()); continue; }
-      if (isAlpha(ch)) {
-        let j = i; while (j < n && isAlpha(src[j])) j++; const run = src.slice(i, j); i = j;
-        if (FUNCS.includes(run)) out += `<span class="fn">${run}</span>`; else out += run.split("").map(l => `<i>${l}</i>`).join("");
-        continue;
-      }
-      if (ch === "-") { out += op("−"); i++; continue; }
-      if (ch === "+" || ch === "=") { out += op(ch); i++; continue; }
-      if (ch === "<") { out += op("&lt;"); i++; continue; }
-      if (ch === ">") { out += op("&gt;"); i++; continue; }
-      if (ch === "&") { out += "&amp;"; i++; continue; }
-      if (ch === "*") { out += op("·"); i++; continue; }
-      out += ch; i++;
-    }
-    return out;
-  }
-  function M(html) {
-    if (!html) return "";
-    return String(html)
-      .replace(/\$\$([\s\S]+?)\$\$/g, (m, s) => `<span class="m d">${tex(s.trim())}</span>`)
-      .replace(/\$([^$]+?)\$/g, (m, s) => `<span class="m">${tex(s.trim())}</span>`);
-  }
+  /* ---------- 數學排版（math.js）---------- */
+  const { M, circled, esc } = window.GSATMath;
 
   /* ---------- 狀態 ---------- */
   let state = load();
   function load() {
-    try { const s = JSON.parse(localStorage.getItem(STORE) || "null"); if (s && s.answers) return s; } catch (e) { /* ignore */ }
+    try {
+      let s = JSON.parse(localStorage.getItem(storeKey()) || "null");
+      if (!s && D === CURRENT && D.meta.round === 1) s = JSON.parse(localStorage.getItem("gsat-matha-116-v1") || "null"); // 第 1 回上線初期的舊鍵
+      if (s && s.answers) return s;
+    } catch (e) { /* ignore */ }
     return { answers: {}, results: {}, timer: null };
   }
-  function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) { /* ignore */ } }
+  function save() { try { localStorage.setItem(storeKey(), JSON.stringify(state)); } catch (e) { /* ignore */ } }
   const view = { mode: "list", cur: null, filter: "all" };
   let player = null;
-  const byNo = {}; D.questions.forEach(q => { byNo[q.no] = q; });
+  let byNo = {}; const indexQs = () => { byNo = {}; D.questions.forEach(q => { byNo[q.no] = q; }); }; indexQs();
+
+  /* ---------- 週次切換與封存 ---------- */
+  const isCurrent = () => D === CURRENT;
+  function loadPaper(week) {
+    return new Promise((resolve, reject) => {
+      if (week === CURRENT.meta.week) return resolve(CURRENT);
+      if (window.GSAT_PAPERS && window.GSAT_PAPERS[week]) return resolve(window.GSAT_PAPERS[week]);
+      const entry = ARCHIVE.find(e => e.week === week); if (!entry) return reject(new Error("沒有這一週的卷子"));
+      const sc = document.createElement("script"); sc.src = entry.file;
+      sc.onload = () => (window.GSAT_PAPERS && window.GSAT_PAPERS[week]) ? resolve(window.GSAT_PAPERS[week]) : reject(new Error("封存檔格式不對"));
+      sc.onerror = () => reject(new Error("讀不到封存檔")); document.head.appendChild(sc);
+    });
+  }
+  function switchWeek(week, qno) {
+    if (week === D.meta.week) { if (qno) openQ(qno); return Promise.resolve(); }
+    return loadPaper(week).then(paper => {
+      if (player) { player.destroy(); player = null; }
+      D = paper; indexQs(); state = load(); view.mode = "list"; view.cur = null; view.filter = "all";
+      renderHeat(); renderWeekbar(); renderPaperBar(); renderArchive();
+      if (qno && byNo[qno]) openQ(qno); else { renderPaperBody(); setHash("paper"); }
+    }).catch(err => alert(err.message));
+  }
+  function renderWeekbar() {
+    const m = D.meta; const opts = [CURRENT, ...ARCHIVE.map(e => ({ meta: e }))];
+    $("#paper-title").textContent = m.title;
+    $("#paper-lede").textContent = `週次 ${m.week}（${m.from} ～ ${m.to}）・共 20 題／100 分，考試時間 100 分鐘。單選 6 題、多選 6 題、選填 5 題（各 5 分），混合題 3 小題（15 分）。`;
+    $("#weekbar").innerHTML = `<label>切換卷子 <select id="week-select">${opts.map(o => `<option value="${o.meta.week}" ${o.meta.week === m.week ? "selected" : ""}>第 ${o.meta.round} 回（${o.meta.week}，${o.meta.from.slice(5).replace("-", "/")}～${o.meta.to.slice(5).replace("-", "/")}）${o === CURRENT ? " · 本週" : ""}</option>`).join("")}</select></label>` +
+      (isCurrent() ? '<span class="pill">本週卷 · 下週一自動換卷</span>' : `<span class="pill old">封存卷</span>${archivePdfLinks(ARCHIVE.find(e => e.week === m.week))}`);
+    $("#week-select").onchange = (e) => switchWeek(e.target.value);
+  }
+  function archivePdfLinks(e) { if (!e || !e.pdf) return ""; return `<a class="btn sm pdf-s" href="${e.pdf.student}" target="_blank" rel="noopener">學用版 PDF</a><a class="btn sm pdf-t" href="${e.pdf.teacher}" target="_blank" rel="noopener">教用版 PDF</a>`; }
+  function renderArchive() {
+    const host = $("#archive-list"); if (!host) return;
+    const cur = `<div class="card arch cur"><div class="row"><span class="round">第 ${CURRENT.meta.round} 回</span><span class="dates">${CURRENT.meta.week} · ${CURRENT.meta.from} ～ ${CURRENT.meta.to}</span><span class="pill" style="margin-left:auto">本週</span></div><div class="small muted">本週卷子線上作答中；下週一換卷時會自動封存並產生 PDF。</div><div class="links"><button class="btn sm" data-week="${CURRENT.meta.week}">線上作答</button></div></div>`;
+    const rows = ARCHIVE.map(e => `<div class="card arch"><div class="row"><span class="round">第 ${e.round} 回</span><span class="dates">${e.week} · ${e.from} ～ ${e.to}</span></div><div class="links"><button class="btn sm" data-week="${e.week}">線上作答／看動畫</button>${archivePdfLinks(e)}</div></div>`).join("");
+    host.innerHTML = `<div class="arch-list">${cur}${rows}</div>` + (ARCHIVE.length ? "" : '<div class="arch-empty" style="margin-top:12px">目前還沒有封存的卷子。第一次換卷會在下週一清晨進行，屆時第 1 回會出現在這裡並附上兩種 PDF。</div>');
+    host.querySelectorAll("[data-week]").forEach(b => { b.onclick = () => { switchWeek(b.dataset.week).then(() => { const top = $("#paper").getBoundingClientRect().top + window.scrollY - 64; window.scrollTo({ top, behavior: "smooth" }); }); }; });
+  }
 
   /* ---------- 計分 ---------- */
   function grade(q, ans) {
@@ -137,7 +110,7 @@
   /* ---------- 首頁統計、考點熱度 ---------- */
   function renderHero() {
     const units = new Set(D.questions.map(q => q.unit)).size;
-    $("#hero-stats").innerHTML = [[D.questions.length, "題／完整一回"], [Object.keys(A.registry).length, "段核心意義動畫"], [units, "個涵蓋單元"], [D.meta.minutes, "分鐘模擬計時"]]
+    $("#hero-stats").innerHTML = [[D.questions.length, "題／每週一回"], [Object.keys(A.registry).length, "段核心意義動畫"], [units, "個涵蓋單元"], ["第 " + CURRENT.meta.round + " 回", "本週上線（" + CURRENT.meta.week + "）"]]
       .map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
   }
   function renderHeat() {
@@ -294,15 +267,22 @@
     if (player) player.destroy();
     const spec = A.get(q.anim);
     const host = $("#player-host");
-    if (spec) player = new A.Player(host, spec, { autoplay: true });
+    if (spec) player = new A.Player(host, spec, { autoplay: true, q });
     else host.innerHTML = '<div class="muted small">這一題尚未提供動畫。</div>';
   }
 
   /* ---------- 路由 ---------- */
-  function setHash(h) { if (location.hash !== "#" + h) history.replaceState(null, "", "#" + h); }
+  function setHash(h) {
+    const wk = isCurrent() ? "" : D.meta.week;
+    const full = h === "paper" ? (wk || "paper") : (wk ? wk + "/" + h : h);
+    if (location.hash !== "#" + full) history.replaceState(null, "", "#" + full);
+  }
   function route() {
-    const m = /^#q(\d+)$/.exec(location.hash);
-    if (m && byNo[Number(m[1])]) { openQ(Number(m[1])); return true; }
+    const m = /^#(?:(\d{4}-W\d{2}))?\/?(?:q(\d+))?$/.exec(location.hash);
+    if (!m || (!m[1] && !m[2])) return false;
+    const week = m[1] || CURRENT.meta.week, qno = m[2] ? Number(m[2]) : null;
+    if (week !== D.meta.week) { switchWeek(week, qno); return true; }
+    if (qno && byNo[qno]) { openQ(qno); return true; }
     return false;
   }
   window.addEventListener("hashchange", () => { route(); });
@@ -317,10 +297,10 @@
     const next = cur ? (cur === "dark" ? "light" : "dark") : (sysDark ? "light" : "dark");
     applyTheme(next); try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* ignore */ }
   };
-  $("#btn-reset").onclick = () => { if (!confirm("確定要清除所有作答紀錄與計時嗎？此動作無法復原。")) return; state = { answers: {}, results: {}, timer: null }; save(); renderPaperBar(); renderPaperBody(); };
+  $("#btn-reset").onclick = () => { if (!confirm(`確定要清除「${D.meta.title}」的作答紀錄與計時嗎？此動作無法復原。`)) return; state = { answers: {}, results: {}, timer: null }; save(); try { localStorage.removeItem("gsat-matha-116-v1"); } catch (e) { /* ignore */ } renderPaperBar(); renderPaperBody(); };
   $("#cta-start").addEventListener("click", (e) => { e.preventDefault(); const first = D.questions.find(q => !resultOf(q)) || D.questions[0]; openQ(first.no); });
 
   /* ---------- 啟動 ---------- */
-  renderHero(); renderHeat(); renderPaperBar();
+  renderHero(); renderHeat(); renderWeekbar(); renderArchive(); renderPaperBar();
   if (!route()) renderPaperBody();
 })();
